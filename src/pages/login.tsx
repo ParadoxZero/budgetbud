@@ -35,8 +35,6 @@ function LoginForm() {
 
 export function LoginPage() {
     return (
-        <Flex align="center" justify="space-around" vertical >
-            <LoginForm />
-        </Flex>
+        <LoginForm />
     )
 }

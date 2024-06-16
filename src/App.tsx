@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 
 import { View } from './store'
 import { OverviewPage } from './pages/overview';
+import { Flex } from 'antd';
 
 function render_view() {
   const view = useSelector((state: any) => state.navigation.current_view);
@@ -18,9 +19,9 @@ function render_view() {
 function App() {
 
   return (
-    <>
+    <Flex align="center" justify="space-around" vertical style={{ height: "100vh", flexGrow: 1 }} >
       {render_view()}
-    </>
+    </ Flex>
   )
 }
 
