@@ -23,7 +23,7 @@ function LoginForm() {
                     <Input placeholder="Password" type="password" />
                     <Button type="primary">Login</Button>
                     <Button type="link">Forgot Password?</Button>
-                    <p> No account yet? Register now <Button type="link">Register</Button></p>
+                    <p> No account yet? <Button type="link" style={{ padding: 0 }}>Register now</Button></p>
                     <Socials />
                 </Flex>
             </Card>
