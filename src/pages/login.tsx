@@ -3,6 +3,9 @@ import { Button, Card, Flex, Input } from "antd";
 import { GetScreenSize, ScreenSize } from "../utils";
 import { GoogleOutlined, GithubOutlined, InstagramOutlined, LinkOutlined } from "@ant-design/icons";
 
+import { View, navigation } from '../store';
+import { useDispatch } from "react-redux";
+
 function Socials() {
     return (
         <Flex gap={5} align="center" justify="space-evenly" dir="row">
@@ -15,12 +18,13 @@ function Socials() {
 }
 
 function LoginForm() {
+    const dispatch = useDispatch();
     return (
         <Card bordered={GetScreenSize() == ScreenSize.desktop}>
             <Flex gap={10} align="center" vertical>
                 <Input placeholder="Username" />
                 <Input placeholder="Password" type="password" />
-                <Button type="primary">Login</Button>
+                <Button type="primary" onClick={() => dispatch(navigation(View.Overview))}>Login</Button>
                 <Button type="link">Forgot Password?</Button>
                 <p> No account yet? <Button type="link" style={{ padding: 0 }}>Register now</Button></p>
                 <Socials />
