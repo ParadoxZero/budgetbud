@@ -19,7 +19,7 @@ function render_view() {
 function App() {
 
   return (
-    <Flex align="center" justify="space-around" vertical style={{ height: "100vh", flexGrow: 1 }} >
+    <Flex align="center" justify="center" vertical style={{ height: "100vh", flexGrow: 1, width: "100vw" }} >
       {render_view()}
     </ Flex>
   )
