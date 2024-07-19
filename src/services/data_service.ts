@@ -15,7 +15,7 @@ export interface DataService {
     getHistory(): Promise<UserDataHistory>;
 }
 
-export function getService(isProduction: boolean): DataService {
+export function getDataService(isProduction: boolean): DataService {
     if (isProduction) {
         // Return the URL service implementation
         return new RemoteDataService();
