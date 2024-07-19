@@ -1,27 +1,12 @@
-
+//The data_id would be sharable with another user if for e.g. a family wants to track their expenses together.
+// will result in a complex merge resolution. But should be doable.
 export interface User {
-    id: number;
-    name: string;
     email: string;
     isVerified: boolean;
     isActive: boolean;
+    data_id: string;
 }
 
-export interface Category {
-    id: number;
-    name: string;
-    description: string;
-    allocation: number;
-    isActive: boolean;
-    lastUpdated: Date;
-    currency: string;
-}
-
-export interface CategoryLog {
-    id: number;
-    timestamp: Date;
-    allocation: number;
-}
 
 export interface Expense {
     id: number;
@@ -31,13 +16,11 @@ export interface Expense {
     timestamp: Date;
 }
 
-export interface Special {
+export interface Unplanned {
     id: number;
     name: string;
-    description: string;
+    description?: string;
     isActive: boolean;
-    month: number;
-    year: number;
 }
 
 export enum RecurringType {
@@ -55,8 +38,72 @@ export interface Recurring {
     isActive: boolean;
     lastUpdated: Date;
     frequency: RecurringType;
+    frequencey_unit: number; // This has different meanings based on the frequency, if monthly, it will be day of month, if weekly, it will be day of week etc.
     startDate: Date;
     endDate: Date;
     amount: number;
-    category?: number; 
+}
+
+export interface Category {
+    id: number;
+    name: string;
+    description: string;
+    allocation: number;
+    isActive: boolean;
+    lastUpdated: Date;
+    currency: string;
+    expenseList: Expense[];
+}
+
+export interface CategoryLog {
+    id: number;
+    timestamp: Date;
+    allocation: number;
+}
+
+export interface TimeUnit {
+    month: number;
+    year: number;
+}
+
+export enum UserActionType {
+    addCategory = 0,
+    deleteCategory = 1,
+    updateCategory = 2,
+    addExpense = 3,
+    deleteExpense = 4,
+    updateExpense = 5,
+    addRecurring = 6,
+    deleteRecurring = 7,
+    updateRecurring = 8,
+    addUnplanned = 9,
+    deleteUnplanned = 10,
+    updateUnplanned = 11
+}
+
+export interface UserAction {
+    timestamp: Date;
+    type: UserActionType;
+    payload: Category | Expense | Recurring | Unplanned;
+}
+
+// TODO: Design Question -
+// It will be impossible to delete a non-empty category. User will have to wait till next month when 
+// the category is reset. Otherwise explicitly delete the expenses in the category. Or should we allow
+// deletion of non-empty categories with a warning?
+export interface UserData {
+    id: string;
+    history_id: string;
+    categoryList: Category[];
+    recurringList: Recurring[];
+    unplannedList: Unplanned[];
+    history_unit: TimeUnit;
+    userActions: UserAction[];
+    last_updated: Date;
+    authorized_users: string[];
+}
+
+export interface UserDataHistory {
+    id: string;
+    history: UserData[];
 }

@@ -1,5 +1,5 @@
-import { Card, Divider, Flex, Progress, Space, Statistic } from "antd"
-import { CheckCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { Button, Card, Divider, Flex, Progress, Space, Statistic } from "antd"
+import { CheckCircleOutlined, PlusCircleOutlined, RightCircleOutlined, RightOutlined } from '@ant-design/icons';
 import { GetScreenSize, ScreenSize } from "../utils";
 
 
@@ -44,16 +44,17 @@ function header() {
 
 function render_single_category(title: string, value: number, total: number) {
     var progress = null;
-    if (GetScreenSize() == ScreenSize.desktop) {
-        progress = <Progress type="line" percent={(value / total) * 100} strokeColor={'#1677ff'} style={{ marginBottom: 14 }} />
-    }
+    progress = <Progress type="line" percent={(value / total) * 100} strokeColor={'#1677ff'} style={{ marginBottom: 14 }} />
     return (
         <div style={{ margin: 0, marginTop: 0, marginBottom: 0, padding: 0, minWidth: 300 }}>
             <Flex align="center" justify="space-between">
                 <p style={{ margin: 10 }}>{title}</p>
-                <Flex align="center" justify="center" vertical>
-                    <p>${value}/${total}</p>
-                    {progress}
+                <Flex align="center" justify="right">
+                    <Flex align="center" justify="center" vertical>
+                        <p>${value}/${total}</p>
+                        {progress}
+                    </Flex>
+                    <Button shape="circle" type="default" icon={<RightOutlined />} style={{ padding: 20, marginLeft: 20 }}></Button>
                 </Flex>
             </Flex>
         </div >
@@ -80,7 +81,7 @@ function render_categories() {
 
 export function OverviewPage() {
     return (
-        <Flex vertical={GetScreenSize() != ScreenSize.desktop}>
+        <Flex vertical={GetScreenSize() != ScreenSize.desktop} justify={GetScreenSize() == ScreenSize.desktop ? "center" : "space-between"}>
             {header()}
             {render_categories()}
         </Flex >

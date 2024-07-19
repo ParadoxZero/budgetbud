@@ -3,14 +3,13 @@ import { configureStore } from '@reduxjs/toolkit'
 import { createSlice } from '@reduxjs/toolkit'
 
 export enum View {
-    Login,
     Overview
 }
 
 export const counterSlice = createSlice({
     name: 'navigation',
     initialState: {
-        current_view: View.Login,
+        current_view: View.Overview,
         history: []
     },
     reducers: {
