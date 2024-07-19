@@ -84,7 +84,7 @@ export enum UserActionType {
 export interface UserAction {
     timestamp: Date;
     type: UserActionType;
-    payload: Category | Expense | Recurring | Unplanned;
+    payload: Category | Expense | Recurring | Unplanned | null;
 }
 
 // TODO: Design Question -
@@ -106,4 +106,119 @@ export interface UserData {
 export interface UserDataHistory {
     id: string;
     history: UserData[];
+}
+
+export class DataModelFactory {
+    static createUser(): User {
+        // Development code check
+        if (import.meta.env.NODE_ENV !== 'development') {
+            throw new Error('Create User function is only available in development mode');
+        }
+
+        return {
+            email: '',
+            isVerified: false,
+            isActive: false,
+            data_id: ''
+        };
+    }
+
+    static createExpense(lastUsedId: number, categoryId: number): Expense {
+        const id = lastUsedId + 1;
+        return {
+            id,
+            title: '',
+            amount: 0,
+            categoryId,
+            timestamp: new Date()
+        };
+    }
+
+    static createUnplanned(lastUsedId: number): Unplanned {
+        const id = lastUsedId + 1;
+        return {
+            id,
+            name: '',
+            description: '',
+            isActive: false
+        };
+    }
+
+    static createRecurring(lastUsedId: number): Recurring {
+        const id = lastUsedId + 1;
+        return {
+            id,
+            name: '',
+            description: '',
+            isActive: false,
+            lastUpdated: new Date(),
+            frequency: RecurringType.weekly,
+            frequencey_unit: 0,
+            startDate: new Date(),
+            endDate: new Date(),
+            amount: 0
+        };
+    }
+
+    static createCategory(lastUsedId: number): Category {
+        const id = lastUsedId + 1;
+        return {
+            id,
+            name: '',
+            description: '',
+            allocation: 0,
+            isActive: false,
+            lastUpdated: new Date(),
+            currency: '',
+            expenseList: []
+        };
+    }
+
+    static createCategoryLog(lastUsedId: number): CategoryLog {
+        const id = lastUsedId + 1;
+        return {
+            id,
+            timestamp: new Date(),
+            allocation: 0
+        };
+    }
+
+    static createTimeUnit(): TimeUnit {
+        return {
+            month: 0,
+            year: 0
+        };
+    }
+
+    static createUserAction(): UserAction {
+        return {
+            timestamp: new Date(),
+            type: UserActionType.addCategory,
+            payload: {} as Category | Expense | Recurring | Unplanned
+        };
+    }
+
+    static createUserData(): UserData {
+        return {
+            id: crypto.randomUUID().toString(), // Unique id for user data
+            history_id: '',
+            categoryList: [],
+            recurringList: [],
+            unplannedList: [],
+            history_unit: {
+                month: new Date(Date.now()).getMonth(),
+                year: new Date(Date.now()).getFullYear()
+            },
+            userActions: [],
+            last_updated: new Date(),
+            authorized_users: []
+        };
+    }
+
+    static createUserDataHistory(): UserDataHistory {
+        return {
+            id: crypto.randomUUID().toString(), // Unique id for user data history
+            history: []
+        };
+    }
 }
