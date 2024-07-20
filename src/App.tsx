@@ -1,9 +1,8 @@
-import { LoginPage } from './pages/login'
 import { useSelector } from 'react-redux'
 
 import { View } from './store'
 import { OverviewPage } from './pages/overview';
-import { Flex } from 'antd';
+import { CreateDummyData } from './utils';
 
 function render_view() {
   const view = useSelector((state: any) => state.navigation.current_view);
@@ -14,7 +13,17 @@ function render_view() {
   }
 }
 
+function CreateDummyDataIfRequired() {
+  // only for development mode
+  if (!import.meta.env.DEV) {
+    return;
+  }
+  localStorage.clear();
+  localStorage.setItem('userData', JSON.stringify(CreateDummyData()));
+}
+
 function App() {
+  CreateDummyDataIfRequired();
 
   return (
     <>

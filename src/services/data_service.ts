@@ -15,13 +15,13 @@ export interface DataService {
     getHistory(): Promise<UserDataHistory>;
 }
 
-export function getDataService(isProduction: boolean): DataService {
-    if (isProduction) {
-        // Return the URL service implementation
-        return new RemoteDataService();
-    } else {
+export function getDataService(): DataService {
+    if (import.meta.env.MODE === 'development') {
         // Return the local data service implementation
         return new LocalDataService();
+    } else {
+        // Return the URL service implementation
+        return new RemoteDataService();
     }
 }
 class RemoteDataService implements DataService {

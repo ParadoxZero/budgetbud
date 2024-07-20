@@ -123,12 +123,12 @@ export class DataModelFactory {
         };
     }
 
-    static createExpense(lastUsedId: number, categoryId: number): Expense {
+    static createExpense(lastUsedId: number, categoryId: number, amount: number): Expense {
         const id = lastUsedId + 1;
         return {
             id,
             title: '',
-            amount: 0,
+            amount: amount,
             categoryId,
             timestamp: new Date()
         };
