@@ -1,9 +1,12 @@
 import React, { useState } from "react";
-import { Button, Card, Divider, Empty, Flex, Progress, Skeleton, Space, Spin, Statistic } from "antd";
-import { CheckCircleOutlined, LoadingOutlined, PlusCircleOutlined, RightCircleOutlined, RightOutlined } from '@ant-design/icons';
+import { Button, Card, Divider, Empty, Flex, Progress, ProgressProps, Skeleton, Space, Spin, Statistic } from "antd";
+import { CheckCircleOutlined, LoadingOutlined, PlusCircleOutlined, RightCircleOutlined, RightOutlined, SmileOutlined } from '@ant-design/icons';
 import { GetScreenSize, ScreenSize } from "../utils";
 import { DataService, getDataService } from "../services/data_service";
 import { UserData } from "../datamodel/datamodel";
+import { Typography } from "antd";
+
+const { Title, Text } = Typography;
 
 interface IProp { }
 interface IState {
@@ -21,10 +24,11 @@ export class OverviewPage extends React.Component<IProp, IState> {
             <Card bordered={false} style={{ margin: 10 }} >
                 <Statistic
                     title="Budget used"
-                    value={Object.values(this.state.filled_allocations).reduce((acc, curr) => acc += curr, 0) / 100}
-                    precision={2}
+                    groupSeparator=""
+                    value={Object.values(this.state.filled_allocations).reduce((acc, curr) => acc += curr, 0)}
+                    precision={0}
                     prefix={<CheckCircleOutlined />}
-                    suffix={"/ " + (this.state.total_allocations / 100).toString()}
+                    suffix={"/ " + (this.state.total_allocations).toString()}
                     valueStyle={{ color: '#3f8600' }}
                 />
             </Card>
@@ -32,11 +36,11 @@ export class OverviewPage extends React.Component<IProp, IState> {
     }
 
     render_upcoming() {
-        let content = <Empty description="No upcoming expense" />;
+        let content = <Empty description="No upcoming expense" imageStyle={{ height: "auto", color: '#3f8600', fontSize: 48 }} image={<CheckCircleOutlined />} />;
         if (this.state.upcoming_expense != null) {
             content = <Statistic
                 title="Upcoming expenses"
-                value={this.state.upcoming_expense.amount / 100}
+                value={this.state.upcoming_expense.amount}
                 precision={2}
                 prefix={<PlusCircleOutlined />}
                 suffix={this.state.upcoming_expense.name}
@@ -59,15 +63,33 @@ export class OverviewPage extends React.Component<IProp, IState> {
     }
 
     render_single_category(title: string, value: number, total: number) {
-        var progress = null;
-        progress = <Progress type="line" percent={(value / total) * 100} strokeColor={'#1677ff'} style={{ marginBottom: 14 }} />
+        let progress_color = '#3f8600';
+        const percent = Math.floor((value / total) * 100);
+        if (percent > 85) {
+            progress_color = '#ff4d4f';
+        }
+        else if (percent > 60) {
+            progress_color = '#ffa940';
+        }
+
+        var progress = <Progress
+            type="line"
+            percent={percent}
+            strokeColor={progress_color}
+            style={{
+                marginBottom: 14,
+                minWidth: 100
+            }}
+            status={"active"}
+        />
+
         return (
-            <div style={{ margin: 0, marginTop: 0, marginBottom: 0, padding: 0, minWidth: 300 }}>
+            <div style={{ margin: 0, marginTop: 10, marginBottom: 10, padding: 0, minWidth: 300 }}>
                 <Flex align="center" justify="space-between">
-                    <p style={{ margin: 10 }}>{title}</p>
+                    <Text code strong type="secondary" style={{ fontSize: 18 }}>{title}</Text>
                     <Flex align="center" justify="right">
-                        <Flex align="center" justify="center" vertical>
-                            <p>${value}/${total}</p>
+                        <Flex align="flex-end" justify="center" vertical>
+                            <Text >{value} / {total}</Text>
                             {progress}
                         </Flex>
                         <Button shape="circle" type="default" icon={<RightOutlined />} style={{ padding: 20, marginLeft: 20 }}></Button>
@@ -81,15 +103,13 @@ export class OverviewPage extends React.Component<IProp, IState> {
         return (
             <Card bordered={false} style={{ margin: 0, marginTop: 10, marginBottom: 10, padding: 0 }}>
                 <Flex align="stretch" justify="space-around" vertical>
-                    {this.render_single_category("Groceries", 2000, 4000)}
-                    <Divider style={{ margin: 0, padding: 0 }} />
-                    {this.render_single_category("Car Wash", 0, 4000)}
-                    <Divider style={{ margin: 0, padding: 0 }} />
-                    {this.render_single_category("Car Insurance", 0, 4000)}
-                    <Divider style={{ margin: 0, padding: 0 }} />
-                    {this.render_single_category("Gas", 150, 4000)}
-                    <Divider style={{ margin: 0, padding: 0 }} />
-                    {this.render_single_category("Other", 0, 4000)}
+                    {this.state.user_data?.categoryList.map((category) => (
+                        <div key={category.id}>
+                            {this.render_single_category(category.name, this.state.filled_allocations[category.id], category.allocation)}
+                            < Divider style={{ margin: 0, padding: 0 }} />
+                        </div>
+                    ))}
+
                 </Flex>
             </Card>
         )
@@ -148,7 +168,7 @@ export class OverviewPage extends React.Component<IProp, IState> {
         user_data?.categoryList.forEach((category) => {
             filled_allocations[category.id] = 0;
             category.expenseList.forEach((expense) => {
-                filled_allocations[category.name] += expense.amount;
+                filled_allocations[category.id] += expense.amount;
             });
         });
         this.setState({
