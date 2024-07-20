@@ -27,8 +27,8 @@ export enum RecurringType {
     weekly = 0,
     biweekly = 1,
     monthly = 2,
-    quarterly = 3,
-    halfYearly = 4,
+    quarterly = 3, // unsupported
+    halfYearly = 4, // unsupported
     yearly = 5
 }
 export interface Recurring {

@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Button, Card, Divider, Empty, Flex, Progress, ProgressProps, Skeleton, Space, Spin, Statistic } from "antd";
-import { CheckCircleOutlined, LoadingOutlined, PlusCircleOutlined, RightCircleOutlined, RightOutlined, SmileOutlined } from '@ant-design/icons';
+import { AccountBookOutlined, CheckCircleOutlined, LoadingOutlined, PlusCircleOutlined, RightCircleOutlined, RightOutlined, SmileOutlined, WalletOutlined } from '@ant-design/icons';
 import { GetScreenSize, ScreenSize } from "../utils";
 import { DataService, getDataService } from "../services/data_service";
-import { UserData } from "../datamodel/datamodel";
+import { Recurring, RecurringType, UserData } from "../datamodel/datamodel";
 import { Typography } from "antd";
+import { RecurringCalculatorService } from "../services/recurring_date_service";
 
 const { Title, Text } = Typography;
 
@@ -19,6 +20,8 @@ interface IState {
 export class OverviewPage extends React.Component<IProp, IState> {
 
     _data_service: DataService;
+    _recurring_calculator_service: RecurringCalculatorService;
+
     render_available_budget() {
         return (
             <Card bordered={false} style={{ margin: 10 }} >
@@ -41,8 +44,7 @@ export class OverviewPage extends React.Component<IProp, IState> {
             content = <Statistic
                 title="Upcoming expenses"
                 value={this.state.upcoming_expense.amount}
-                precision={2}
-                prefix={<PlusCircleOutlined />}
+                prefix={<WalletOutlined />}
                 suffix={this.state.upcoming_expense.name}
             />;
         }
@@ -136,6 +138,7 @@ export class OverviewPage extends React.Component<IProp, IState> {
     constructor(props: any) {
         super(props);
         this._data_service = getDataService();
+        this._recurring_calculator_service = new RecurringCalculatorService();
         this.state = {
             user_data: null,
             total_allocations: 0,
@@ -153,11 +156,29 @@ export class OverviewPage extends React.Component<IProp, IState> {
     componentDidUpdate(_prevProps: Readonly<IProp>, prevState: Readonly<IState>, _snapshot?: any): void {
         if (this.state.user_data != null && prevState.user_data?.last_updated != this.state.user_data.last_updated) {
             this.update_calculations();
+            this.update_next_recurring();
         }
     }
 
+    private update_next_recurring() {
+        let recurring_list: Recurring[] = this.state.user_data!.recurringList;
+        let next_dates_ = recurring_list.map((recurring) => (
+            {
+                "next_date": this._recurring_calculator_service.calculateNextDate(recurring),
+                "data": recurring
+            }
+        )).sort((a, b) => a.next_date.getTime() - b.next_date.getTime());
 
+        if (next_dates_.length > 0) {
+            this.setState({
+                upcoming_expense: {
+                    name: next_dates_[0].data.name,
+                    amount: next_dates_[0].data.amount
+                }
+            });
+        }
 
+    }
     private update_calculations() {
         let user_data = this.state.user_data;
         let total_allocations = 0;

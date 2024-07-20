@@ -1,4 +1,4 @@
-import { DataModelFactory } from "./datamodel/datamodel";
+import { DataModelFactory, Recurring, RecurringType } from "./datamodel/datamodel";
 
 export enum ScreenSize {
     mobile = 0,
@@ -65,6 +65,19 @@ export function CreateDummyData() {
         user_category.expenseList = Array.from({ length: Math.floor(Math.random() * 15) }, generateRandomExpense);
         last_cat_id++;
         user_data.categoryList.push(user_category);
+    }
+
+    let recurring = DataModelFactory.createRecurring(0);
+    recurring.amount = 1000;
+    recurring.name = "Rent";
+    recurring.description = "Monthly rent";
+    recurring.isActive = true;
+    recurring.lastUpdated = new Date();
+    recurring.frequency = RecurringType.monthly;
+    recurring.frequencey_unit = 1;
+
+    if (Math.random() > 0.5) {
+        user_data.recurringList.push(recurring);
     }
 
     return user_data;
