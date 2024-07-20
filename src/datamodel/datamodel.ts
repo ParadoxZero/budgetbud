@@ -109,19 +109,6 @@ export interface UserDataHistory {
 }
 
 export class DataModelFactory {
-    static createUser(): User {
-        // Development code check
-        if (import.meta.env.NODE_ENV !== 'development') {
-            throw new Error('Create User function is only available in development mode');
-        }
-
-        return {
-            email: '',
-            isVerified: false,
-            isActive: false,
-            data_id: ''
-        };
-    }
 
     static createExpense(lastUsedId: number, categoryId: number, amount: number): Expense {
         const id = lastUsedId + 1;
@@ -199,8 +186,11 @@ export class DataModelFactory {
     }
 
     static createUserData(): UserData {
+        if (!import.meta.env.DEV) {
+            throw new Error('Create User Data function is only available in development mode');
+        }
         return {
-            id: crypto.randomUUID().toString(), // Unique id for user data
+            id: Math.random().toString(),
             history_id: '',
             categoryList: [],
             recurringList: [],
@@ -216,8 +206,11 @@ export class DataModelFactory {
     }
 
     static createUserDataHistory(): UserDataHistory {
+        if (!import.meta.env.DEV) {
+            throw new Error('Create User Data function is only available in development mode');
+        }
         return {
-            id: crypto.randomUUID().toString(), // Unique id for user data history
+            id: Math.random().toString(),
             history: []
         };
     }
