@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Button, Card, Divider, Empty, Flex, Progress, ProgressProps, Skeleton, Space, Spin, Statistic } from "antd";
-import { AccountBookOutlined, CheckCircleOutlined, LoadingOutlined, PlusCircleOutlined, RightCircleOutlined, RightOutlined, SmileOutlined, WalletOutlined } from '@ant-design/icons';
+import { Button, Card, Divider, Empty, Flex, Input, InputNumber, Progress, ProgressProps, Skeleton, Space, Spin, Statistic } from "antd";
+import { AccountBookOutlined, CheckCircleOutlined, LoadingOutlined, PlusCircleFilled, PlusCircleOutlined, PlusOutlined, RightCircleOutlined, RightOutlined, SmileOutlined, WalletOutlined } from '@ant-design/icons';
 import { GetScreenSize, ScreenSize } from "../utils";
 import { DataService, getDataService } from "../services/data_service";
 import { Recurring, RecurringType, UserData } from "../datamodel/datamodel";
@@ -18,6 +18,7 @@ interface IState {
     total_allocations: number;
     filled_allocations: { [key: number]: number };
     upcoming_expense: { name: string, amount: number } | null;
+    add_expense_mode_category: number | null;
 }
 
 export class OverviewPage extends React.Component<IProp, IState> {
@@ -67,10 +68,24 @@ export class OverviewPage extends React.Component<IProp, IState> {
         )
     }
 
-    render_single_category(title: string, value: number, total: number) {
+    render_add_single_category_expense() {
+        return (
+            <div style={{ margin: 0, marginTop: 10, marginBottom: 10, paddingRight: 20, paddingLeft: 20, minWidth: 300 }} className='touchahble'>
+                <Flex align="center" justify="space-between" style={{ minHeight: 100 }}>
+                    <Input size="large" type="number" allowClear placeholder="Spent amount" autoFocus variant="borderless" minLength={250} inputMode="numeric" />
+                    <Flex align="center" justify="right">
+                        <Button shape="circle" type="default" icon={<PlusOutlined />} style={{ padding: 20, marginLeft: 20 }} onClick={(e) => { this.setState({ add_expense_mode_category: null }) }}></Button>
+                        <Button shape="circle" type="default" icon={<RightOutlined />} style={{ padding: 20, marginLeft: 20 }} onClick={(e) => { alert('button'); e.stopPropagation(); }}></Button>
+                    </Flex>
+                </Flex>
+            </div >
+        )
+    }
+
+    render_view_single_category(id: number, title: string, value: number, total: number) {
+        const percent = Math.floor((value / total) * 100);
         let progress_color = '#3f8600';
         let text_type: BaseType = "success";
-        const percent = Math.floor((value / total) * 100);
         if (percent > 85) {
             progress_color = '#ff4d4f';
             text_type = "danger";
@@ -80,7 +95,7 @@ export class OverviewPage extends React.Component<IProp, IState> {
             text_type = "warning";
         }
 
-        var progress = <Progress
+        const progress = <Progress
             type="line"
             percent={percent}
             strokeColor={progress_color}
@@ -92,7 +107,7 @@ export class OverviewPage extends React.Component<IProp, IState> {
         />
 
         return (
-            <div style={{ margin: 0, marginTop: 10, marginBottom: 10, paddingRight: 20, paddingLeft: 20, minWidth: 300 }} className='touchahble'>
+            <div style={{ margin: 0, marginTop: 10, marginBottom: 10, paddingRight: 20, paddingLeft: 20, minWidth: 300, minHeight: 100 }} className='touchahble' onClick={() => this.setState({ add_expense_mode_category: id })}>
                 <Flex align="center" justify="space-between">
                     <Text strong type="secondary" style={{ fontSize: 18 }}>{title}</Text>
                     <Flex align="center" justify="right">
@@ -108,6 +123,13 @@ export class OverviewPage extends React.Component<IProp, IState> {
         )
     }
 
+    render_catogory_list_row(id: number, title: string, value: number, total: number) {
+        if (this.state.add_expense_mode_category == id) {
+            return this.render_add_single_category_expense();
+        }
+        return this.render_view_single_category(id, title, value, total);
+    }
+
     render_categories() {
         return (
             <Card bordered={false} style={{ margin: 0, marginTop: 0, marginBottom: 10, padding: 0 }}>
@@ -115,7 +137,7 @@ export class OverviewPage extends React.Component<IProp, IState> {
                     < Divider style={{ margin: 0, padding: 0 }} />
                     {this.state.user_data?.categoryList.map((category) => (
                         <div key={category.id}>
-                            {this.render_single_category(category.name, this.state.filled_allocations[category.id], category.allocation)}
+                            {this.render_catogory_list_row(category.id, category.name, this.state.filled_allocations[category.id], category.allocation)}
                             < Divider style={{ margin: 0, padding: 0 }} />
                         </div>
                     ))}
