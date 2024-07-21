@@ -16,7 +16,21 @@ export function GetScreenSize(): ScreenSize {
     }
 }
 
+export enum Status {
+    success = 0,
+    error = 1,
+    warning = 2,
+}
 
+export function GetStatusFromPercent(percent: number): Status {
+    if (percent > 90) {
+        return Status.error;
+    } else if (percent > 75) {
+        return Status.warning;
+    } else {
+        return Status.success;
+    }
+}
 export function CreateDummyData() {
     // Error if not development
     if (!import.meta.env.DEV) {

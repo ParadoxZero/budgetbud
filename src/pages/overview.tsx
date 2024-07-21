@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, Card, Divider, Empty, Flex, Input, InputNumber, Progress, ProgressProps, Skeleton, Space, Spin, Statistic } from "antd";
 import { AccountBookOutlined, CheckCircleOutlined, LoadingOutlined, PlusCircleFilled, PlusCircleOutlined, PlusOutlined, RightCircleOutlined, RightOutlined, SmileOutlined, WalletOutlined } from '@ant-design/icons';
-import { GetScreenSize, ScreenSize } from "../utils";
+import { GetScreenSize, GetStatusFromPercent, ScreenSize, Status } from "../utils";
 import { DataService, getDataService } from "../services/data_service";
 import { Recurring, RecurringType, UserData } from "../datamodel/datamodel";
 import { Typography } from "antd";
@@ -27,16 +27,27 @@ export class OverviewPage extends React.Component<IProp, IState> {
     _recurring_calculator_service: RecurringCalculatorService;
 
     render_available_budget() {
+        const used_up_budget = Object.values(this.state.filled_allocations).reduce((acc, curr) => acc += curr, 0);
+        const percent = used_up_budget / this.state.total_allocations * 100;
+        let status_color = '#3f8600';
+        switch (GetStatusFromPercent(percent)) {
+            case Status.error:
+                status_color = '#ff4d4f';
+                break;
+            case Status.warning:
+                status_color = 'ffa940';
+                break;
+        }
         return (
             <Card bordered={false} hoverable style={{ margin: 10 }} >
                 <Statistic
                     title="Budget Used"
                     groupSeparator=""
-                    value={Object.values(this.state.filled_allocations).reduce((acc, curr) => acc += curr, 0)}
+                    value={used_up_budget}
                     precision={0}
                     // prefix={<CheckCircleOutlined />}
                     suffix={"/ " + (this.state.total_allocations).toString()}
-                    valueStyle={{ color: '#3f8600' }}
+                    valueStyle={{ color: status_color }}
                 />
             </Card>
         )
@@ -72,7 +83,7 @@ export class OverviewPage extends React.Component<IProp, IState> {
         return (
             <div style={{ margin: 0, marginTop: 10, marginBottom: 10, paddingRight: 20, paddingLeft: 20, minWidth: 300 }} className='touchahble'>
                 <Flex align="center" justify="space-between" style={{ minHeight: 100 }}>
-                    <Input size="large" type="number" allowClear placeholder="Spent amount" autoFocus variant="borderless" minLength={250} inputMode="numeric" />
+                    <Input id="expense_amount" size="large" type="number" allowClear placeholder="Spent amount" autoFocus variant="borderless" minLength={250} inputMode="numeric" style={{ padding: 0 }} />
                     <Flex align="center" justify="right">
                         <Button shape="circle" type="default" icon={<PlusOutlined />} style={{ padding: 20, marginLeft: 20 }} onClick={(e) => { this.setState({ add_expense_mode_category: null }) }}></Button>
                         <Button shape="circle" type="default" icon={<RightOutlined />} style={{ padding: 20, marginLeft: 20 }} onClick={(e) => { alert('button'); e.stopPropagation(); }}></Button>
@@ -86,13 +97,17 @@ export class OverviewPage extends React.Component<IProp, IState> {
         const percent = Math.floor((value / total) * 100);
         let progress_color = '#3f8600';
         let text_type: BaseType = "success";
-        if (percent > 85) {
-            progress_color = '#ff4d4f';
-            text_type = "danger";
-        }
-        else if (percent > 60) {
-            progress_color = '#ffa940';
-            text_type = "warning";
+
+        const status = GetStatusFromPercent(percent);
+        switch (status) {
+            case Status.error:
+                progress_color = '#ff4d4f';
+                text_type = "danger";
+                break;
+            case Status.warning:
+                progress_color = '#ffa940';
+                text_type = "warning";
+                break;
         }
 
         const progress = <Progress
