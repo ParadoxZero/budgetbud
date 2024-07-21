@@ -1,0 +1,35 @@
+.touchahble {
+    cursor: pointer;
+    transition: box-shadow 0.3s, border 0.3s;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.touchahble:hover {
+    cursor: pointer;
+    background: linear-gradient(to right, #fff, #f2f2f2);
+    background-size: 200% 200%;
+    animation: gradientAnimation 1s ease forwards;
+}
+
+.touchahble:active {
+    /* cursor: pointer;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    border: 1px solid #ccc;
+    background: linear-gradient(to bottom, #fff, #f2f2f2);
+    transition: box-shadow 0.3s, border 0.3s, background 0.3s; */
+}
+
+@keyframes gradientAnimation {
+    0% {
+        background-position: 0% 0%;
+    }
+
+    50% {
+        background-position: 100% 100%;
+    }
+
+    100% {
+        background-position: 0% 0%;
+    }
+}

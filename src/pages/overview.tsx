@@ -6,6 +6,9 @@ import { DataService, getDataService } from "../services/data_service";
 import { Recurring, RecurringType, UserData } from "../datamodel/datamodel";
 import { Typography } from "antd";
 import { RecurringCalculatorService } from "../services/recurring_date_service";
+import { BaseType } from "antd/es/typography/Base";
+
+import '../main.css';
 
 const { Title, Text } = Typography;
 
@@ -24,13 +27,13 @@ export class OverviewPage extends React.Component<IProp, IState> {
 
     render_available_budget() {
         return (
-            <Card bordered={false} style={{ margin: 10 }} >
+            <Card bordered={false} hoverable style={{ margin: 10 }} >
                 <Statistic
-                    title="Budget used"
+                    title="Budget Used"
                     groupSeparator=""
                     value={Object.values(this.state.filled_allocations).reduce((acc, curr) => acc += curr, 0)}
                     precision={0}
-                    prefix={<CheckCircleOutlined />}
+                    // prefix={<CheckCircleOutlined />}
                     suffix={"/ " + (this.state.total_allocations).toString()}
                     valueStyle={{ color: '#3f8600' }}
                 />
@@ -42,14 +45,14 @@ export class OverviewPage extends React.Component<IProp, IState> {
         let content = <Empty description="No upcoming expense" imageStyle={{ height: "auto", color: '#3f8600', fontSize: 48 }} image={<CheckCircleOutlined />} />;
         if (this.state.upcoming_expense != null) {
             content = <Statistic
-                title="Upcoming expenses"
+                title="Upcoming"
                 value={this.state.upcoming_expense.amount}
                 prefix={<WalletOutlined />}
                 suffix={this.state.upcoming_expense.name}
             />;
         }
         return (
-            <Card bordered={false} style={{ margin: 10 }}>
+            <Card bordered={false} hoverable style={{ margin: 10 }}>
                 {content}
             </Card>
         )
@@ -66,12 +69,15 @@ export class OverviewPage extends React.Component<IProp, IState> {
 
     render_single_category(title: string, value: number, total: number) {
         let progress_color = '#3f8600';
+        let text_type: BaseType = "success";
         const percent = Math.floor((value / total) * 100);
         if (percent > 85) {
             progress_color = '#ff4d4f';
+            text_type = "danger";
         }
         else if (percent > 60) {
             progress_color = '#ffa940';
+            text_type = "warning";
         }
 
         var progress = <Progress
@@ -82,19 +88,20 @@ export class OverviewPage extends React.Component<IProp, IState> {
                 marginBottom: 14,
                 minWidth: 100
             }}
-            status={"active"}
+            status={percent < 100 ? "active" : "exception"}
         />
 
         return (
-            <div style={{ margin: 0, marginTop: 10, marginBottom: 10, padding: 0, minWidth: 300 }}>
+            <div style={{ margin: 0, marginTop: 10, marginBottom: 10, paddingRight: 20, paddingLeft: 20, minWidth: 300 }} className='touchahble'>
                 <Flex align="center" justify="space-between">
-                    <Text code strong type="secondary" style={{ fontSize: 18 }}>{title}</Text>
+                    <Text strong type="secondary" style={{ fontSize: 18 }}>{title}</Text>
                     <Flex align="center" justify="right">
                         <Flex align="flex-end" justify="center" vertical>
-                            <Text >{value} / {total}</Text>
+                            <Text type="secondary"> Remaining</Text>
+                            <Text strong type={text_type}>{total - value} / {total} </Text>
                             {progress}
                         </Flex>
-                        <Button shape="circle" type="default" icon={<RightOutlined />} style={{ padding: 20, marginLeft: 20 }}></Button>
+                        <Button shape="circle" type="default" icon={<RightOutlined />} style={{ padding: 20, marginLeft: 20 }} onClick={(e) => { alert('button'); e.stopPropagation(); }}></Button>
                     </Flex>
                 </Flex>
             </div >
@@ -103,8 +110,9 @@ export class OverviewPage extends React.Component<IProp, IState> {
 
     render_categories() {
         return (
-            <Card bordered={false} style={{ margin: 0, marginTop: 10, marginBottom: 10, padding: 0 }}>
+            <Card bordered={false} style={{ margin: 0, marginTop: 0, marginBottom: 10, padding: 0 }}>
                 <Flex align="stretch" justify="space-around" vertical>
+                    < Divider style={{ margin: 0, padding: 0 }} />
                     {this.state.user_data?.categoryList.map((category) => (
                         <div key={category.id}>
                             {this.render_single_category(category.name, this.state.filled_allocations[category.id], category.allocation)}

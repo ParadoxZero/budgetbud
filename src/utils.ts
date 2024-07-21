@@ -27,18 +27,18 @@ export function CreateDummyData() {
 
     // Create dummy categories
     const categories = [
-        "food",
-        "travel",
-        "clothes",
-        "date night",
-        "learning",
-        "entertainment",
-        "healthcare",
-        "housing",
-        "utilities",
-        "transportation",
-        "gifts",
-        "miscellaneous"
+        "Food",
+        "Travel",
+        "Clothes",
+        "Date night",
+        "Learning",
+        "Entertainment",
+        "Healthcare",
+        "Housing",
+        "Utilities",
+        "Transportation",
+        "Gifts",
+        "Miscellaneous"
     ];
 
     function getRandomAllocation() {
