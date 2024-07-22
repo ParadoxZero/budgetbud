@@ -1,4 +1,4 @@
-import { DataModelFactory, Recurring, RecurringType } from "./datamodel/datamodel";
+import { DataModelFactory, RecurringType } from "./datamodel/datamodel";
 
 export enum ScreenSize {
     mobile = 0,

@@ -32,31 +32,31 @@ class RemoteDataService implements DataService {
     getHistory(): Promise<UserDataHistory> {
         throw new Error("Not implemented");
     }
-    updateCategory(category: Category): Promise<UserData> {
+    updateCategory(_category: Category): Promise<UserData> {
         throw new Error("Not implemented");
     }
 
-    updateExpense(categoryId: number, expense: Expense): Promise<UserData> {
+    updateExpense(_categoryId: number, _expense: Expense): Promise<UserData> {
         throw new Error("Not implemented");
     }
 
-    deleteExpense(expenseId: number): Promise<UserData> {
+    deleteExpense(_expenseId: number): Promise<UserData> {
         throw new Error("Not implemented");
     }
 
-    updateRecurring(recurring: Recurring): Promise<UserData> {
+    updateRecurring(_recurring: Recurring): Promise<UserData> {
         throw new Error("Not implemented");
     }
 
-    deleteRecurring(recurringId: number): Promise<UserData> {
+    deleteRecurring(_recurringId: number): Promise<UserData> {
         throw new Error("Not implemented");
     }
 
-    updateUnplanned(unplanned: Unplanned): Promise<UserData> {
+    updateUnplanned(_unplanned: Unplanned): Promise<UserData> {
         throw new Error("Not implemented");
     }
 
-    deleteUnplanned(unplannedId: number): Promise<UserData> {
+    deleteUnplanned(_unplannedId: number): Promise<UserData> {
         throw new Error("Not implemented");
     }
 
@@ -93,7 +93,7 @@ class LocalDataService implements DataService {
     }
 
     updateCategory(category: Category): Promise<UserData> {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, _reject) => {
             // Implement the logic to update a category in local storage
             // For example:
             const user_data: UserData = JSON.parse(localStorage.getItem('userData') ?? "{}");

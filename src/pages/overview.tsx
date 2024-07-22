@@ -1,16 +1,16 @@
-import React, { useState } from "react";
-import { Button, Card, Divider, Empty, Flex, Input, InputNumber, Progress, ProgressProps, Skeleton, Space, Spin, Statistic } from "antd";
-import { AccountBookOutlined, CheckCircleOutlined, LoadingOutlined, PlusCircleFilled, PlusCircleOutlined, PlusOutlined, RightCircleOutlined, RightOutlined, SmileOutlined, WalletOutlined } from '@ant-design/icons';
+import React from "react";
+import { Button, Card, Divider, Empty, Flex, Input, Progress, Spin, Statistic } from "antd";
+import { CheckCircleOutlined, LoadingOutlined, PlusOutlined, RightOutlined, WalletOutlined } from '@ant-design/icons';
 import { GetScreenSize, GetStatusFromPercent, ScreenSize, Status } from "../utils";
 import { DataService, getDataService } from "../services/data_service";
-import { DataModelFactory, Recurring, RecurringType, UserData } from "../datamodel/datamodel";
+import { DataModelFactory, Recurring, UserData } from "../datamodel/datamodel";
 import { Typography } from "antd";
 import { RecurringCalculatorService } from "../services/recurring_date_service";
 import { BaseType } from "antd/es/typography/Base";
 
 import '../main.css';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 interface IProp { }
 interface IState {
@@ -202,6 +202,7 @@ export class OverviewPage extends React.Component<IProp, IState> {
             total_allocations: 0,
             filled_allocations: {},
             upcoming_expense: null,
+            add_expense_mode_category: null
         }
     }
 
