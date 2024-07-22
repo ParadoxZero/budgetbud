@@ -3,7 +3,7 @@ import { Button, Card, Divider, Empty, Flex, Input, InputNumber, Progress, Progr
 import { AccountBookOutlined, CheckCircleOutlined, LoadingOutlined, PlusCircleFilled, PlusCircleOutlined, PlusOutlined, RightCircleOutlined, RightOutlined, SmileOutlined, WalletOutlined } from '@ant-design/icons';
 import { GetScreenSize, GetStatusFromPercent, ScreenSize, Status } from "../utils";
 import { DataService, getDataService } from "../services/data_service";
-import { Recurring, RecurringType, UserData } from "../datamodel/datamodel";
+import { DataModelFactory, Recurring, RecurringType, UserData } from "../datamodel/datamodel";
 import { Typography } from "antd";
 import { RecurringCalculatorService } from "../services/recurring_date_service";
 import { BaseType } from "antd/es/typography/Base";
@@ -80,12 +80,24 @@ export class OverviewPage extends React.Component<IProp, IState> {
     }
 
     render_add_single_category_expense() {
+        const handle_add_expense = () => {
+            const entered_amount = parseFloat((document.getElementById('expense_amount') as HTMLInputElement).value);
+            if (entered_amount > 0) {
+                const category_id = this.state.add_expense_mode_category!;
+                const list_of_expenses = this.state.user_data?.categoryList.find((category) => category.id == category_id)?.expenseList ?? [];
+                const last_expense_id = list_of_expenses?.reduce((acc, curr) => Math.max(acc, curr.id), 0) ?? 0;
+                let expense = DataModelFactory.createExpense(last_expense_id, this.state.add_expense_mode_category!, entered_amount);
+                this._data_service.updateExpense(category_id, expense).then((data) => {
+                    this.setState({ user_data: data, add_expense_mode_category: null })
+                });
+            }
+        }
         return (
             <div style={{ margin: 0, marginTop: 10, marginBottom: 10, paddingRight: 20, paddingLeft: 20, minWidth: 300 }} className='touchahble'>
                 <Flex align="center" justify="space-between" style={{ minHeight: 100 }}>
-                    <Input id="expense_amount" size="large" type="number" allowClear placeholder="Spent amount" autoFocus variant="borderless" minLength={250} inputMode="numeric" style={{ padding: 0 }} />
+                    <Input id="expense_amount" size="large" type="number" allowClear placeholder="Spent amount" autoFocus variant="borderless" minLength={250} inputMode="numeric" style={{ padding: 0 }} onPressEnter={() => handle_add_expense()} />
                     <Flex align="center" justify="right">
-                        <Button shape="circle" type="default" icon={<PlusOutlined />} style={{ padding: 20, marginLeft: 20 }} onClick={(e) => { this.setState({ add_expense_mode_category: null }) }}></Button>
+                        <Button shape="circle" type="default" icon={<PlusOutlined />} style={{ padding: 20, marginLeft: 20 }} onClick={() => { handle_add_expense() }}></Button>
                         <Button shape="circle" type="default" icon={<RightOutlined />} style={{ padding: 20, marginLeft: 20 }} onClick={(e) => { alert('button'); e.stopPropagation(); }}></Button>
                     </Flex>
                 </Flex>
