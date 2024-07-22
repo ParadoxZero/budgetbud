@@ -1,7 +1,6 @@
 .touchahble {
     cursor: pointer;
     transition: box-shadow 0.3s, border 0.3s;
-    padding: 5px;
     border-radius: 5px;
 }
 
@@ -32,4 +31,16 @@
     100% {
         background-position: 0% 0%;
     }
+}
+
+body {
+    -webkit-touch-callout: none;
+    /* Safari */
+    -webkit-user-select: none;
+    /* Chrome */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* Internet Explorer/Edge */
+    user-select: none;
 }
