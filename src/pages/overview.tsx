@@ -88,13 +88,14 @@ export class OverviewPage extends React.Component<IProp, IState> {
                 const last_expense_id = list_of_expenses?.reduce((acc, curr) => Math.max(acc, curr.id), 0) ?? 0;
                 let expense = DataModelFactory.createExpense(last_expense_id, this.state.add_expense_mode_category!, entered_amount);
                 this._data_service.updateExpense(category_id, expense).then((data) => {
-                    this.setState({ user_data: data, add_expense_mode_category: null })
+                    this.setState({ user_data: data })
                 });
             }
+            this.setState({ add_expense_mode_category: null });
         }
         return (
             <div style={{ margin: 0, marginTop: 10, marginBottom: 10, paddingRight: 20, paddingLeft: 20, minWidth: 300 }} className='touchahble'>
-                <Flex align="center" justify="space-between" style={{ minHeight: 100 }}>
+                <Flex align="center" justify="space-between" style={{ minHeight: 80 }}>
                     <Input id="expense_amount" size="large" type="number" allowClear placeholder="Spent amount" autoFocus variant="borderless" minLength={250} inputMode="numeric" style={{ padding: 0 }} onPressEnter={() => handle_add_expense()} />
                     <Flex align="center" justify="right">
                         <Button shape="circle" type="default" icon={<PlusOutlined />} style={{ padding: 20, marginLeft: 20 }} onClick={() => { handle_add_expense() }}></Button>
@@ -134,7 +135,7 @@ export class OverviewPage extends React.Component<IProp, IState> {
         />
 
         return (
-            <div style={{ margin: 0, marginTop: 10, marginBottom: 10, paddingRight: 20, paddingLeft: 20, minWidth: 300, minHeight: 100 }} className='touchahble' onClick={() => this.setState({ add_expense_mode_category: id })}>
+            <div style={{ margin: 0, marginTop: 10, marginBottom: 10, paddingRight: 20, paddingLeft: 20, minWidth: 300 }} className='touchahble' onClick={() => this.setState({ add_expense_mode_category: id })}>
                 <Flex align="center" justify="space-between">
                     <Text strong type="secondary" style={{ fontSize: 18 }}>{title}</Text>
                     <Flex align="center" justify="right">
