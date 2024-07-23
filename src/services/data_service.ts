@@ -21,7 +21,7 @@ export function getDataService(): DataService {
         return new LocalDataService();
     } else {
         // Return the URL service implementation
-        return new RemoteDataService();
+        return new LocalDataService();
     }
 }
 class RemoteDataService implements DataService {
