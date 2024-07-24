@@ -1,5 +1,6 @@
 using budgetbud.Exceptions;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace budgetbud.Services;
 
@@ -33,7 +34,7 @@ public class AzureIdentityService : IIdentityService
 
     private static string ProcessGithub(dynamic json)
     {
-        dynamic[] claims = json.claims;
+        JArray claims = json.claims;
         foreach (dynamic claim in claims)
         {
             if (claim.typ == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")
