@@ -1,3 +1,4 @@
+using budgetbud.Exceptions;
 using Newtonsoft.Json;
 
 namespace budgetbud.Services;
@@ -17,17 +18,17 @@ public class AzureIdentityService : IIdentityService
         {
             string decoded_userId = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(userId!));
             dynamic claims = JsonConvert.DeserializeObject(decoded_userId) ?? throw new Exception("Claims not valid JSON");
-            string provider = claims.provider_name;
+            string provider = claims.auth_typ;
             switch (provider)
             {
                 case "github":
                     return ProcessGithub(claims);
                 default:
-                    throw new Exception("Provider not supported" + claims);
+                    throw new AuthException("Provider not supported" + claims);
             }
         }
 
-        throw new Exception("X-MS-CLIENT-PRINCIPAL-ID header not found");
+        throw new AuthException("X-MS-CLIENT-PRINCIPAL-ID header not found");
     }
 
     private static string ProcessGithub(dynamic json)
@@ -40,6 +41,6 @@ public class AzureIdentityService : IIdentityService
                 return "github:" + claim.val;
             }
         }
-        throw new Exception("Name claim not found");
+        throw new AuthException("Name claim not found");
     }
 }

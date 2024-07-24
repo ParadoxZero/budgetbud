@@ -1,3 +1,4 @@
+using budgetbud.Exceptions;
 using budgetbud.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,9 +28,9 @@ public class UserDataController : ControllerBase
         {
             return Ok(_identityService.GetUserIdentity());
         }
-        catch (Exception e)
+        catch (AuthException e)
         {
-            return BadRequest(e.Message + e.StackTrace);
+            return BadRequest(e.Message);
         }
     }
 }
