@@ -186,8 +186,8 @@ export class DataModelFactory {
     }
 
     static createUserData(): UserData {
-        if (!import.meta.env.DEV) {
-            throw new Error('Create User Data function is only available in development mode');
+        if (import.meta.env.VITE_CREATE_DUMMY_DATA !== 'true') {
+            throw new Error('Create User Data function is only available if dummy mode is enabled.');
         }
         return {
             id: Math.random().toString(),
@@ -206,8 +206,8 @@ export class DataModelFactory {
     }
 
     static createUserDataHistory(): UserDataHistory {
-        if (!import.meta.env.DEV) {
-            throw new Error('Create User Data function is only available in development mode');
+        if (import.meta.env.VITE_CREATE_DUMMY_DATA !== 'true') {
+            throw new Error('Create User Data function is only available if dummy mode is enabled.');
         }
         return {
             id: Math.random().toString(),

@@ -15,8 +15,7 @@ function render_view() {
 }
 
 function CreateDummyDataIfRequired() {
-  // only for development mode
-  if (!import.meta.env.DEV) {
+  if (import.meta.env.VITE_CREATE_DUMMY_DATA !== 'true') {
     return;
   }
   localStorage.clear();
@@ -24,7 +23,7 @@ function CreateDummyDataIfRequired() {
 }
 
 function PingRemoteIfRequired() {
-  if (import.meta.env.DEV) {
+  if (import.meta.env.VITE_PING_REMOTE !== 'true') {
     return;
   }
   PingRemote().then((response) => { console.log(response) }).catch((error) => { console.log(error) }).catch((error) => { console.log(error) });
