@@ -32,5 +32,9 @@ public class UserDataController : ControllerBase
         {
             return BadRequest(e.Message);
         }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message + e.StackTrace);
+        }
     }
 }
