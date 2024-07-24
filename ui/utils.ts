@@ -33,8 +33,8 @@ export function GetStatusFromPercent(percent: number): Status {
 }
 export function CreateDummyData() {
     // Error if not development
-    if (!import.meta.env.DEV) {
-        throw new Error('PopulateDummpyContent function is only available in development mode');
+    if (import.meta.env.VITE_CREATE_DUMMY_DATA !== 'true') {
+        throw new Error('PopulateDummpyContent function is only available if dummy mode is enabled.');
     }
     // Create dummy data
     const user_data = DataModelFactory.createUserData();
