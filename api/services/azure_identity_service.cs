@@ -33,7 +33,7 @@ public class AzureIdentityService : IIdentityService
 
     private static string ProcessGithub(dynamic json)
     {
-        string? claims = json.claims;
+        dynamic[] claims = json.claims;
         foreach (dynamic claim in claims)
         {
             if (claim.typ == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")
