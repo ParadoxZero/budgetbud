@@ -1,6 +1,18 @@
+using budgetbud.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddScoped<IIdentityService, FakeIdentityService>();
+}
+else
+{
+    builder.Services.AddScoped<IIdentityService, AzureIdentityService>();
+}
+
 
 var app = builder.Build();
 
