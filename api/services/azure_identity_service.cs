@@ -23,7 +23,7 @@ public class AzureIdentityService : IIdentityService
                 case "github":
                     return ProcessGithub(claims);
                 default:
-                    throw new Exception("Provider not supported" + provider.ToString());
+                    throw new Exception("Provider not supported" + claims);
             }
         }
 
