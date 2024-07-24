@@ -2,10 +2,11 @@ using budgetbud.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 if (builder.Environment.IsDevelopment())
 {
+    builder.Services.AddSwaggerGen();
     builder.Services.AddScoped<IIdentityService, FakeIdentityService>();
 }
 else
