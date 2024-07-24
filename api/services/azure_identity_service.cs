@@ -1,6 +1,4 @@
-using System.Diagnostics;
-using System.Text.Json;
-using budgetbud.Services;
+using Newtonsoft.Json;
 
 namespace budgetbud.Services;
 
@@ -18,7 +16,7 @@ public class AzureIdentityService : IIdentityService
         if (_httpContextAccessor.HttpContext != null && _httpContextAccessor.HttpContext!.Request.Headers.TryGetValue("X-MS-CLIENT-PRINCIPAL", out var userId))
         {
             string decoded_userId = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(userId!));
-            dynamic claims = JsonSerializer.Deserialize<dynamic>(decoded_userId) ?? throw new Exception("Claims not valid JSON");
+            dynamic claims = JsonConvert.DeserializeObject(decoded_userId) ?? throw new Exception("Claims not valid JSON");
             string provider = claims.provider_name;
             switch (provider)
             {
