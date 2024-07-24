@@ -24,46 +24,46 @@ export function getDataService(): DataService {
         return new LocalDataService();
     }
 }
-class RemoteDataService implements DataService {
-    getUserData(): Promise<UserData> {
-        throw new Error("Not implemented");
-    }
+// class RemoteDataService implements DataService {
+//     getUserData(): Promise<UserData> {
+//         throw new Error("Not implemented");
+//     }
 
-    getHistory(): Promise<UserDataHistory> {
-        throw new Error("Not implemented");
-    }
-    updateCategory(_category: Category): Promise<UserData> {
-        throw new Error("Not implemented");
-    }
+//     getHistory(): Promise<UserDataHistory> {
+//         throw new Error("Not implemented");
+//     }
+//     updateCategory(_category: Category): Promise<UserData> {
+//         throw new Error("Not implemented");
+//     }
 
-    updateExpense(_categoryId: number, _expense: Expense): Promise<UserData> {
-        throw new Error("Not implemented");
-    }
+//     updateExpense(_categoryId: number, _expense: Expense): Promise<UserData> {
+//         throw new Error("Not implemented");
+//     }
 
-    deleteExpense(_expenseId: number): Promise<UserData> {
-        throw new Error("Not implemented");
-    }
+//     deleteExpense(_expenseId: number): Promise<UserData> {
+//         throw new Error("Not implemented");
+//     }
 
-    updateRecurring(_recurring: Recurring): Promise<UserData> {
-        throw new Error("Not implemented");
-    }
+//     updateRecurring(_recurring: Recurring): Promise<UserData> {
+//         throw new Error("Not implemented");
+//     }
 
-    deleteRecurring(_recurringId: number): Promise<UserData> {
-        throw new Error("Not implemented");
-    }
+//     deleteRecurring(_recurringId: number): Promise<UserData> {
+//         throw new Error("Not implemented");
+//     }
 
-    updateUnplanned(_unplanned: Unplanned): Promise<UserData> {
-        throw new Error("Not implemented");
-    }
+//     updateUnplanned(_unplanned: Unplanned): Promise<UserData> {
+//         throw new Error("Not implemented");
+//     }
 
-    deleteUnplanned(_unplannedId: number): Promise<UserData> {
-        throw new Error("Not implemented");
-    }
+//     deleteUnplanned(_unplannedId: number): Promise<UserData> {
+//         throw new Error("Not implemented");
+//     }
 
-    getUserActions(): Promise<UserAction[]> {
-        throw new Error("Not implemented");
-    }
-}
+//     getUserActions(): Promise<UserAction[]> {
+//         throw new Error("Not implemented");
+//     }
+// }
 
 class LocalDataService implements DataService {
     getUserData(): Promise<UserData> {
