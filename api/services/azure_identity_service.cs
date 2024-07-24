@@ -15,7 +15,7 @@ public class AzureIdentityService : IIdentityService
 
     public string GetUserIdentity()
     {
-        if (_httpContextAccessor.HttpContext != null && _httpContextAccessor.HttpContext!.Request.Headers.TryGetValue("X-MS-CLIENT-PRINCIPAL-ID", out var userId))
+        if (_httpContextAccessor.HttpContext != null && _httpContextAccessor.HttpContext!.Request.Headers.TryGetValue("X-MS-CLIENT-PRINCIPAL", out var userId))
         {
             string decoded_userId = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(userId!));
             dynamic claims = JsonSerializer.Deserialize<dynamic>(decoded_userId) ?? throw new Exception("Claims not valid JSON");
@@ -25,7 +25,7 @@ public class AzureIdentityService : IIdentityService
                 case "github":
                     return ProcessGithub(claims);
                 default:
-                    throw new Exception("Provider not supported");
+                    throw new Exception("Provider not supported" + provider.ToString());
             }
         }
 
