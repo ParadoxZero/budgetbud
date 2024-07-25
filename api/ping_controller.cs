@@ -25,7 +25,12 @@ public class PingController : ControllerBase
     {
         try
         {
-            return Ok(_identityService.GetUserIdentity());
+            string user_id = _identityService.GetUserIdentity();
+            dynamic user_data = new
+            {
+                user_id = user_id,
+            };
+            return Ok(user_data);
         }
         catch (AuthException e)
         {

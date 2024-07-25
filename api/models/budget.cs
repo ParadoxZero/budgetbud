@@ -4,6 +4,7 @@ namespace budgetbud.Models;
 public class Budget
 {
     public required string id { get; set; }
+    public required string name { get; set; }
     public required string history_id { get; set; }
     public required List<Category> categoryList { get; set; }
     public required List<Recurring> recurringList { get; set; }

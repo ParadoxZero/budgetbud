@@ -14,11 +14,11 @@ namespace budgetbud.Services
         private Container _container;
         private IIdentityService _identityService;
 
-        public DbService(string endpointUri, string databaseName, string containerName, IIdentityService identityService)
+        public DbService(IConfiguration configuration, IIdentityService identityService)
         {
-            _cosmosClient = new CosmosClient(endpointUri);
-            _database = _cosmosClient.GetDatabase(databaseName);
-            _container = _database.GetContainer(containerName);
+            _cosmosClient = new CosmosClient(configuration["CosmosDb:ConnectionString"]);
+            _database = _cosmosClient.GetDatabase(configuration["CosmosDb:Database"]);
+            _container = _database.GetContainer(configuration["CosmosDb:Container"]);
             _identityService = identityService;
         }
 
@@ -33,7 +33,7 @@ namespace budgetbud.Services
                 UserData userData = new UserData
                 {
                     id = user_id,
-                    BudgetId = new List<string>()
+                    BudgetIds = new List<string>()
                 };
                 await _container.CreateItemAsync(userData, new PartitionKey(user_id));
                 return userData;
@@ -45,7 +45,7 @@ namespace budgetbud.Services
             return await _container.ReadItemAsync<Budget>(budget_id, new PartitionKey(budget_id));
         }
 
-        public async Task CreateNewBudgetAsync(string name)
+        public async Task<Budget> CreateNewBudgetAsync(string name)
         {
             BudgetHistory history = new BudgetHistory
             {
@@ -61,6 +61,7 @@ namespace budgetbud.Services
 
             Budget budget = new Budget
             {
+                name = name,
                 id = Guid.NewGuid().ToString(),
                 authorized_users = new List<string>() { _identityService.GetUserIdentity() },
                 categoryList = new List<Category>(),
@@ -74,6 +75,8 @@ namespace budgetbud.Services
 
             await _container.CreateItemAsync(history, new PartitionKey(history.id));
             await _container.CreateItemAsync(budget, new PartitionKey(budget.id));
+
+            return budget;
 
         }
 

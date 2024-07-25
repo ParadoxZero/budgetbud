@@ -26,3 +26,6 @@ dist-ssr
 obj/
 bin/
 wwwroot/
+
+appsettings.Development.json
+appsettings.Development.json

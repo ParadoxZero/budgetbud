@@ -7,12 +7,15 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddSwaggerGen();
-    builder.Services.AddScoped<IIdentityService, FakeIdentityService>();
+    builder.Services.AddSingleton<IIdentityService, FakeIdentityService>();
 }
 else
 {
-    builder.Services.AddScoped<IIdentityService, AzureIdentityService>();
+    builder.Services.AddSingleton<IIdentityService, AzureIdentityService>();
 }
+
+builder.Services.AddSingleton<DbService>();
+builder.Services.AddSingleton<UserDataService>();
 
 
 var app = builder.Build();
