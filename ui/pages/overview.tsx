@@ -3,7 +3,7 @@ import { Button, Card, Divider, Empty, Flex, Input, Progress, Spin, Statistic } 
 import { CheckCircleOutlined, LoadingOutlined, PlusOutlined, RightOutlined, WalletOutlined } from '@ant-design/icons';
 import { GetScreenSize, GetStatusFromPercent, ScreenSize, Status } from "../utils";
 import { DataService, getDataService } from "../services/data_service";
-import { DataModelFactory, Recurring, UserData } from "../datamodel/datamodel";
+import { DataModelFactory, Recurring, Budget } from "../datamodel/datamodel";
 import { Typography } from "antd";
 import { RecurringCalculatorService } from "../services/recurring_date_service";
 import { BaseType } from "antd/es/typography/Base";
@@ -14,7 +14,7 @@ const { Text } = Typography;
 
 interface IProp { }
 interface IState {
-    user_data: UserData | null;
+    budget: Budget | null;
     total_allocations: number;
     filled_allocations: { [key: number]: number };
     upcoming_expense: { name: string, amount: number } | null;
@@ -84,11 +84,11 @@ export class OverviewPage extends React.Component<IProp, IState> {
             const entered_amount = parseFloat((document.getElementById('expense_amount') as HTMLInputElement).value);
             if (entered_amount > 0) {
                 const category_id = this.state.add_expense_mode_category!;
-                const list_of_expenses = this.state.user_data?.categoryList.find((category) => category.id == category_id)?.expenseList ?? [];
+                const list_of_expenses = this.state.budget?.categoryList.find((category) => category.id == category_id)?.expenseList ?? [];
                 const last_expense_id = list_of_expenses?.reduce((acc, curr) => Math.max(acc, curr.id), 0) ?? 0;
                 let expense = DataModelFactory.createExpense(last_expense_id, this.state.add_expense_mode_category!, entered_amount);
                 this._data_service.updateExpense(category_id, expense).then((data) => {
-                    this.setState({ user_data: data })
+                    this.setState({ budget: data })
                 });
             }
             this.setState({ add_expense_mode_category: null });
@@ -163,7 +163,7 @@ export class OverviewPage extends React.Component<IProp, IState> {
             <Card bordered={false} style={{ margin: 0, marginTop: 0, marginBottom: 10, padding: 0 }}>
                 <Flex align="stretch" justify="space-around" vertical>
                     < Divider style={{ margin: 0, padding: 0 }} />
-                    {this.state.user_data?.categoryList.map((category) => (
+                    {this.state.budget?.categoryList.map((category) => (
                         <div key={category.id}>
                             {this.render_catogory_list_row(category.id, category.name, this.state.filled_allocations[category.id], category.allocation)}
                             < Divider style={{ margin: 0, padding: 0 }} />
@@ -185,7 +185,7 @@ export class OverviewPage extends React.Component<IProp, IState> {
     }
 
     render() {
-        if (this.state.user_data == null) {
+        if (this.state.budget == null) {
             return <Flex vertical justify="center" align="center" style={{ height: "100vh" }}>
                 <Spin size="large" indicator={<LoadingOutlined style={{ fontSize: 48 }} />} />
             </Flex>
@@ -198,7 +198,7 @@ export class OverviewPage extends React.Component<IProp, IState> {
         this._data_service = getDataService();
         this._recurring_calculator_service = new RecurringCalculatorService();
         this.state = {
-            user_data: null,
+            budget: null,
             total_allocations: 0,
             filled_allocations: {},
             upcoming_expense: null,
@@ -207,20 +207,20 @@ export class OverviewPage extends React.Component<IProp, IState> {
     }
 
     componentDidMount(): void {
-        this._data_service.getUserData().then((data) => {
-            this.setState({ user_data: data });
+        this._data_service.getBudget().then((data) => {
+            this.setState({ budget: data });
         });
     }
 
     componentDidUpdate(_prevProps: Readonly<IProp>, prevState: Readonly<IState>, _snapshot?: any): void {
-        if (this.state.user_data != null && prevState.user_data?.last_updated != this.state.user_data.last_updated) {
+        if (this.state.budget != null && prevState.budget?.last_updated != this.state.budget.last_updated) {
             this.update_calculations();
             this.update_next_recurring();
         }
     }
 
     private update_next_recurring() {
-        let recurring_list: Recurring[] = this.state.user_data!.recurringList;
+        let recurring_list: Recurring[] = this.state.budget!.recurringList;
         let next_dates_ = recurring_list.map((recurring) => (
             {
                 "next_date": this._recurring_calculator_service.calculateNextDate(recurring),
@@ -239,13 +239,13 @@ export class OverviewPage extends React.Component<IProp, IState> {
 
     }
     private update_calculations() {
-        let user_data = this.state.user_data;
+        let budget = this.state.budget;
         let total_allocations = 0;
-        user_data?.categoryList.forEach((category) => {
+        budget?.categoryList.forEach((category) => {
             total_allocations += category.allocation;
         });
         let filled_allocations: { [key: string]: number; } = {}; // Add type annotation
-        user_data?.categoryList.forEach((category) => {
+        budget?.categoryList.forEach((category) => {
             filled_allocations[category.id] = 0;
             category.expenseList.forEach((expense) => {
                 filled_allocations[category.id] += expense.amount;

@@ -37,7 +37,7 @@ export function CreateDummyData() {
         throw new Error('PopulateDummpyContent function is only available if dummy mode is enabled.');
     }
     // Create dummy data
-    const user_data = DataModelFactory.createUserData();
+    const user_data = DataModelFactory.createBudget();
 
     // Create dummy categories
     const categories = [

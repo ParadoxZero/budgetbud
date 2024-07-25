@@ -23,4 +23,5 @@ public class UserAction
     public Expense? expense { get; set; }
     public Recurring? recurring { get; set; }
     public Expense? unplanned { get; set; }
+    public required string userId { get; set; }
 }

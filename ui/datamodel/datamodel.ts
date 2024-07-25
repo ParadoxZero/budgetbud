@@ -91,21 +91,21 @@ export interface UserAction {
 // It will be impossible to delete a non-empty category. User will have to wait till next month when 
 // the category is reset. Otherwise explicitly delete the expenses in the category. Or should we allow
 // deletion of non-empty categories with a warning?
-export interface UserData {
+export interface Budget {
     id: string;
     history_id: string;
     categoryList: Category[];
     recurringList: Recurring[];
     unplannedList: Unplanned[];
-    history_unit: TimeUnit;
+    period: TimeUnit;
     userActions: UserAction[];
     last_updated: Date;
     authorized_users: string[];
 }
 
-export interface UserDataHistory {
+export interface BudgetHistory {
     id: string;
-    history: UserData[];
+    history: Budget[];
 }
 
 export class DataModelFactory {
@@ -185,7 +185,7 @@ export class DataModelFactory {
         };
     }
 
-    static createUserData(): UserData {
+    static createBudget(): Budget {
         if (import.meta.env.VITE_CREATE_DUMMY_DATA !== 'true') {
             throw new Error('Create User Data function is only available if dummy mode is enabled.');
         }
@@ -195,7 +195,7 @@ export class DataModelFactory {
             categoryList: [],
             recurringList: [],
             unplannedList: [],
-            history_unit: {
+            period: {
                 month: new Date(Date.now()).getMonth(),
                 year: new Date(Date.now()).getFullYear()
             },
@@ -205,7 +205,7 @@ export class DataModelFactory {
         };
     }
 
-    static createUserDataHistory(): UserDataHistory {
+    static createBudgetHistory(): BudgetHistory {
         if (import.meta.env.VITE_CREATE_DUMMY_DATA !== 'true') {
             throw new Error('Create User Data function is only available if dummy mode is enabled.');
         }

@@ -3,29 +3,29 @@ using budgetbud.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace budgetbud.Controllers;
-
 [ApiController]
 [Route("api/[controller]")]
-public class UserDataController : ControllerBase
+public class PingController : ControllerBase
 {
     private readonly IIdentityService _identityService;
 
-    public UserDataController(IIdentityService identityService)
+    public PingController(IIdentityService identityService)
     {
         _identityService = identityService;
     }
 
-    [HttpGet]
-    public IActionResult GetUserData()
+    [HttpGet("hello-world")]
+    public IActionResult HelloWorld()
+    {
+        return Ok("Hello World!");
+    }
+
+    [HttpGet("user")]
+    public IActionResult GetUser()
     {
         try
         {
-            string user_id = _identityService.GetUserIdentity();
-            dynamic user_data = new
-            {
-                user_id = user_id,
-            };
-            return Ok(user_data);
+            return Ok(_identityService.GetUserIdentity());
         }
         catch (AuthException e)
         {
