@@ -14,7 +14,6 @@ export const navigationSlice = createSlice({
     name: 'navigation',
     initialState: {
         current_view: View.Overview,
-        history: []
     },
     reducers: {
         navigation: (state, action) => {

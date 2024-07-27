@@ -5,6 +5,7 @@ export interface DataService {
     getBudget(id: string): Promise<Budget[]>;
     createBudget(name: string): Promise<Budget>;
     getHistory(): Promise<BudgetHistory>;
+    createCategories(budget_id: string, categories: Category[]): Promise<Budget>;
     updateCategory(budget_id: string, category: Category): Promise<Budget>;
     updateExpense(budget_id: string, expense: Expense): Promise<Budget>;
     deleteExpense(budget_id: string, expenseId: number): Promise<Budget>;
@@ -33,7 +34,7 @@ class RemoteDataService implements DataService {
     }
 
     createBudget(name: string): Promise<Budget> {
-        let endpoint: string = `${this.BASE_URL}/api/Budget`;
+        const endpoint: string = `${this.BASE_URL}/api/Budget`;
         return fetch(endpoint, {
             method: 'POST',
             body: JSON.stringify({ name: name }),
@@ -43,7 +44,7 @@ class RemoteDataService implements DataService {
         }).then((response) => response.json() as Promise<Budget>);
     }
     getBudget(): Promise<Budget[]> {
-        let endpoint: string = `${this.BASE_URL}/api/Budget`;
+        const endpoint: string = `${this.BASE_URL}/api/Budget`;
         return fetch(endpoint, { method: 'GET' }).then((response) => response.json() as Promise<Budget[]>);
     }
 
@@ -51,10 +52,21 @@ class RemoteDataService implements DataService {
         throw new Error("Not implemented");
     }
     updateCategory(budger_id: string, category: Category): Promise<Budget> {
-        let endpoint: string = `${this.BASE_URL}/api/Budget/${budger_id}`;
+        const endpoint: string = `${this.BASE_URL}/api/Budget/${budger_id}`;
         return fetch(endpoint, {
             method: 'POST',
             body: JSON.stringify(category),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        }).then((response) => response.json() as Promise<Budget>);
+    }
+
+    createCategories(_budget_id: string, _categories: Category[]): Promise<Budget> {
+        const endpoint: string = `${this.BASE_URL}/api/Budget/${_budget_id}/categories`;
+        return fetch(endpoint, {
+            method: 'POST',
+            body: JSON.stringify(_categories),
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -95,7 +107,7 @@ class LocalDataService implements DataService {
         return new Promise((resolve) => {
             // Implement the logic to retrieve user data from local storage
             // For example:
-            let budgetList: Budget[] = [];
+            const budgetList: Budget[] = [];
             const userData = localStorage.getItem('userData');
             if (userData) {
                 budgetList.push(JSON.parse(userData));
@@ -127,6 +139,39 @@ class LocalDataService implements DataService {
         });
     }
 
+    createCategories(_budget_id: string, categories: Category[]): Promise<Budget> {
+        return new Promise((resolve, reject) => {
+            // Implement the logic to create categories in local storage
+            // For example:
+            const userData = localStorage.getItem('userData');
+            if (userData) {
+                const parsedBudget = JSON.parse(userData);
+                let lastUsedId: number = 0;
+                if (!parsedBudget.categoryList) {
+                    parsedBudget.categoryList = [];
+                } else {
+                    lastUsedId = parsedBudget.categoryList.reduce((acc: number, c: Category) => c.id > acc ? c.id : acc, 0);
+                }
+                for (const category of categories) {
+                    category.id = lastUsedId;
+                    lastUsedId++;
+                }
+
+                parsedBudget.categoryList = parsedBudget.categoryList.concat(categories);
+                for (const category of categories) {
+                    const user_action: UserAction = DataModelFactory.createUserAction();
+                    user_action.type = UserActionType.updateCategory;
+                    user_action.payload = category;
+                    parsedBudget.userActions.push(user_action);
+                }
+
+                localStorage.setItem('userData', JSON.stringify(parsedBudget));
+                resolve(parsedBudget);
+            }
+            reject();
+        });
+    }
+
     updateCategory(_budget_id: string, category: Category): Promise<Budget> {
         return new Promise((resolve, _reject) => {
             // Implement the logic to update a category in local storage
@@ -147,7 +192,7 @@ class LocalDataService implements DataService {
             if (!found) {
                 user_data.categoryList.push(category);
             }
-            let user_action: UserAction = DataModelFactory.createUserAction();
+            const user_action: UserAction = DataModelFactory.createUserAction();
             user_action.type = UserActionType.updateCategory;
             user_action.payload = category;
             user_data.userActions.push(user_action);
@@ -177,7 +222,7 @@ class LocalDataService implements DataService {
                     if (!found) {
                         updatedExpenses.push(expense);
                     }
-                    let user_action: UserAction = DataModelFactory.createUserAction();
+                    const user_action: UserAction = DataModelFactory.createUserAction();
                     user_action.type = UserActionType.updateExpense;
                     user_action.payload = expense;
                     parsedBudget.userActions.push(user_action);
@@ -217,7 +262,7 @@ class LocalDataService implements DataService {
                         }
                         return true;
                     });
-                    let user_action: UserAction = DataModelFactory.createUserAction();
+                    const user_action: UserAction = DataModelFactory.createUserAction();
                     user_action.type = UserActionType.deleteExpense;
                     user_action.payload = expense;
                     parsedBudget.userActions.push(user_action);
@@ -246,7 +291,7 @@ class LocalDataService implements DataService {
                 } else {
                     parsedBudget.recurringList.push(recurring);
                 }
-                let user_action: UserAction = DataModelFactory.createUserAction();
+                const user_action: UserAction = DataModelFactory.createUserAction();
                 user_action.type = UserActionType.updateRecurring;
                 user_action.payload = recurring;
                 parsedBudget.userActions.push(user_action);
@@ -275,7 +320,7 @@ class LocalDataService implements DataService {
                 });
                 if (recurringIndex !== -1) {
                     parsedBudget.recurringList.splice(recurringIndex, 1);
-                    let user_action: UserAction = DataModelFactory.createUserAction();
+                    const user_action: UserAction = DataModelFactory.createUserAction();
                     user_action.type = UserActionType.deleteRecurring;
                     user_action.payload = recurring;
                     parsedBudget.userActions.push(user_action);
@@ -301,7 +346,7 @@ class LocalDataService implements DataService {
                 const unplannedIndex = parsedBudget.unplannedList.findIndex((u: Unplanned) => u.id === unplanned.id);
                 if (unplannedIndex !== -1) {
                     parsedBudget.unplannedList[unplannedIndex] = unplanned;
-                    let user_action: UserAction = DataModelFactory.createUserAction();
+                    const user_action: UserAction = DataModelFactory.createUserAction();
                     user_action.type = UserActionType.updateUnplanned;
                     user_action.payload = unplanned;
                     parsedBudget.userActions.push(user_action);
@@ -334,7 +379,7 @@ class LocalDataService implements DataService {
                 });
                 if (unplannedIndex !== -1) {
                     parsedBudget.unplannedList.splice(unplannedIndex, 1);
-                    let user_action: UserAction = DataModelFactory.createUserAction();
+                    const user_action: UserAction = DataModelFactory.createUserAction();
                     user_action.type = UserActionType.deleteUnplanned;
                     user_action.payload = unplanned;
                     parsedBudget.userActions.push(user_action);

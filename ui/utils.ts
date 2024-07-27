@@ -37,7 +37,7 @@ export function CreateDummyData() {
         throw new Error('PopulateDummpyContent function is only available if dummy mode is enabled.');
     }
     // Create dummy data
-    const user_data = DataModelFactory.createBudget();
+    const user_data = DataModelFactory.createBudget("Dummy Budget");
 
     // Create dummy categories
     const categories = [
@@ -72,7 +72,7 @@ export function CreateDummyData() {
     let last_cat_id = 0;
     // Add random allocations to the categories
     for (const category in categories) {
-        let user_category = DataModelFactory.createCategory(last_cat_id);
+        const user_category = DataModelFactory.createCategory(last_cat_id);
         user_category.allocation = getRandomAllocation();
         user_category.name = categories[category];
         user_category.description = "This is a dummy category";
@@ -81,7 +81,7 @@ export function CreateDummyData() {
         user_data.categoryList.push(user_category);
     }
 
-    let recurring = DataModelFactory.createRecurring(0);
+    const recurring = DataModelFactory.createRecurring(0);
     recurring.amount = 1000;
     recurring.name = "Rent";
     recurring.description = "Monthly rent";

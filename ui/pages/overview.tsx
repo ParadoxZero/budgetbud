@@ -88,7 +88,7 @@ export class OverviewPage extends React.Component<IProp, IState> {
                 const category_id = this.state.add_expense_mode_category!;
                 const list_of_expenses = this.state.budget?.categoryList.find((category) => category.id == category_id)?.expenseList ?? [];
                 const last_expense_id = list_of_expenses?.reduce((acc, curr) => Math.max(acc, curr.id), 0) ?? 0;
-                let expense = DataModelFactory.createExpense(last_expense_id, this.state.add_expense_mode_category!, entered_amount);
+                const expense = DataModelFactory.createExpense(last_expense_id, this.state.add_expense_mode_category!, entered_amount);
                 this._data_service.updateExpense(this.state.budget?.id!, expense).then((data) => {
                     this.setState({ budget: data })
                 });
@@ -240,8 +240,8 @@ export class OverviewPage extends React.Component<IProp, IState> {
     }
 
     private update_next_recurring() {
-        let recurring_list: Recurring[] = this.state.budget!.recurringList;
-        let next_dates_ = recurring_list.map((recurring) => (
+        const recurring_list: Recurring[] = this.state.budget!.recurringList;
+        const next_dates_ = recurring_list.map((recurring) => (
             {
                 "next_date": this._recurring_calculator_service.calculateNextDate(recurring),
                 "data": recurring
@@ -259,12 +259,12 @@ export class OverviewPage extends React.Component<IProp, IState> {
 
     }
     private update_calculations() {
-        let budget = this.state.budget;
+        const budget = this.state.budget;
         let total_allocations = 0;
         budget?.categoryList.forEach((category) => {
             total_allocations += category.allocation;
         });
-        let filled_allocations: { [key: string]: number; } = {}; // Add type annotation
+        const filled_allocations: { [key: string]: number; } = {}; // Add type annotation
         budget?.categoryList.forEach((category) => {
             filled_allocations[category.id] = 0;
             category.expenseList.forEach((expense) => {

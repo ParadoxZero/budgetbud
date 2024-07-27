@@ -2,7 +2,7 @@ import { Recurring, RecurringType } from "../datamodel/datamodel";
 
 export class RecurringCalculatorService {
     public calculateNextDate(recurring: Recurring): Date {
-        let next_date = new Date(recurring.lastUpdated);
+        const next_date = new Date(recurring.lastUpdated);
         switch (recurring.frequency) {
             case RecurringType.weekly:
                 return this.calculateNextDateForWeekly(recurring);
@@ -15,7 +15,7 @@ export class RecurringCalculatorService {
     }
 
     private calculateNextDateForWeekly(recurring: Recurring): Date {
-        let date = new Date(Date.now());
+        const date = new Date(Date.now());
         if (date.getDay() < recurring.frequencey_unit) {
             date.setDate(date.getDate() + recurring.frequencey_unit - date.getDay());
             return date;
@@ -26,7 +26,7 @@ export class RecurringCalculatorService {
     }
 
     private calculateNextDateForMonthly(recurring: Recurring): Date {
-        let date = new Date(Date.now());
+        const date = new Date(Date.now());
         if (date.getDate() < recurring.frequencey_unit) {
             date.setDate(recurring.frequencey_unit);
             return date;
@@ -38,7 +38,7 @@ export class RecurringCalculatorService {
     }
 
     private calculateNextDateForYearly(recurring: Recurring): Date {
-        let date = new Date(Date.now());
+        const date = new Date(Date.now());
         if (date.getMonth() < recurring.frequencey_unit) {
             date.setMonth(recurring.frequencey_unit);
             return date;
