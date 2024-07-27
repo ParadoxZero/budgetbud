@@ -4,7 +4,7 @@ import { View } from './store'
 import { OverviewPage } from './pages/overview';
 import { CreateDummyData } from './utils';
 import { PingRemote } from './services/ping_service';
-import { CreateBudgetPage } from './pages/create_budget';
+import NoBudgetAvailablePage from './pages/no-budget_page';
 
 function render_view() {
   const view = useSelector((state: any) => state.navigation.current_view);
@@ -12,19 +12,18 @@ function render_view() {
   switch (view) {
     case View.Overview:
       return <OverviewPage />
-    case View.CreateBudget:
-      return <CreateBudgetPage />
+    case View.NoBudgetAvailable:
+      return <NoBudgetAvailablePage />
     default:
       return (<>Not Found</>)
   }
 }
 
 function CreateDummyDataIfRequired() {
-  if (import.meta.env.VITE_CREATE_DUMMY_DATA !== 'true') {
-    return;
+  if (import.meta.env.VITE_CREATE_DUMMY_DATA === 'true') {
+    localStorage.clear();
+    localStorage.setItem('userData', JSON.stringify(CreateDummyData()));
   }
-  localStorage.clear();
-  localStorage.setItem('userData', JSON.stringify(CreateDummyData()));
 }
 
 function PingRemoteIfRequired() {

@@ -89,7 +89,7 @@ export class OverviewPage extends React.Component<IProp, IState> {
                 const list_of_expenses = this.state.budget?.categoryList.find((category) => category.id == category_id)?.expenseList ?? [];
                 const last_expense_id = list_of_expenses?.reduce((acc, curr) => Math.max(acc, curr.id), 0) ?? 0;
                 let expense = DataModelFactory.createExpense(last_expense_id, this.state.add_expense_mode_category!, entered_amount);
-                this._data_service.updateExpense(category_id, expense).then((data) => {
+                this._data_service.updateExpense(this.state.budget?.id!, expense).then((data) => {
                     this.setState({ budget: data })
                 });
             }
@@ -223,7 +223,7 @@ export class OverviewPage extends React.Component<IProp, IState> {
             if (data.length > 0)
                 this.setState({ budget: data[0] });
             else {
-                this.navigate_to(View.CreateBudget);
+                this.navigate_to(View.NoBudgetAvailable);
             }
         });
     }
