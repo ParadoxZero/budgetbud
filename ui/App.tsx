@@ -4,6 +4,7 @@ import { View } from './store'
 import { OverviewPage } from './pages/overview';
 import { CreateDummyData } from './utils';
 import { PingRemote } from './services/ping_service';
+import { CreateBudgetPage } from './pages/create_budget';
 
 function render_view() {
   const view = useSelector((state: any) => state.navigation.current_view);
@@ -11,6 +12,10 @@ function render_view() {
   switch (view) {
     case View.Overview:
       return <OverviewPage />
+    case View.CreateBudget:
+      return <CreateBudgetPage />
+    default:
+      return (<>Not Found</>)
   }
 }
 

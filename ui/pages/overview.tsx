@@ -7,8 +7,10 @@ import { DataModelFactory, Recurring, Budget } from "../datamodel/datamodel";
 import { Typography } from "antd";
 import { RecurringCalculatorService } from "../services/recurring_date_service";
 import { BaseType } from "antd/es/typography/Base";
+import { navigation, View, store } from '../store';
 
 import '../main.css';
+import { } from "react-redux";
 
 const { Text } = Typography;
 
@@ -212,13 +214,17 @@ export class OverviewPage extends React.Component<IProp, IState> {
             total_allocations: 0,
             filled_allocations: {},
             upcoming_expense: null,
-            add_expense_mode_category: null
+            add_expense_mode_category: null,
         }
     }
 
     componentDidMount(): void {
         this._data_service.getBudget().then((data) => {
-            this.setState({ budget: data });
+            if (data.length > 0)
+                this.setState({ budget: data[0] });
+            else {
+                this.navigate_to(View.CreateBudget);
+            }
         });
     }
 
@@ -227,6 +233,10 @@ export class OverviewPage extends React.Component<IProp, IState> {
             this.update_calculations();
             this.update_next_recurring();
         }
+    }
+
+    private navigate_to(view: View) {
+        store.dispatch(navigation(view));
     }
 
     private update_next_recurring() {

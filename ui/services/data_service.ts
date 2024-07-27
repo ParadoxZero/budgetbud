@@ -2,7 +2,8 @@ import { Category, Expense, Budget, BudgetHistory, Recurring, Unplanned, UserAct
 
 
 export interface DataService {
-    getBudget(): Promise<Budget>;
+    getBudget(): Promise<Budget[]>;
+    createBudget(name: string): Promise<Budget>;
     getHistory(): Promise<BudgetHistory>;
     updateCategory(category: Category): Promise<Budget>;
     updateExpense(categoryId: number, expense: Expense): Promise<Budget>;
@@ -66,16 +67,26 @@ export function getDataService(): DataService {
 // }
 
 class LocalDataService implements DataService {
-    getBudget(): Promise<Budget> {
+    getBudget(): Promise<Budget[]> {
         return new Promise((resolve) => {
             // Implement the logic to retrieve user data from local storage
             // For example:
+            let budgetList: Budget[] = [];
             const userData = localStorage.getItem('userData');
             if (userData) {
-                resolve(JSON.parse(userData));
-            } else {
-                resolve(DataModelFactory.createBudget());
+                budgetList.push(JSON.parse(userData));
             }
+            resolve(budgetList);
+        });
+    }
+
+    createBudget(name: string): Promise<Budget> {
+        return new Promise((resolve) => {
+            // Implement the logic to create a new budget in local storage
+            // For example:
+            const budget = DataModelFactory.createBudget(name);
+            localStorage.setItem('userData', JSON.stringify(budget));
+            resolve(budget);
         });
     }
 

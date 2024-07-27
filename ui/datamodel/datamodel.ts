@@ -93,6 +93,7 @@ export interface UserAction {
 // deletion of non-empty categories with a warning?
 export interface Budget {
     id: string;
+    name: string;
     history_id: string;
     categoryList: Category[];
     recurringList: Recurring[];
@@ -185,9 +186,10 @@ export class DataModelFactory {
         };
     }
 
-    static createBudget(): Budget {
+    static createBudget(name: string): Budget {
         return {
             id: Math.random().toString(),
+            name,
             history_id: '',
             categoryList: [],
             recurringList: [],

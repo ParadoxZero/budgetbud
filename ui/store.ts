@@ -3,7 +3,11 @@ import { configureStore } from '@reduxjs/toolkit'
 import { createSlice } from '@reduxjs/toolkit'
 
 export enum View {
-    Overview
+    Overview,
+    CreateBudget,
+    CategoryDetails,
+    CategoryEdit,
+    ExpenseDetails,
 }
 
 export const counterSlice = createSlice({
