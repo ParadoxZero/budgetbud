@@ -4,15 +4,21 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-if (builder.Environment.IsDevelopment())
+bool use_swagger = builder.Configuration.GetValue<bool>("EnableSwagger");
+if (use_swagger)
 {
     builder.Services.AddSwaggerGen();
+}
+
+if (builder.Environment.IsDevelopment())
+{
     builder.Services.AddSingleton<IIdentityService, FakeIdentityService>();
 }
 else
 {
     builder.Services.AddSingleton<IIdentityService, AzureIdentityService>();
 }
+
 
 builder.Services.AddSingleton<DbService>();
 builder.Services.AddSingleton<UserDataService>();
@@ -23,7 +29,7 @@ var app = builder.Build();
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-if (app.Environment.IsDevelopment())
+if (use_swagger)
 {
     app.UseSwagger();
     app.UseSwaggerUI();
