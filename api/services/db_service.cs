@@ -88,7 +88,9 @@ namespace budgetbud.Services
         public async Task AddExpenseAsync(string budget_id, Expense expense)
         {
             Budget budget = await GetBudgetAsync(budget_id);
-            budget.categoryList?.Find(c => c.Id == expense.CategoryId)?.ExpenseList.Add(expense);
+            Category cat = budget.categoryList?.Find(c => c.Id == expense.CategoryId) ?? throw new Exception("Category not found");
+            expense.Id = cat.ExpenseList.LastOrDefault()?.Id ?? 0;
+            cat.ExpenseList.Add(expense);
             await UpdateBudgetAsync(budget);
         }
 

@@ -1,8 +1,6 @@
-using budgetbud.Exceptions;
+using budgetbud.Models;
 using budgetbud.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Cosmos.Serialization.HybridRow.RecordIO;
-using Microsoft.Identity.Client;
 
 namespace budgetbud.Controllers;
 
@@ -27,7 +25,20 @@ public class BudgetController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateBudget([FromBody] CreateBudgetInput input)
     {
-        return Ok(await _userDataService.AddExpenseToBudget(input.name));
+        return Ok(await _userDataService.CreateBudget(input.name));
+    }
+
+    [HttpPost("{budget_id}/category")]
+    public async Task<IActionResult> AddCategoryInput(string budget_id, Category category)
+    {
+        return Ok(await _userDataService.AddCategoryToBudget(budget_id, category));
+    }
+
+
+    [HttpPost("{budget_id}/expense")]
+    public async Task<IActionResult> AddExpenseInput(string budget_id, Expense expense)
+    {
+        return Ok(await _userDataService.AddExpenseToBudget(budget_id, expense));
     }
 
 }
