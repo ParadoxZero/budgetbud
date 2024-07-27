@@ -2,69 +2,93 @@ import { Category, Expense, Budget, BudgetHistory, Recurring, Unplanned, UserAct
 
 
 export interface DataService {
-    getBudget(): Promise<Budget[]>;
+    getBudget(id: string): Promise<Budget[]>;
     createBudget(name: string): Promise<Budget>;
     getHistory(): Promise<BudgetHistory>;
-    updateCategory(category: Category): Promise<Budget>;
-    updateExpense(categoryId: number, expense: Expense): Promise<Budget>;
-    deleteExpense(expenseId: number): Promise<Budget>;
-    updateRecurring(recurring: Recurring): Promise<Budget>;
-    deleteRecurring(recurringId: number): Promise<Budget>;
-    updateUnplanned(unplanned: Unplanned): Promise<Budget>;
-    deleteUnplanned(unplannedId: number): Promise<Budget>;
-    getUserActions(): Promise<UserAction[]>;
-    getHistory(): Promise<BudgetHistory>;
+    updateCategory(budget_id: string, category: Category): Promise<Budget>;
+    updateExpense(budget_id: string, expense: Expense): Promise<Budget>;
+    deleteExpense(budget_id: string, expenseId: number): Promise<Budget>;
+    updateRecurring(budget_id: string, recurring: Recurring): Promise<Budget>;
+    deleteRecurring(budget_id: string, recurringId: number): Promise<Budget>;
+    updateUnplanned(budget_id: string, unplanned: Unplanned): Promise<Budget>;
+    deleteUnplanned(budget_id: string, unplannedId: number): Promise<Budget>;
+    getUserActions(budget_id: string): Promise<UserAction[]>;
+    getHistory(budger_id: string): Promise<BudgetHistory>;
 }
 
 export function getDataService(): DataService {
-    if (import.meta.env.MODE === 'development') {
+    if (import.meta.env.VITE_USE_LOCAL_DATA_SERVICE === 'true') {
         // Return the local data service implementation
         return new LocalDataService();
     } else {
         // Return the URL service implementation
-        return new LocalDataService();
+        return new RemoteDataService();
     }
 }
-// class RemoteDataService implements DataService {
-//     getBudget(): Promise<Budget> {
-//         throw new Error("Not implemented");
-//     }
+class RemoteDataService implements DataService {
+    BASE_URL: string;
 
-//     getHistory(): Promise<BudgetHistory> {
-//         throw new Error("Not implemented");
-//     }
-//     updateCategory(_category: Category): Promise<Budget> {
-//         throw new Error("Not implemented");
-//     }
+    constructor() {
+        this.BASE_URL = window.location.hostname;
+    }
 
-//     updateExpense(_categoryId: number, _expense: Expense): Promise<Budget> {
-//         throw new Error("Not implemented");
-//     }
+    createBudget(name: string): Promise<Budget> {
+        let endpoint: string = `${this.BASE_URL}/api/Budget`;
+        return fetch(endpoint, {
+            method: 'POST',
+            body: JSON.stringify({ name: name }),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        }).then((response) => response.json() as Promise<Budget>);
+    }
+    getBudget(): Promise<Budget[]> {
+        let endpoint: string = `${this.BASE_URL}/api/Budget`;
+        return fetch(endpoint, { method: 'GET' }).then((response) => response.json() as Promise<Budget[]>);
+    }
 
-//     deleteExpense(_expenseId: number): Promise<Budget> {
-//         throw new Error("Not implemented");
-//     }
+    getHistory(): Promise<BudgetHistory> {
+        throw new Error("Not implemented");
+    }
+    updateCategory(budger_id: string, category: Category): Promise<Budget> {
+        let endpoint: string = `${this.BASE_URL}/api/Budget/${budger_id}`;
+        return fetch(endpoint, {
+            method: 'POST',
+            body: JSON.stringify(category),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        }).then((response) => response.json() as Promise<Budget>);
+    }
 
-//     updateRecurring(_recurring: Recurring): Promise<Budget> {
-//         throw new Error("Not implemented");
-//     }
+    updateExpense(_budget_id: string, _expense: Expense): Promise<Budget> {
+        throw new Error("Not implemented");
+    }
 
-//     deleteRecurring(_recurringId: number): Promise<Budget> {
-//         throw new Error("Not implemented");
-//     }
+    deleteExpense(_budget_id: string, _expenseId: number): Promise<Budget> {
+        throw new Error("Not implemented");
+    }
 
-//     updateUnplanned(_unplanned: Unplanned): Promise<Budget> {
-//         throw new Error("Not implemented");
-//     }
+    updateRecurring(_budget_id: string, _recurring: Recurring): Promise<Budget> {
+        throw new Error("Not implemented");
+    }
 
-//     deleteUnplanned(_unplannedId: number): Promise<Budget> {
-//         throw new Error("Not implemented");
-//     }
+    deleteRecurring(_budget_id: string, _recurringId: number): Promise<Budget> {
+        throw new Error("Not implemented");
+    }
 
-//     getUserActions(): Promise<UserAction[]> {
-//         throw new Error("Not implemented");
-//     }
-// }
+    updateUnplanned(_budget_id: string, _unplanned: Unplanned): Promise<Budget> {
+        throw new Error("Not implemented");
+    }
+
+    deleteUnplanned(_budget_id: string, _unplannedId: number): Promise<Budget> {
+        throw new Error("Not implemented");
+    }
+
+    getUserActions(_budget_id: string): Promise<UserAction[]> {
+        throw new Error("Not implemented");
+    }
+}
 
 class LocalDataService implements DataService {
     getBudget(): Promise<Budget[]> {
@@ -103,7 +127,7 @@ class LocalDataService implements DataService {
         });
     }
 
-    updateCategory(category: Category): Promise<Budget> {
+    updateCategory(_budget_id: string, category: Category): Promise<Budget> {
         return new Promise((resolve, _reject) => {
             // Implement the logic to update a category in local storage
             // For example:
@@ -133,14 +157,14 @@ class LocalDataService implements DataService {
         });
     }
 
-    updateExpense(categoryId: number, expense: Expense): Promise<Budget> {
+    updateExpense(_budget_id: string, expense: Expense): Promise<Budget> {
         return new Promise((resolve, reject) => {
             // Implement the logic to update an expense in local storage
             // For example:
             const userData = localStorage.getItem('userData');
             if (userData) {
                 const parsedBudget: Budget = JSON.parse(userData);
-                const category = parsedBudget.categoryList.find((c: Category) => c.id === categoryId);
+                const category = parsedBudget.categoryList.find((c: Category) => c.id === expense.categoryId);
                 if (category) {
                     let found: boolean = false;
                     const updatedExpenses = category.expenseList.map((e: Expense) => {
@@ -159,7 +183,7 @@ class LocalDataService implements DataService {
                     parsedBudget.userActions.push(user_action);
 
                     parsedBudget.categoryList = parsedBudget.categoryList.map((c: Category) => {
-                        if (c.id === categoryId) {
+                        if (c.id === expense.categoryId) {
                             c.expenseList = updatedExpenses;
                         }
                         return c;
@@ -176,7 +200,7 @@ class LocalDataService implements DataService {
         });
     }
 
-    deleteExpense(expenseId: number): Promise<Budget> {
+    deleteExpense(_budget_id: string, expenseId: number): Promise<Budget> {
         return new Promise((resolve, reject) => {
             // Implement the logic to delete an expense from local storage
             // For example:
@@ -209,7 +233,7 @@ class LocalDataService implements DataService {
         });
     }
 
-    updateRecurring(recurring: Recurring): Promise<Budget> {
+    updateRecurring(_budget_id: string, recurring: Recurring): Promise<Budget> {
         return new Promise((resolve, reject) => {
             // Implement the logic to update a recurring expense in local storage
             // For example:
@@ -235,7 +259,7 @@ class LocalDataService implements DataService {
         });
     }
 
-    deleteRecurring(recurringId: number): Promise<Budget> {
+    deleteRecurring(_budget_id: string, recurringId: number): Promise<Budget> {
         return new Promise((resolve, reject) => {
             // Implement the logic to delete a recurring expense from local storage
             // For example:
@@ -267,7 +291,7 @@ class LocalDataService implements DataService {
         });
     }
 
-    updateUnplanned(unplanned: Unplanned): Promise<Budget> {
+    updateUnplanned(_budget_id: string, unplanned: Unplanned): Promise<Budget> {
         return new Promise((resolve, reject) => {
             // Implement the logic to update an unplanned expense in local storage
             // For example:
@@ -293,7 +317,7 @@ class LocalDataService implements DataService {
         });
     }
 
-    deleteUnplanned(unplannedId: number): Promise<Budget> {
+    deleteUnplanned(_budget_id: string, unplannedId: number): Promise<Budget> {
         return new Promise((resolve, reject) => {
             // Implement the logic to delete an unplanned expense from local storage
             // For example:
@@ -326,7 +350,7 @@ class LocalDataService implements DataService {
         });
     }
 
-    getUserActions(): Promise<UserAction[]> {
+    getUserActions(_budget_id: string): Promise<UserAction[]> {
         return new Promise((resolve) => {
             // Implement the logic to retrieve user actions from local storage
             // For example:

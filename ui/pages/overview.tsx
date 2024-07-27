@@ -219,7 +219,7 @@ export class OverviewPage extends React.Component<IProp, IState> {
     }
 
     componentDidMount(): void {
-        this._data_service.getBudget().then((data) => {
+        this._data_service.getBudget("").then((data) => {
             if (data.length > 0)
                 this.setState({ budget: data[0] });
             else {
