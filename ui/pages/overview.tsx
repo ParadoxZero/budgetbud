@@ -159,17 +159,27 @@ export class OverviewPage extends React.Component<IProp, IState> {
     }
 
     render_categories() {
+        if (this.state.budget?.categoryList.length != 0) {
+
+            return (
+                <Card bordered={false} style={{ margin: 0, marginTop: 0, marginBottom: 10, padding: 0 }}>
+                    <Flex align="stretch" justify="space-around" vertical>
+                        < Divider style={{ margin: 0, padding: 0 }} />
+                        {this.state.budget?.categoryList.map((category) => (
+                            <div key={category.id}>
+                                {this.render_catogory_list_row(category.id, category.name, this.state.filled_allocations[category.id], category.allocation)}
+                                < Divider style={{ margin: 0, padding: 0 }} />
+                            </div>
+                        ))}
+
+                    </Flex>
+                </Card>
+            )
+        }
         return (
             <Card bordered={false} style={{ margin: 0, marginTop: 0, marginBottom: 10, padding: 0 }}>
-                <Flex align="stretch" justify="space-around" vertical>
-                    < Divider style={{ margin: 0, padding: 0 }} />
-                    {this.state.budget?.categoryList.map((category) => (
-                        <div key={category.id}>
-                            {this.render_catogory_list_row(category.id, category.name, this.state.filled_allocations[category.id], category.allocation)}
-                            < Divider style={{ margin: 0, padding: 0 }} />
-                        </div>
-                    ))}
-
+                <Flex align="center" justify="center" style={{ height: 200 }}>
+                    <Empty description="No budget details" imageStyle={{ height: "auto", fontSize: 48 }} />
                 </Flex>
             </Card>
         )

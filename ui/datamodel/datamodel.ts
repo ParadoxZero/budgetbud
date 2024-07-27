@@ -186,9 +186,6 @@ export class DataModelFactory {
     }
 
     static createBudget(): Budget {
-        if (import.meta.env.VITE_CREATE_DUMMY_DATA !== 'true') {
-            throw new Error('Create User Data function is only available if dummy mode is enabled.');
-        }
         return {
             id: Math.random().toString(),
             history_id: '',
@@ -206,9 +203,6 @@ export class DataModelFactory {
     }
 
     static createBudgetHistory(): BudgetHistory {
-        if (import.meta.env.VITE_CREATE_DUMMY_DATA !== 'true') {
-            throw new Error('Create User Data function is only available if dummy mode is enabled.');
-        }
         return {
             id: Math.random().toString(),
             history: []
