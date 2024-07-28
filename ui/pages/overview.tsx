@@ -7,7 +7,7 @@ import { DataModelFactory, Recurring, Budget } from "../datamodel/datamodel";
 import { Typography } from "antd";
 import { RecurringCalculatorService } from "../services/recurring_date_service";
 import { BaseType } from "antd/es/typography/Base";
-import { navigation, View, store } from '../store';
+import { navigation, View, store, headerSlice } from '../store';
 
 import '../main.css';
 import { } from "react-redux";
@@ -220,8 +220,17 @@ export class OverviewPage extends React.Component<IProp, IState> {
 
     componentDidMount(): void {
         this._data_service.getBudget("").then((data) => {
-            if (data.length > 0)
+            if (data.length > 0) {
                 this.setState({ budget: data[0] });
+                store.dispatch(
+                    headerSlice.actions.header(
+                        {
+                            budget_list: data,
+                            is_visible: true,
+                        })
+
+                );
+            }
             else {
                 this.navigate_to(View.NoBudgetAvailable);
             }

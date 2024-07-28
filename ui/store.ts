@@ -17,15 +17,18 @@ export const navigationSlice = createSlice({
     },
     reducers: {
         navigation: (state, action) => {
+            console.log(action);
             state.current_view = action.payload;
         }
-    }
+    },
 })
 
 export const headerSlice = createSlice({
     name: 'header',
     initialState: {
         title: 'BudgetBud',
+        is_visible: true,
+        budget_list: []
     },
     reducers: {
         header: (state, action) => {
