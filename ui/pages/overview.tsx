@@ -191,7 +191,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
                             <Text strong type={text_type}>{total - value} / {total} </Text>
                             {progress}
                         </Flex>
-                        <Button shape="circle" type="default" icon={<RightOutlined />} style={{ padding: 20, marginLeft: 20 }} onClick={(e) => { alert('button'); e.stopPropagation(); }}></Button>
+                        <Button shape="circle" type="default" icon={<RightOutlined />} style={{ padding: 20, marginLeft: 20 }} onClick={(e) => { alert('button'); e.stopPropagation(); }} disabled></Button>
                     </Flex>
                 </Flex>
             </div >
