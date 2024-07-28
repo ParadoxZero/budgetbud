@@ -104,8 +104,8 @@ export class OverviewPage extends React.Component<IProp, IState> {
                 context!.processing = true;
                 this.setState({ add_expense_mode_context: context });
                 this._data_service.updateExpense(this.state.budget?.id!, expense).then((data) => {
-                    // this.setState({ budget: data, add_expense_mode_context: null });
-                });
+                    this.setState({ budget: data, add_expense_mode_context: null });
+                }).catch(() => this.setState({ add_expense_mode_context: null }));
             } else {
                 this.setState({ add_expense_mode_context: null });
             }
