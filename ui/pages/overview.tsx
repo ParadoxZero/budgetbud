@@ -169,9 +169,10 @@ export class OverviewPage extends React.Component<IProp, IState> {
         />
 
         const on_click = () => {
-            if (this.state.add_expense_mode_context == null) {
-                this.setState({ add_expense_mode_context: { category_id: id, filled: false, processing: false } });
+            if (this.state.add_expense_mode_context?.filled || this.state.add_expense_mode_context?.processing) {
+                return;
             }
+            this.setState({ add_expense_mode_context: { category_id: id, filled: false, processing: false } });
         }
 
         return (
