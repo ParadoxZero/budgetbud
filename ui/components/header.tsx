@@ -29,6 +29,16 @@ class Header extends React.Component<HeaderProps> {
 
     render_budget_selector() {
         const items = this.props.budget_list.map((budget, index) => ({ name: budget.name, value: index }));
+        if (items.length == 0) {
+            return (
+                <Input
+                    size="large"
+                    placeholder="Create Budget"
+                    prefix={<Avatar icon={<FileOutlined />} />}
+                    suffix={<Button type="default" icon={<PlusOutlined />} />}
+                />
+            );
+        }
         let defaultValue: number = this.props.selected_budget_index ?? 0;
         const addItem = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
             e.preventDefault();
