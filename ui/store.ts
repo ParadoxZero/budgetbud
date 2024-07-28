@@ -53,6 +53,13 @@ export const budgetSlice = createSlice({
                 return;
             }
             state.budget_list[state.selected_budget_index] = action.payload.budget;
+        },
+        updateSelection: (state, action) => {
+            const new_index = action.payload.index;
+            if (new_index < 0 || new_index >= state.budget_list.length) {
+                return;
+            }
+            state.selected_budget_index = new_index;
         }
     }
 })

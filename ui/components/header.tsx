@@ -2,6 +2,7 @@ import { FileOutlined, MoreOutlined, PlusOutlined, SettingOutlined } from "@ant-
 import { Avatar, Button, Divider, Flex, Input, InputRef, Select, Space, Typography } from "antd";
 import React from "react";
 import { connect } from "react-redux";
+import { budgetSlice, store } from "../store";
 
 export interface HeaderBudgetDetails {
     name: string;
@@ -12,6 +13,7 @@ export interface HeaderProps {
     title: string;
     isVisible: boolean;
     budget_list: HeaderBudgetDetails[];
+    selected_budget_index: number | null;
 }
 
 class Header extends React.Component<HeaderProps> {
@@ -26,26 +28,30 @@ class Header extends React.Component<HeaderProps> {
     }
 
     render_budget_selector() {
-        const items = ["Budget 1", "Budget 2", "Budget 3"];
-
-        let index = 0;
-
+        const items = this.props.budget_list.map((budget, index) => ({ name: budget.name, value: index }));
+        let defaultValue: number = this.props.selected_budget_index ?? 0;
         const addItem = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
             e.preventDefault();
             // setItems([...items, name || `New item ${index++}`]);
             // setName('');
         };
+        const onSelectionChanged = (value: number) => {
+            store.dispatch(budgetSlice.actions.updateSelection({ index: value }));
+        }
         return (
             <Select
                 size="large"
                 style={{ width: 300 }}
                 placeholder="Select Budget"
+                options={items.map((item) => ({ label: item.name, value: item.value }))}
+                defaultValue={defaultValue}
+                onChange={onSelectionChanged}
                 dropdownRender={(menu) => (
                     <>
                         {menu}
                         <Divider style={{ margin: '8px 0' }} />
                         <Space style={{ padding: '0 8px 4px' }}>
-                            <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
+                            <Button type="text" icon={<PlusOutlined />} onClick={addItem} disabled>
                                 Add Budget
                             </Button>
                         </Space>
@@ -58,8 +64,6 @@ class Header extends React.Component<HeaderProps> {
                     </Flex>
                 )}
                 variant="outlined"
-                removeIcon={<FileOutlined />}
-                options={items.map((item) => ({ label: item, value: item }))}
             />
         );
     }
@@ -68,7 +72,8 @@ class Header extends React.Component<HeaderProps> {
 
 function mapStateToProps(state: any): HeaderProps {
     return {
-        budget_list: state.header.budget_list,
+        budget_list: state.budget.budget_list,
+        selected_budget_index: state.budget.selected_budget_index,
         title: state.header.title,
         isVisible: state.header.is_visible
     };
