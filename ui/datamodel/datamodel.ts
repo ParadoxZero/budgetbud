@@ -13,7 +13,7 @@ export interface Expense {
     title: string;
     amount: number;
     categoryId: number;
-    timestamp: Date;
+    timestamp: number;
 }
 
 export interface Unplanned {
@@ -36,11 +36,11 @@ export interface Recurring {
     name: string;
     description: string;
     isActive: boolean;
-    lastUpdated: Date;
+    lastUpdated: number;
     frequency: RecurringType;
     frequencey_unit: number; // This has different meanings based on the frequency, if monthly, it will be day of month, if weekly, it will be day of week etc.
-    startDate: Date;
-    endDate: Date;
+    startDate: number;
+    endDate: number;
     amount: number;
 }
 
@@ -50,14 +50,14 @@ export interface Category {
     description: string;
     allocation: number;
     isActive: boolean;
-    lastUpdated: Date;
+    lastUpdated: number;
     currency: string;
     expenseList: Expense[];
 }
 
 export interface CategoryLog {
     id: number;
-    timestamp: Date;
+    timestamp: number;
     allocation: number;
 }
 
@@ -82,7 +82,7 @@ export enum UserActionType {
 }
 
 export interface UserAction {
-    timestamp: Date;
+    timestamp: number;
     type: UserActionType;
     payload: Category | Expense | Recurring | Unplanned | null;
 }
@@ -100,7 +100,7 @@ export interface Budget {
     unplannedList: Unplanned[];
     period: TimeUnit;
     userActions: UserAction[];
-    last_updated: Date;
+    last_updated: number;
     authorized_users: string[];
 }
 
@@ -118,7 +118,7 @@ export class DataModelFactory {
             title: '',
             amount: amount,
             categoryId,
-            timestamp: new Date()
+            timestamp: Date.now()
         };
     }
 
@@ -139,11 +139,11 @@ export class DataModelFactory {
             name: '',
             description: '',
             isActive: false,
-            lastUpdated: new Date(),
+            lastUpdated: Date.now(),
             frequency: RecurringType.weekly,
             frequencey_unit: 0,
-            startDate: new Date(),
-            endDate: new Date(),
+            startDate: Date.now(),
+            endDate: Date.now(),
             amount: 0
         };
     }
@@ -156,7 +156,7 @@ export class DataModelFactory {
             description: '',
             allocation: 0,
             isActive: false,
-            lastUpdated: new Date(),
+            lastUpdated: Date.now(),
             currency: '',
             expenseList: []
         };
@@ -166,7 +166,7 @@ export class DataModelFactory {
         const id = lastUsedId + 1;
         return {
             id,
-            timestamp: new Date(),
+            timestamp: Date.now(),
             allocation: 0
         };
     }
@@ -180,7 +180,7 @@ export class DataModelFactory {
 
     static createUserAction(): UserAction {
         return {
-            timestamp: new Date(),
+            timestamp: Date.now(),
             type: UserActionType.addCategory,
             payload: {} as Category | Expense | Recurring | Unplanned
         };
@@ -199,7 +199,7 @@ export class DataModelFactory {
                 year: new Date(Date.now()).getFullYear()
             },
             userActions: [],
-            last_updated: new Date(),
+            last_updated: Date.now(),
             authorized_users: []
         };
     }

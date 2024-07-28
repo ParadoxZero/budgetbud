@@ -86,7 +86,7 @@ export function CreateDummyData() {
     recurring.name = "Rent";
     recurring.description = "Monthly rent";
     recurring.isActive = true;
-    recurring.lastUpdated = new Date();
+    recurring.lastUpdated = Date.now();
     recurring.frequency = RecurringType.monthly;
     recurring.frequencey_unit = 1;
 

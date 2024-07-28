@@ -233,7 +233,7 @@ class LocalDataService implements DataService {
                         }
                         return c;
                     });
-                    parsedBudget.last_updated = new Date(Date.now());
+                    parsedBudget.last_updated = Date.now();
                     localStorage.setItem('userData', JSON.stringify(parsedBudget));
                     resolve(parsedBudget);
                 } else {

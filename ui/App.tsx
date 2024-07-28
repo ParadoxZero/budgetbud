@@ -1,5 +1,4 @@
 import { navigation, store, View } from './store'
-import { OverviewPage } from './pages/overview';
 import { CreateDummyData } from './utils';
 import { PingRemote } from './services/ping_service';
 import NoBudgetAvailablePage from './pages/no-budget_page';
@@ -8,6 +7,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { ConfigProvider, Layout } from 'antd';
 import Header from './components/header';
+import Overview from './pages/overview';
 
 
 interface PreRun {
@@ -89,7 +89,7 @@ class App extends React.Component<AppProps> {
 
     switch (view) {
       case View.Overview:
-        return <OverviewPage />
+        return <Overview />
       case View.NoBudgetAvailable:
         return <NoBudgetAvailablePage />
       default:

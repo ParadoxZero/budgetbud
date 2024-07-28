@@ -7,15 +7,17 @@ import { DataModelFactory, Recurring, Budget } from "../datamodel/datamodel";
 import { Typography } from "antd";
 import { RecurringCalculatorService } from "../services/recurring_date_service";
 import { BaseType } from "antd/es/typography/Base";
-import { navigation, View, store, headerSlice } from '../store';
+import { navigation, View, store, headerSlice, budgetSlice } from '../store';
 
 import '../main.css';
-import { } from "react-redux";
-import { TypeIcon } from "antd/es/message/PurePanel";
+import { connect } from "react-redux";
 
 const { Text } = Typography;
 
-interface IProp { }
+interface OverviewProps {
+    budget_list: Budget[];
+    selected_budget_index: number | null;
+}
 
 interface AddExpenseContext {
     category_id: number;
@@ -24,15 +26,13 @@ interface AddExpenseContext {
 }
 
 interface IState {
-    budget: Budget | null;
     total_allocations: number;
     filled_allocations: { [key: number]: number };
     upcoming_expense: { name: string, amount: number } | null;
     add_expense_mode_context: AddExpenseContext | null;
-
 }
 
-export class OverviewPage extends React.Component<IProp, IState> {
+class OverviewPage extends React.Component<OverviewProps, IState> {
 
     _data_service: DataService;
     _recurring_calculator_service: RecurringCalculatorService;
@@ -98,13 +98,19 @@ export class OverviewPage extends React.Component<IProp, IState> {
             const entered_amount = parseFloat((document.getElementById('expense_amount') as HTMLInputElement).value);
             if (entered_amount > 0) {
                 const category_id = context!.category_id;
-                const list_of_expenses = this.state.budget?.categoryList.find((category) => category.id == category_id)?.expenseList ?? [];
+                if (this.props.selected_budget_index == null) {
+                    return;
+                }
+                const budget = this.props.budget_list[this.props.selected_budget_index];
+                const list_of_expenses = budget.categoryList
+                    .find((category) => category.id == category_id)?.expenseList ?? [];
                 const last_expense_id = list_of_expenses?.reduce((acc, curr) => Math.max(acc, curr.id), 0) ?? 0;
                 const expense = DataModelFactory.createExpense(last_expense_id, context!.category_id, entered_amount);
                 context!.processing = true;
                 this.setState({ add_expense_mode_context: context });
-                this._data_service.updateExpense(this.state.budget?.id!, expense).then((data) => {
-                    this.setState({ budget: data, add_expense_mode_context: null });
+                this._data_service.updateExpense(budget.id, expense).then((data) => {
+                    store.dispatch(budgetSlice.actions.upadteBudget({ budget: data }));
+                    this.setState({ add_expense_mode_context: null });
                 }).catch(() => this.setState({ add_expense_mode_context: null }));
             } else {
                 this.setState({ add_expense_mode_context: null });
@@ -200,13 +206,14 @@ export class OverviewPage extends React.Component<IProp, IState> {
     }
 
     render_categories() {
-        if (this.state.budget?.categoryList.length != 0) {
 
+        if (this.props.selected_budget_index != null) {
+            const budget = this.props.budget_list[this.props.selected_budget_index];
             return (
                 <Card bordered={false} style={{ margin: 0, marginTop: 0, marginBottom: 10, padding: 0 }}>
                     <Flex align="stretch" justify="space-around" vertical>
                         < Divider style={{ margin: 0, padding: 0 }} />
-                        {this.state.budget?.categoryList.map((category) => (
+                        {budget?.categoryList.map((category) => (
                             <div key={category.id}>
                                 {this.render_catogory_list_row(category.id, category.name, this.state.filled_allocations[category.id], category.allocation)}
                                 < Divider style={{ margin: 0, padding: 0 }} />
@@ -236,7 +243,7 @@ export class OverviewPage extends React.Component<IProp, IState> {
     }
 
     render() {
-        if (this.state.budget == null) {
+        if (this.props.selected_budget_index == null) {
             return <Flex vertical justify="center" align="center" style={{ height: "100vh" }}>
                 <Spin size="large" indicator={<LoadingOutlined style={{ fontSize: 48 }} />} />
             </Flex>
@@ -249,7 +256,6 @@ export class OverviewPage extends React.Component<IProp, IState> {
         this._data_service = getDataService();
         this._recurring_calculator_service = new RecurringCalculatorService();
         this.state = {
-            budget: null,
             total_allocations: 0,
             filled_allocations: {},
             upcoming_expense: null,
@@ -260,15 +266,13 @@ export class OverviewPage extends React.Component<IProp, IState> {
     componentDidMount(): void {
         this._data_service.getBudget("").then((data) => {
             if (data.length > 0) {
-                this.setState({ budget: data[0] });
                 store.dispatch(
-                    headerSlice.actions.header(
-                        {
-                            budget_list: data,
-                            is_visible: true,
-                        })
-
+                    budgetSlice.actions.budget({
+                        budget_list: data,
+                        selected_budget_index: 0
+                    })
                 );
+                store.dispatch(headerSlice.actions.header({ is_visible: true }));
             }
             else {
                 this.navigate_to(View.NoBudgetAvailable);
@@ -276,10 +280,16 @@ export class OverviewPage extends React.Component<IProp, IState> {
         });
     }
 
-    componentDidUpdate(_prevProps: Readonly<IProp>, prevState: Readonly<IState>, _snapshot?: any): void {
-        if (this.state.budget != null && prevState.budget?.last_updated != this.state.budget.last_updated) {
-            this.update_calculations();
-            this.update_next_recurring();
+    componentDidUpdate(prevProps: Readonly<OverviewProps>, _prevState: Readonly<IState>, _snapshot?: any): void {
+        if (this.props.selected_budget_index != null) {
+            const current_budget = this.props.budget_list[this.props.selected_budget_index];
+            if (prevProps.selected_budget_index != this.props.selected_budget_index ||
+                (prevProps.selected_budget_index != null && prevProps.budget_list[prevProps.selected_budget_index].last_updated != current_budget.last_updated)) {
+                {
+                    this.update_calculations();
+                    this.update_next_recurring();
+                }
+            }
         }
     }
 
@@ -288,7 +298,8 @@ export class OverviewPage extends React.Component<IProp, IState> {
     }
 
     private update_next_recurring() {
-        const recurring_list: Recurring[] = this.state.budget!.recurringList;
+        const budget = this.props.budget_list[this.props.selected_budget_index!];
+        const recurring_list: Recurring[] = budget.recurringList;
         const next_dates_ = recurring_list.map((recurring) => (
             {
                 "next_date": this._recurring_calculator_service.calculateNextDate(recurring),
@@ -307,7 +318,7 @@ export class OverviewPage extends React.Component<IProp, IState> {
 
     }
     private update_calculations() {
-        const budget = this.state.budget;
+        const budget = this.props.budget_list[this.props.selected_budget_index!];
         let total_allocations = 0;
         budget?.categoryList.forEach((category) => {
             total_allocations += category.allocation;
@@ -326,4 +337,10 @@ export class OverviewPage extends React.Component<IProp, IState> {
     }
 }
 
-export default OverviewPage;
+function mapStateToProps(state: any): OverviewProps {
+    return {
+        budget_list: state.budget.budget_list,
+        selected_budget_index: state.budget.selected_budget_index
+    };
+}
+export default connect(mapStateToProps)(OverviewPage);
