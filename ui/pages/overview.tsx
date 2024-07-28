@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, Card, Divider, Empty, Flex, Input, Progress, Spin, Statistic } from "antd";
-import { CheckCircleOutlined, LoadingOutlined, PlusOutlined, RightOutlined, WalletOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, CloseOutlined, LoadingOutlined, PlusOutlined, RightOutlined, WalletOutlined } from '@ant-design/icons';
 import { GetScreenSize, GetStatusFromPercent, ScreenSize, Status } from "../utils";
 import { DataService, getDataService } from "../services/data_service";
 import { DataModelFactory, Recurring, Budget } from "../datamodel/datamodel";
@@ -11,16 +11,25 @@ import { navigation, View, store, headerSlice } from '../store';
 
 import '../main.css';
 import { } from "react-redux";
+import { TypeIcon } from "antd/es/message/PurePanel";
 
 const { Text } = Typography;
 
 interface IProp { }
+
+interface AddExpenseContext {
+    category_id: number;
+    filled: boolean;
+    processing: boolean;
+}
+
 interface IState {
     budget: Budget | null;
     total_allocations: number;
     filled_allocations: { [key: number]: number };
     upcoming_expense: { name: string, amount: number } | null;
-    add_expense_mode_category: number | null;
+    add_expense_mode_context: AddExpenseContext | null;
+
 }
 
 export class OverviewPage extends React.Component<IProp, IState> {
@@ -82,26 +91,49 @@ export class OverviewPage extends React.Component<IProp, IState> {
     }
 
     render_add_single_category_expense() {
+
+        let context = this.state.add_expense_mode_context;
+
         const handle_add_expense = () => {
             const entered_amount = parseFloat((document.getElementById('expense_amount') as HTMLInputElement).value);
             if (entered_amount > 0) {
-                const category_id = this.state.add_expense_mode_category!;
+                const category_id = context!.category_id;
                 const list_of_expenses = this.state.budget?.categoryList.find((category) => category.id == category_id)?.expenseList ?? [];
                 const last_expense_id = list_of_expenses?.reduce((acc, curr) => Math.max(acc, curr.id), 0) ?? 0;
-                const expense = DataModelFactory.createExpense(last_expense_id, this.state.add_expense_mode_category!, entered_amount);
+                const expense = DataModelFactory.createExpense(last_expense_id, context!.category_id, entered_amount);
+                context!.processing = true;
+                this.setState({ add_expense_mode_context: context });
                 this._data_service.updateExpense(this.state.budget?.id!, expense).then((data) => {
-                    this.setState({ budget: data })
+                    // this.setState({ budget: data, add_expense_mode_context: null });
                 });
+            } else {
+                this.setState({ add_expense_mode_context: null });
             }
-            this.setState({ add_expense_mode_category: null });
         }
+
+        const handle_input_change = () => {
+            const entered_amount = parseFloat((document.getElementById('expense_amount') as HTMLInputElement).value);
+            context!.filled = entered_amount > 0;
+            this.setState({ add_expense_mode_context: context });
+        }
+
+        let feature_button_icon = <CloseOutlined />;
+        if (context?.processing) {
+            feature_button_icon = <LoadingOutlined />
+        } else if (context?.filled) {
+            feature_button_icon = <PlusOutlined />
+        }
+
         return (
             <div style={{ margin: 0, marginTop: 10, marginBottom: 10, paddingRight: 20, paddingLeft: 20, minWidth: 300 }} className='touchahble'>
                 <Flex align="center" justify="space-between" style={{ minHeight: 80 }}>
-                    <Input id="expense_amount" size="large" type="number" allowClear placeholder="Spent amount" autoFocus variant="borderless" minLength={250} inputMode="numeric" style={{ padding: 0 }} onPressEnter={() => handle_add_expense()} />
+                    <Input id="expense_amount" size="large" type="number" placeholder="Spent amount"
+                        autoFocus variant="borderless" minLength={250} inputMode="numeric"
+                        style={{ padding: 0 }} onPressEnter={handle_add_expense}
+                        onInput={handle_input_change} disabled={context?.processing} />
                     <Flex align="center" justify="right">
-                        <Button shape="circle" type="default" icon={<PlusOutlined />} style={{ padding: 20, marginLeft: 20 }} onClick={() => { handle_add_expense() }}></Button>
-                        <Button shape="circle" type="default" icon={<RightOutlined />} style={{ padding: 20, marginLeft: 20 }} onClick={(e) => { alert('button'); e.stopPropagation(); }}></Button>
+                        <Button shape="circle" type="default" icon={feature_button_icon} style={{ padding: 20, marginLeft: 20 }} onClick={() => { handle_add_expense() }}></Button>
+                        <Button shape="circle" type="default" icon={<RightOutlined />} style={{ padding: 20, marginLeft: 20 }} onClick={(e) => { alert('button'); e.stopPropagation(); }} disabled></Button>
                     </Flex>
                 </Flex>
             </div >
@@ -136,8 +168,14 @@ export class OverviewPage extends React.Component<IProp, IState> {
             status={percent < 100 ? "active" : "exception"}
         />
 
+        const on_click = () => {
+            if (this.state.add_expense_mode_context == null) {
+                this.setState({ add_expense_mode_context: { category_id: id, filled: false, processing: false } });
+            }
+        }
+
         return (
-            <div style={{ margin: 0, marginTop: 10, marginBottom: 10, paddingRight: 20, paddingLeft: 20, minWidth: 300 }} className='touchahble' onClick={() => this.setState({ add_expense_mode_category: id })}>
+            <div style={{ margin: 0, marginTop: 10, marginBottom: 10, paddingRight: 20, paddingLeft: 20, minWidth: 300 }} className='touchahble' onClick={on_click}>
                 <Flex align="center" justify="space-between">
                     <Text strong type="secondary" style={{ fontSize: 18 }}>{title}</Text>
                     <Flex align="center" justify="right">
@@ -154,7 +192,7 @@ export class OverviewPage extends React.Component<IProp, IState> {
     }
 
     render_catogory_list_row(id: number, title: string, value: number, total: number) {
-        if (this.state.add_expense_mode_category == id) {
+        if (this.state.add_expense_mode_context?.category_id == id) {
             return this.render_add_single_category_expense();
         }
         return this.render_view_single_category(id, title, value, total);
@@ -214,7 +252,7 @@ export class OverviewPage extends React.Component<IProp, IState> {
             total_allocations: 0,
             filled_allocations: {},
             upcoming_expense: null,
-            add_expense_mode_category: null,
+            add_expense_mode_context: null
         }
     }
 
