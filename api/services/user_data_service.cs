@@ -28,7 +28,11 @@ public class UserDataService
 
     public async Task<Budget> CreateBudget(string name)
     {
-        return await _dbService.CreateNewBudgetAsync(name);
+        var budget = await _dbService.CreateNewBudgetAsync(name);
+        var user_data = await _dbService.GetUserData(_identityService.GetUserIdentity());
+        user_data.BudgetIds.Add(budget.id);
+        await _dbService.UpdateUserData(user_data);
+        return budget;
     }
 
     public async Task<Budget> AddExpenseToBudget(string budget_id, Expense expense)
@@ -37,9 +41,9 @@ public class UserDataService
         return await _dbService.GetBudgetAsync(budget_id);
     }
 
-    public async Task<Budget> AddCategoryToBudget(string budget_id, Category category)
+    public async Task<Budget> AddCategoryToBudget(string budget_id, List<Category> categoryList)
     {
-        await _dbService.AddCategoryAsync(budget_id, category);
+        await _dbService.AddCategoryAsync(budget_id, categoryList);
         return await _dbService.GetBudgetAsync(budget_id);
     }
 }

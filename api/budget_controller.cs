@@ -28,10 +28,10 @@ public class BudgetController : ControllerBase
         return Ok(await _userDataService.CreateBudget(input.name));
     }
 
-    [HttpPost("{budget_id}/category")]
-    public async Task<IActionResult> AddCategoryInput(string budget_id, Category category)
+    [HttpPost("{budget_id}/categories")]
+    public async Task<IActionResult> AddCategoryInput(string budget_id, List<Category> categoryList)
     {
-        return Ok(await _userDataService.AddCategoryToBudget(budget_id, category));
+        return Ok(await _userDataService.AddCategoryToBudget(budget_id, categoryList));
     }
 
 

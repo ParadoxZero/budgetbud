@@ -30,7 +30,8 @@ class RemoteDataService implements DataService {
     BASE_URL: string;
 
     constructor() {
-        this.BASE_URL = window.location.hostname;
+        this.BASE_URL = "";
+        console.log(`Using remote data service at ${this.BASE_URL}`);
     }
 
     createBudget(name: string): Promise<Budget> {
@@ -43,6 +44,7 @@ class RemoteDataService implements DataService {
             },
         }).then((response) => response.json() as Promise<Budget>);
     }
+
     getBudget(): Promise<Budget[]> {
         const endpoint: string = `${this.BASE_URL}/api/Budget`;
         return fetch(endpoint, { method: 'GET' }).then((response) => response.json() as Promise<Budget[]>);
@@ -51,6 +53,7 @@ class RemoteDataService implements DataService {
     getHistory(): Promise<BudgetHistory> {
         throw new Error("Not implemented");
     }
+
     updateCategory(budger_id: string, category: Category): Promise<Budget> {
         const endpoint: string = `${this.BASE_URL}/api/Budget/${budger_id}`;
         return fetch(endpoint, {
@@ -73,8 +76,15 @@ class RemoteDataService implements DataService {
         }).then((response) => response.json() as Promise<Budget>);
     }
 
-    updateExpense(_budget_id: string, _expense: Expense): Promise<Budget> {
-        throw new Error("Not implemented");
+    updateExpense(_budget_id: string, expense: Expense): Promise<Budget> {
+        const endpoint: string = `${this.BASE_URL}/api/Budget/${_budget_id}/expense`;
+        return fetch(endpoint, {
+            method: 'POST',
+            body: JSON.stringify(expense),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        }).then((response) => response.json() as Promise<Budget>);
     }
 
     deleteExpense(_budget_id: string, _expenseId: number): Promise<Budget> {

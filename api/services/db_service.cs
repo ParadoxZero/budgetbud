@@ -40,6 +40,11 @@ namespace budgetbud.Services
             }
         }
 
+        public async Task UpdateUserData(UserData userData)
+        {
+            await _container.UpsertItemAsync(userData, new PartitionKey(userData.id));
+        }
+
         public async Task<Budget> GetBudgetAsync(string budget_id)
         {
             return await _container.ReadItemAsync<Budget>(budget_id, new PartitionKey(budget_id));
@@ -66,7 +71,7 @@ namespace budgetbud.Services
                 authorized_users = new List<string>() { _identityService.GetUserIdentity() },
                 categoryList = new List<Category>(),
                 history_id = history.id,
-                last_updated = DateTime.Now,
+                last_updated = DateTime.UtcNow.Ticks,
                 period = period,
                 recurringList = new List<Recurring>(),
                 unplannedList = new List<Expense>(),
@@ -82,6 +87,7 @@ namespace budgetbud.Services
 
         public async Task UpdateBudgetAsync(Budget budget)
         {
+            budget.last_updated = DateTime.UtcNow.Ticks;
             await _container.UpsertItemAsync(budget, new PartitionKey(budget.id));
         }
 
@@ -90,15 +96,19 @@ namespace budgetbud.Services
             Budget budget = await GetBudgetAsync(budget_id);
             Category cat = budget.categoryList?.Find(c => c.Id == expense.CategoryId) ?? throw new Exception("Category not found");
             expense.Id = cat.ExpenseList.LastOrDefault()?.Id ?? 0;
+            expense.Timestamp = DateTime.UtcNow.Ticks;
             cat.ExpenseList.Add(expense);
+            cat.LastUpdated = DateTime.UtcNow.Ticks;
             await UpdateBudgetAsync(budget);
         }
 
         public async Task UpdateExpenseAsync(string budget_id, Expense expense)
         {
             Budget budget = await GetBudgetAsync(budget_id);
+            expense.Timestamp = DateTime.UtcNow.Ticks;
             Category category = budget.categoryList?.Find(c => c.Id == expense.CategoryId) ?? throw new Exception("Category not found");
             category.ExpenseList[category.ExpenseList.FindIndex(e => e.Id == expense.Id)] = expense;
+            category.LastUpdated = DateTime.UtcNow.Ticks;
             await UpdateBudgetAsync(budget);
         }
 
@@ -107,14 +117,16 @@ namespace budgetbud.Services
             Budget budget = await GetBudgetAsync(budget_id);
             Category category = budget.categoryList?.Find(c => c.Id == expense.CategoryId) ?? throw new Exception("Category not found");
             category.ExpenseList.RemoveAll(e => e.Id == expense.Id);
+            category.LastUpdated = DateTime.UtcNow.Ticks;
             await UpdateBudgetAsync(budget);
         }
 
-        public async Task AddCategoryAsync(string budget_id, Category category)
+        public async Task AddCategoryAsync(string budget_id, List<Category> categoryList)
         {
             Budget budget = await GetBudgetAsync(budget_id);
-            category.Id = (budget.categoryList.LastOrDefault()?.Id ?? 0) + 1;
-            budget.categoryList.Add(category);
+            int last_id = (budget.categoryList.LastOrDefault()?.Id ?? 0) + 1;
+            categoryList.ForEach(c => { c.Id = last_id++; c.LastUpdated = DateTime.UtcNow.Ticks; });
+            budget.categoryList.AddRange(categoryList);
             await UpdateBudgetAsync(budget);
         }
 
@@ -122,6 +134,7 @@ namespace budgetbud.Services
         {
             Budget budget = await GetBudgetAsync(budget_id);
             budget.categoryList[budget.categoryList.FindIndex(c => c.Id == category.Id)] = category;
+            category.LastUpdated = DateTime.UtcNow.Ticks;
             await UpdateBudgetAsync(budget);
         }
 

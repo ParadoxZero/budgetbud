@@ -6,5 +6,5 @@ public class Expense
     public required string Title { get; set; }
     public decimal Amount { get; set; }
     public int CategoryId { get; set; }
-    public DateTime Timestamp { get; set; }
+    public long Timestamp { get; set; }
 }

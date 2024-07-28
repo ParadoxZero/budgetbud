@@ -17,7 +17,7 @@ public enum UserActionType
 
 public class UserAction
 {
-    public DateTime timestamp { get; set; }
+    public long timestamp { get; set; }
     public UserActionType type { get; set; }
     public Category? category { get; set; }
     public Expense? expense { get; set; }
