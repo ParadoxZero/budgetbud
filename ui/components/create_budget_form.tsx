@@ -3,8 +3,9 @@ import React from "react";
 
 import { DataService, getDataService } from "../services/data_service";
 import { navigation, store, View } from "../store";
-import { CloseCircleOutlined, CloseOutlined, CloseSquareFilled, LoadingOutlined } from "@ant-design/icons";
+import { CloseCircleOutlined, CloseOutlined, CloseSquareFilled, LoadingOutlined, RightOutlined } from "@ant-design/icons";
 import { Budget, Category, DataModelFactory } from "../datamodel/datamodel";
+import { connect } from "react-redux";
 
 enum WizardStep {
     CreateBudget,
@@ -15,10 +16,14 @@ enum WizardStep {
 interface CreateBudgetPageState {
     current_step: WizardStep;
     is_loading: boolean;
-    budget: null | Budget;
+    budget_under_edit: null | Budget;
 }
 
-export class CreateBudgetForm extends React.Component<{}, CreateBudgetPageState> {
+interface CreateBudgetPageProps {
+    budget: Budget;
+}
+
+class CreateBudgetForm extends React.Component<CreateBudgetPageProps, CreateBudgetPageState> {
     data_service: DataService;
 
     getTitle(): string {
@@ -34,13 +39,13 @@ export class CreateBudgetForm extends React.Component<{}, CreateBudgetPageState>
         }
     }
 
-    constructor(props: {}) {
+    constructor(props: CreateBudgetPageProps) {
         super(props);
         this.data_service = getDataService();
         this.state = {
             current_step: WizardStep.CreateBudget,
             is_loading: false,
-            budget: null,
+            budget_under_edit: null,
         };
     }
 
@@ -77,23 +82,30 @@ export class CreateBudgetForm extends React.Component<{}, CreateBudgetPageState>
                 this.setState({
                     is_loading: false,
                     current_step: WizardStep.AddCategories,
-                    budget: value,
+                    budget_under_edit: value,
                 });
             }).catch((error) => {
 
             });
         };
+        const render_cancel_button = () => {
+            if (this.props.budget != null) {
+                return (<Button type="link" onClick={() => store.dispatch(navigation(View.Overview))}>Cancel</Button>)
+            }
+            return (<></>);
+        }
         return (
             <Form name="Create Budget"
                 labelCol={{ span: 5 }}
                 wrapperCol={{ span: 10 }}
                 labelAlign="left"
                 onFinish={onFinish}
+                style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
                 layout="vertical">
                 <Form.Item<FieldType>
                     label="Name"
                     name="name"
-                    rules={[{ required: true, message: "Please enter name for budget" }]}>
+                    rules={[{ required: true, message: "Please enter a name for the budget" }]}>
                     <Input />
                 </Form.Item>
                 <Form.Item<FieldType>
@@ -103,9 +115,10 @@ export class CreateBudgetForm extends React.Component<{}, CreateBudgetPageState>
 
                 <Form.Item >
                     <Button type="primary" htmlType="submit" block>
-                        Create
+                        Next
                     </Button>
                 </Form.Item>
+                {render_cancel_button()}
             </Form >
         );
     }
@@ -122,11 +135,11 @@ export class CreateBudgetForm extends React.Component<{}, CreateBudgetPageState>
                 category_list.push(category);
             }
             this.setState({ is_loading: true });
-            this.data_service.createCategories(this.state.budget!.id, category_list).then((value: Budget) => {
+            this.data_service.createCategories(this.state.budget_under_edit!.id, category_list).then((value: Budget) => {
                 this.setState({
                     is_loading: false,
                     current_step: WizardStep.CreateReucrringExpenses,
-                    budget: value,
+                    budget_under_edit: value,
                 });
                 store.dispatch(navigation(View.Overview));
             }).catch((error) => {
@@ -170,6 +183,7 @@ export class CreateBudgetForm extends React.Component<{}, CreateBudgetPageState>
                             <Button type="primary" htmlType="submit" block>
                                 Finalize
                             </Button>
+                            <Button type="link" onClick={() => store.dispatch(navigation(View.Overview))}>Cancel</Button>
                         </div>
                     )}
                 </Form.List>
@@ -177,8 +191,28 @@ export class CreateBudgetForm extends React.Component<{}, CreateBudgetPageState>
         );
     }
 
-    componentDidMount(): void {
-
+    componentDidUpdate(prevProps: Readonly<CreateBudgetPageProps>, prevState: Readonly<CreateBudgetPageState>, snapshot?: any): void {
+        if (prevProps.budget == null && this.props.budget != null) {
+            this.setState({
+                current_step: WizardStep.AddCategories,
+                budget_under_edit: this.props.budget,
+            });
+        }
     }
 
 }
+
+function mapStateToProps(state: any) {
+    const index = state.budget.selected_budget_index;
+    if (index == null) {
+        return {
+            budget: null,
+        };
+    } else {
+        return {
+            budget: state.budget.budget_list[index],
+        };
+    }
+}
+
+export default connect(mapStateToProps)(CreateBudgetForm);
