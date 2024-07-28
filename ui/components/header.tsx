@@ -18,7 +18,7 @@ class Header extends React.Component<HeaderProps> {
 
     render() {
         return (
-            <Flex justify="space-between" align="center" style={{ width: "100%", height: "100%" }}>
+            <Flex justify="space-evenly" align="center" style={{ width: "100%", height: "100%" }}>
                 {this.render_budget_selector()}
                 <Button type="default" icon={<MoreOutlined />} size="large"></Button>
             </Flex>
@@ -26,7 +26,7 @@ class Header extends React.Component<HeaderProps> {
     }
 
     render_budget_selector() {
-        const items = this.props.budget_list;
+        const items = ["Budget 1", "Budget 2", "Budget 3"];
 
         let index = 0;
 
@@ -46,12 +46,20 @@ class Header extends React.Component<HeaderProps> {
                         <Divider style={{ margin: '8px 0' }} />
                         <Space style={{ padding: '0 8px 4px' }}>
                             <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
-                                Add item
+                                Add Budget
                             </Button>
                         </Space>
                     </>
                 )}
-                options={items.map((item) => ({ label: item.name, value: item.id }))}
+                labelRender={(label) => (
+                    <Flex justify="space-between" align="center" style={{ color: 'rgba(0, 0, 0, 0.25)' }}>
+                        <Typography style={{ color: 'rgba(0, 0, 0, 0.25)' }}>{label.label}</Typography>
+                        <Button type="text" style={{ color: 'rgba(0, 0, 0, 0.25)' }} icon={<SettingOutlined />} onClick={(e) => { e.stopPropagation() }} />
+                    </Flex>
+                )}
+                variant="outlined"
+                removeIcon={<FileOutlined />}
+                options={items.map((item) => ({ label: item, value: item }))}
             />
         );
     }
