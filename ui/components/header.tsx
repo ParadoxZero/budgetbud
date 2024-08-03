@@ -3,6 +3,7 @@ import { Avatar, Button, Divider, Flex, Input, InputRef, Select, Space, Typograp
 import React from "react";
 import { connect } from "react-redux";
 import { budgetSlice, headerSlice, navigation, store, View } from "../store";
+import { GetScreenSize, ScreenSize } from "../utils";
 
 export interface HeaderBudgetDetails {
     name: string;
@@ -23,8 +24,12 @@ interface HeaderState {
 class Header extends React.Component<HeaderProps, HeaderState> {
 
     render() {
+        let justify = "space-between";
+        if (GetScreenSize() != ScreenSize.mobile) {
+            justify = "center";
+        }
         return (
-            <Flex justify="space-evenly" align="center" style={{ width: "100%", height: "100%" }}>
+            <Flex justify={justify} align="center" style={{ width: "100%", height: "100%" }} gap="small">
                 {this.render_budget_selector()}
                 <Button type="default" icon={<MoreOutlined />} size="large"></Button>
             </Flex>
