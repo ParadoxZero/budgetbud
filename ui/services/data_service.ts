@@ -31,7 +31,6 @@ class RemoteDataService implements DataService {
 
     constructor() {
         this.BASE_URL = "";
-        console.log(`Using remote data service at ${this.BASE_URL}`);
     }
 
     createBudget(name: string): Promise<Budget> {
@@ -132,7 +131,6 @@ class LocalDataService implements DataService {
             if (userData) {
                 budgetList = JSON.parse(userData) ?? [];
             }
-            console.log(budgetList);
             resolve(budgetList);
         });
     }

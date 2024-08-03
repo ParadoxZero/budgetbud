@@ -1,7 +1,7 @@
 import { navigation, store, View } from './store'
 import { CreateDummyData } from './utils';
 import { PingRemote } from './services/ping_service';
-import NoBudgetAvailablePage from './pages/no-budget_page';
+import CreateNewBudgetPage from './pages/create_new_budget_page';
 import { ReactNode } from 'react';
 import React from 'react';
 import { connect } from 'react-redux';
@@ -91,7 +91,7 @@ class App extends React.Component<AppProps> {
       case View.Overview:
         return <Overview />
       case View.NoBudgetAvailable:
-        return <NoBudgetAvailablePage />
+        return <CreateNewBudgetPage />
       default:
         return (<>Not Found</>)
     }
