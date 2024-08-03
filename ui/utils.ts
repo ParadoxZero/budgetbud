@@ -94,5 +94,5 @@ export function CreateDummyData() {
         user_data.recurringList.push(recurring);
     }
 
-    return user_data;
+    return [user_data];
 }
