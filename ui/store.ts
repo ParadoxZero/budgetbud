@@ -17,7 +17,6 @@ export const navigationSlice = createSlice({
     },
     reducers: {
         navigation: (state, action) => {
-            console.log(action);
             state.current_view = action.payload;
         }
     },
@@ -41,7 +40,7 @@ export const budgetSlice = createSlice({
     name: 'budget',
     initialState: {
         budget_list: [],
-        selected_budget_index: null
+        selected_budget_index: null,
     } as any,
     reducers: {
         budget: (state, action) => {

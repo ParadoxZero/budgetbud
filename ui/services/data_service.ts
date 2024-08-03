@@ -2,7 +2,7 @@ import { Category, Expense, Budget, BudgetHistory, Recurring, Unplanned, UserAct
 
 
 export interface DataService {
-    getBudget(id: string): Promise<Budget[]>;
+    getBudget(): Promise<Budget[]>;
     createBudget(name: string): Promise<Budget>;
     getHistory(): Promise<BudgetHistory>;
     createCategories(budget_id: string, categories: Category[]): Promise<Budget>;
@@ -113,15 +113,26 @@ class RemoteDataService implements DataService {
 }
 
 class LocalDataService implements DataService {
+    find_budget_by_id(budget_id: string, budget_list: Budget[]): number {
+        let found: number = -1;
+        budget_list.forEach((b: Budget, index: number) => {
+            if (b.id === budget_id) {
+                found = index;
+            }
+        });
+        return found;
+    }
+
     getBudget(): Promise<Budget[]> {
         return new Promise((resolve) => {
             // Implement the logic to retrieve user data from local storage
             // For example:
-            const budgetList: Budget[] = [];
+            let budgetList: Budget[] = [];
             const userData = localStorage.getItem('userData');
             if (userData) {
-                budgetList.push(JSON.parse(userData));
+                budgetList = JSON.parse(userData) ?? [];
             }
+            console.log(budgetList);
             resolve(budgetList);
         });
     }
@@ -130,8 +141,13 @@ class LocalDataService implements DataService {
         return new Promise((resolve) => {
             // Implement the logic to create a new budget in local storage
             // For example:
+            let budget_list: Budget[] = [];
+            if (localStorage.getItem('userData')) {
+                budget_list = JSON.parse(localStorage.getItem('userData') ?? "[]");
+            }
             const budget = DataModelFactory.createBudget(name);
-            localStorage.setItem('userData', JSON.stringify(budget));
+            budget_list.push(budget);
+            localStorage.setItem('userData', JSON.stringify(budget_list));
             resolve(budget);
         });
     }
@@ -155,44 +171,52 @@ class LocalDataService implements DataService {
             // For example:
             const userData = localStorage.getItem('userData');
             if (userData) {
-                const parsedBudget = JSON.parse(userData);
+                let budget_list = JSON.parse(userData);
+                let index = this.find_budget_by_id(_budget_id, budget_list);
+                if (index === -1) {
+                    reject();
+                }
                 let lastUsedId: number = 0;
-                if (!parsedBudget.categoryList) {
-                    parsedBudget.categoryList = [];
+                if (!budget_list[index].categoryList) {
+                    budget_list[index].categoryList = [];
                 } else {
-                    lastUsedId = parsedBudget.categoryList.reduce((acc: number, c: Category) => c.id > acc ? c.id : acc, 0);
+                    lastUsedId = budget_list[index].categoryList.reduce((acc: number, c: Category) => c.id > acc ? c.id : acc, 0);
                 }
                 for (const category of categories) {
                     category.id = lastUsedId;
                     lastUsedId++;
                 }
 
-                parsedBudget.categoryList = parsedBudget.categoryList.concat(categories);
+                budget_list[index].categoryList = budget_list[index].categoryList.concat(categories);
                 for (const category of categories) {
                     const user_action: UserAction = DataModelFactory.createUserAction();
                     user_action.type = UserActionType.updateCategory;
                     user_action.payload = category;
-                    parsedBudget.userActions.push(user_action);
+                    budget_list[index].userActions.push(user_action);
                 }
 
-                localStorage.setItem('userData', JSON.stringify(parsedBudget));
-                resolve(parsedBudget);
+                localStorage.setItem('userData', JSON.stringify(budget_list));
+                resolve(budget_list[index]);
             }
             reject();
         });
     }
 
-    updateCategory(_budget_id: string, category: Category): Promise<Budget> {
+    updateCategory(budget_id: string, category: Category): Promise<Budget> {
         return new Promise((resolve, _reject) => {
             // Implement the logic to update a category in local storage
             // For example:
-            const user_data: Budget = JSON.parse(localStorage.getItem('userData') ?? "{}");
-            if (!user_data.categoryList) {
-                user_data.categoryList = [];
+            let budget_list: Budget[] = JSON.parse(localStorage.getItem('userData') ?? "[]");
+            let index = this.find_budget_by_id(budget_id, budget_list);
+            if (index === -1) {
+                return;
             }
-            const parsedCategories = user_data.categoryList;
+            if (!budget_list[index].categoryList) {
+                budget_list[index].categoryList = [];
+            }
+            const parsedCategories = budget_list[index].categoryList;
             let found: boolean = false;
-            user_data.categoryList = parsedCategories.map((c: Category) => {
+            budget_list[index].categoryList = parsedCategories.map((c: Category) => {
                 if (c.id === category.id) {
                     found = true;
                     return category;
@@ -200,15 +224,15 @@ class LocalDataService implements DataService {
                 return c;
             });
             if (!found) {
-                user_data.categoryList.push(category);
+                budget_list[index].categoryList.push(category);
             }
             const user_action: UserAction = DataModelFactory.createUserAction();
             user_action.type = UserActionType.updateCategory;
             user_action.payload = category;
-            user_data.userActions.push(user_action);
+            budget_list[index].userActions.push(user_action);
 
-            localStorage.setItem('userData', JSON.stringify(user_data));
-            resolve(user_data);
+            localStorage.setItem('userData', JSON.stringify(budget_list));
+            resolve(budget_list[index]);
         });
     }
 
@@ -216,10 +240,14 @@ class LocalDataService implements DataService {
         return new Promise((resolve, reject) => {
             // Implement the logic to update an expense in local storage
             // For example:
-            const userData = localStorage.getItem('userData');
-            if (userData) {
-                const parsedBudget: Budget = JSON.parse(userData);
-                const category = parsedBudget.categoryList.find((c: Category) => c.id === expense.categoryId);
+            const user_data = localStorage.getItem('userData') ?? "[]";
+            if (user_data) {
+                let budget_list: Budget[] = JSON.parse(user_data);
+                const index = this.find_budget_by_id(_budget_id, budget_list);
+                if (index === -1) {
+                    reject();
+                }
+                const category = budget_list[index].categoryList.find((c: Category) => c.id === expense.categoryId);
                 if (category) {
                     let found: boolean = false;
                     const updatedExpenses = category.expenseList.map((e: Expense) => {
@@ -235,17 +263,17 @@ class LocalDataService implements DataService {
                     const user_action: UserAction = DataModelFactory.createUserAction();
                     user_action.type = UserActionType.updateExpense;
                     user_action.payload = expense;
-                    parsedBudget.userActions.push(user_action);
+                    budget_list[index].userActions.push(user_action);
 
-                    parsedBudget.categoryList = parsedBudget.categoryList.map((c: Category) => {
+                    budget_list[index].categoryList = budget_list[index].categoryList.map((c: Category) => {
                         if (c.id === expense.categoryId) {
                             c.expenseList = updatedExpenses;
                         }
                         return c;
                     });
-                    parsedBudget.last_updated = Date.now();
-                    localStorage.setItem('userData', JSON.stringify(parsedBudget));
-                    resolve(parsedBudget);
+                    budget_list[index].last_updated = Date.now();
+                    localStorage.setItem('userData', JSON.stringify(budget_list));
+                    resolve(budget_list[index]);
                 } else {
                     reject();
                 }
@@ -261,24 +289,29 @@ class LocalDataService implements DataService {
             // For example:
             const userData = localStorage.getItem('userData');
             if (userData) {
-                const parsedBudget = JSON.parse(userData);
-                const category = parsedBudget.categoryList.find((c: Category) => c.expenseList.some((e: Expense) => e.id === expenseId));
-                if (category) {
-                    let expense: Expense | null = null;
-                    category.expenseList = category.expenseList.filter((e: Expense) => {
-                        if (e.id == expenseId) {
-                            expense = e;
-                            return false;
-                        }
-                        return true;
-                    });
-                    const user_action: UserAction = DataModelFactory.createUserAction();
-                    user_action.type = UserActionType.deleteExpense;
-                    user_action.payload = expense;
-                    parsedBudget.userActions.push(user_action);
+                const budget_list: Budget[] = JSON.parse(userData);
+                const index = this.find_budget_by_id(_budget_id, budget_list);
+                if (index !== -1) {
+                    const category = budget_list[index].categoryList.find((c: Category) => c.expenseList.some((e: Expense) => e.id === expenseId));
+                    if (category) {
+                        let expense: Expense | null = null;
+                        category.expenseList = category.expenseList.filter((e: Expense) => {
+                            if (e.id == expenseId) {
+                                expense = e;
+                                return false;
+                            }
+                            return true;
+                        });
+                        const user_action: UserAction = DataModelFactory.createUserAction();
+                        user_action.type = UserActionType.deleteExpense;
+                        user_action.payload = expense;
+                        budget_list[index].userActions.push(user_action);
 
-                    localStorage.setItem('userData', JSON.stringify(parsedBudget));
-                    resolve(parsedBudget);
+                        localStorage.setItem('userData', JSON.stringify(budget_list));
+                        resolve(budget_list[index]);
+                    } else {
+                        reject();
+                    }
                 } else {
                     reject();
                 }
@@ -294,20 +327,25 @@ class LocalDataService implements DataService {
             // For example:
             const userData = localStorage.getItem('userData');
             if (userData) {
-                const parsedBudget = JSON.parse(userData);
-                const recurringIndex = parsedBudget.recurringList.findIndex((r: Recurring) => r.id === recurring.id);
-                if (recurringIndex !== -1) {
-                    parsedBudget.recurringList[recurringIndex] = recurring;
-                } else {
-                    parsedBudget.recurringList.push(recurring);
-                }
-                const user_action: UserAction = DataModelFactory.createUserAction();
-                user_action.type = UserActionType.updateRecurring;
-                user_action.payload = recurring;
-                parsedBudget.userActions.push(user_action);
+                const budget_list: Budget[] = JSON.parse(userData);
+                const index = this.find_budget_by_id(_budget_id, budget_list);
+                if (index !== -1) {
+                    const recurringIndex = budget_list[index].recurringList.findIndex((r: Recurring) => r.id === recurring.id);
+                    if (recurringIndex !== -1) {
+                        budget_list[index].recurringList[recurringIndex] = recurring;
+                    } else {
+                        budget_list[index].recurringList.push(recurring);
+                    }
+                    const user_action: UserAction = DataModelFactory.createUserAction();
+                    user_action.type = UserActionType.updateRecurring;
+                    user_action.payload = recurring;
+                    budget_list[index].userActions.push(user_action);
 
-                localStorage.setItem('userData', JSON.stringify(parsedBudget));
-                resolve(parsedBudget);
+                    localStorage.setItem('userData', JSON.stringify(budget_list));
+                    resolve(budget_list[index]);
+                } else {
+                    reject();
+                }
             } else {
                 reject();
             }
@@ -320,23 +358,23 @@ class LocalDataService implements DataService {
             // For example:
             const userData = localStorage.getItem('userData');
             if (userData) {
-                const parsedBudget = JSON.parse(userData);
-                let recurring: Recurring | null = null;
-                const recurringIndex = parsedBudget.recurringList.findIndex((r: Recurring) => {
-                    if (r.id === recurringId) {
-                        recurring = r;
-                        return true;
-                    } return false;
-                });
-                if (recurringIndex !== -1) {
-                    parsedBudget.recurringList.splice(recurringIndex, 1);
-                    const user_action: UserAction = DataModelFactory.createUserAction();
-                    user_action.type = UserActionType.deleteRecurring;
-                    user_action.payload = recurring;
-                    parsedBudget.userActions.push(user_action);
+                const budget_list: Budget[] = JSON.parse(userData);
+                const index = this.find_budget_by_id(_budget_id, budget_list);
+                if (index !== -1) {
+                    const recurringIndex = budget_list[index].recurringList.findIndex((r: Recurring) => r.id === recurringId);
+                    if (recurringIndex !== -1) {
+                        const recurring = budget_list[index].recurringList[recurringIndex];
+                        budget_list[index].recurringList.splice(recurringIndex, 1);
+                        const user_action: UserAction = DataModelFactory.createUserAction();
+                        user_action.type = UserActionType.deleteRecurring;
+                        user_action.payload = recurring;
+                        budget_list[index].userActions.push(user_action);
 
-                    localStorage.setItem('userData', JSON.stringify(parsedBudget));
-                    resolve(parsedBudget);
+                        localStorage.setItem('userData', JSON.stringify(budget_list));
+                        resolve(budget_list[index]);
+                    } else {
+                        reject();
+                    }
                 } else {
                     reject();
                 }
@@ -352,17 +390,23 @@ class LocalDataService implements DataService {
             // For example:
             const userData = localStorage.getItem('userData');
             if (userData) {
-                const parsedBudget = JSON.parse(userData);
-                const unplannedIndex = parsedBudget.unplannedList.findIndex((u: Unplanned) => u.id === unplanned.id);
-                if (unplannedIndex !== -1) {
-                    parsedBudget.unplannedList[unplannedIndex] = unplanned;
-                    const user_action: UserAction = DataModelFactory.createUserAction();
-                    user_action.type = UserActionType.updateUnplanned;
-                    user_action.payload = unplanned;
-                    parsedBudget.userActions.push(user_action);
+                const budget_list: Budget[] = JSON.parse(userData);
+                const index = this.find_budget_by_id(_budget_id, budget_list);
+                if (index !== -1) {
+                    const parsedBudget = budget_list[index];
+                    const unplannedIndex = parsedBudget.unplannedList.findIndex((u: Unplanned) => u.id === unplanned.id);
+                    if (unplannedIndex !== -1) {
+                        parsedBudget.unplannedList[unplannedIndex] = unplanned;
+                        const user_action: UserAction = DataModelFactory.createUserAction();
+                        user_action.type = UserActionType.updateUnplanned;
+                        user_action.payload = unplanned;
+                        parsedBudget.userActions.push(user_action);
 
-                    localStorage.setItem('userData', JSON.stringify(parsedBudget));
-                    resolve(parsedBudget);
+                        localStorage.setItem('userData', JSON.stringify(budget_list));
+                        resolve(parsedBudget);
+                    } else {
+                        reject();
+                    }
                 } else {
                     reject();
                 }
@@ -378,24 +422,30 @@ class LocalDataService implements DataService {
             // For example:
             const userData = localStorage.getItem('userData');
             if (userData) {
-                const parsedBudget = JSON.parse(userData);
-                let unplanned: Unplanned | null = null;
-                const unplannedIndex = parsedBudget.unplannedList.findIndex((u: Unplanned) => {
-                    if (u.id === unplannedId) {
-                        unplanned = u;
-                        return true;
-                    }
-                    return false;
-                });
-                if (unplannedIndex !== -1) {
-                    parsedBudget.unplannedList.splice(unplannedIndex, 1);
-                    const user_action: UserAction = DataModelFactory.createUserAction();
-                    user_action.type = UserActionType.deleteUnplanned;
-                    user_action.payload = unplanned;
-                    parsedBudget.userActions.push(user_action);
+                const budget_list: Budget[] = JSON.parse(userData);
+                const index = this.find_budget_by_id(_budget_id, budget_list);
+                if (index !== -1) {
+                    const parsedBudget = budget_list[index];
+                    let unplanned: Unplanned | null = null;
+                    const unplannedIndex = parsedBudget.unplannedList.findIndex((u: Unplanned) => {
+                        if (u.id === unplannedId) {
+                            unplanned = u;
+                            return true;
+                        }
+                        return false;
+                    });
+                    if (unplannedIndex !== -1) {
+                        parsedBudget.unplannedList.splice(unplannedIndex, 1);
+                        const user_action: UserAction = DataModelFactory.createUserAction();
+                        user_action.type = UserActionType.deleteUnplanned;
+                        user_action.payload = unplanned;
+                        parsedBudget.userActions.push(user_action);
 
-                    localStorage.setItem('userData', JSON.stringify(parsedBudget));
-                    resolve(parsedBudget);
+                        localStorage.setItem('userData', JSON.stringify(budget_list));
+                        resolve(parsedBudget);
+                    } else {
+                        reject();
+                    }
                 } else {
                     reject();
                 }
@@ -409,9 +459,15 @@ class LocalDataService implements DataService {
         return new Promise((resolve) => {
             // Implement the logic to retrieve user actions from local storage
             // For example:
-            const userActions = localStorage.getItem('userActions');
-            if (userActions) {
-                resolve(JSON.parse(userActions));
+            const userData = localStorage.getItem('userData');
+            if (userData) {
+                const budget_list: Budget[] = JSON.parse(userData);
+                const index = this.find_budget_by_id(_budget_id, budget_list);
+                if (index !== -1) {
+                    resolve(budget_list[index].userActions);
+                } else {
+                    resolve([]);
+                }
             } else {
                 resolve([]);
             }
