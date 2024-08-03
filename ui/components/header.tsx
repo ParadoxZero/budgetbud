@@ -2,7 +2,7 @@ import { FileOutlined, MoreOutlined, PlusOutlined, SettingOutlined } from "@ant-
 import { Avatar, Button, Divider, Flex, Input, InputRef, Select, Space, Typography } from "antd";
 import React from "react";
 import { connect } from "react-redux";
-import { budgetSlice, store } from "../store";
+import { budgetSlice, headerSlice, navigation, store, View } from "../store";
 
 export interface HeaderBudgetDetails {
     name: string;
@@ -16,7 +16,11 @@ export interface HeaderProps {
     selected_budget_index: number | null;
 }
 
-class Header extends React.Component<HeaderProps> {
+interface HeaderState {
+    is_budget_selector_visible: boolean;
+}
+
+class Header extends React.Component<HeaderProps, HeaderState> {
 
     render() {
         return (
@@ -25,6 +29,13 @@ class Header extends React.Component<HeaderProps> {
                 <Button type="default" icon={<MoreOutlined />} size="large"></Button>
             </Flex>
         );
+    }
+
+    constructor(props: HeaderProps) {
+        super(props);
+        this.state = {
+            is_budget_selector_visible: false,
+        };
     }
 
     render_budget_selector() {
@@ -41,13 +52,20 @@ class Header extends React.Component<HeaderProps> {
         }
         let defaultValue: number = this.props.selected_budget_index ?? 0;
         const addItem = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+            this.setState({ is_budget_selector_visible: false });
             e.preventDefault();
-            // setItems([...items, name || `New item ${index++}`]);
-            // setName('');
+            store.dispatch(headerSlice.actions.header({ is_visible: false }));
+            store.dispatch(budgetSlice.actions.updateSelection({ index: null }));
+            store.dispatch(navigation(View.NoBudgetAvailable));
         };
         const onSelectionChanged = (value: number) => {
             store.dispatch(budgetSlice.actions.updateSelection({ index: value }));
         }
+        const onSettingsClicked = () => {
+            this.setState({ is_budget_selector_visible: false });
+            store.dispatch(navigation(View.NoBudgetAvailable));
+        }
+
         return (
             <Select
                 size="large"
@@ -56,12 +74,14 @@ class Header extends React.Component<HeaderProps> {
                 options={items.map((item) => ({ label: item.name, value: item.value }))}
                 defaultValue={defaultValue}
                 onChange={onSelectionChanged}
+                onDropdownVisibleChange={(visible) => { this.setState({ is_budget_selector_visible: visible }) }}
+                open={this.state.is_budget_selector_visible}
                 dropdownRender={(menu) => (
                     <>
                         {menu}
                         <Divider style={{ margin: '8px 0' }} />
                         <Space style={{ padding: '0 8px 4px' }}>
-                            <Button type="text" icon={<PlusOutlined />} onClick={addItem} disabled>
+                            <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
                                 Add Budget
                             </Button>
                         </Space>
@@ -70,7 +90,6 @@ class Header extends React.Component<HeaderProps> {
                 labelRender={(label) => (
                     <Flex justify="space-between" align="center" style={{ color: 'rgba(0, 0, 0, 0.25)' }}>
                         <Typography style={{ color: 'rgba(0, 0, 0, 0.25)' }}>{label.label}</Typography>
-                        <Button type="text" style={{ color: 'rgba(0, 0, 0, 0.25)' }} icon={<SettingOutlined />} onClick={(e) => { e.stopPropagation() }} />
                     </Flex>
                 )}
                 variant="outlined"

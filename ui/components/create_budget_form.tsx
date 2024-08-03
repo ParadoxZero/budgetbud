@@ -126,7 +126,6 @@ class CreateBudgetForm extends React.Component<CreateBudgetPageProps, CreateBudg
     render_add_category() {
         const formRef = React.createRef<FormInstance>();
         const onFinish = (values: any) => {
-            console.log(values);
             const category_list: Category[] = [];
             for (const raw_category of values.categories) {
                 const category = DataModelFactory.createCategory(0);
@@ -192,7 +191,7 @@ class CreateBudgetForm extends React.Component<CreateBudgetPageProps, CreateBudg
     }
 
     componentDidUpdate(prevProps: Readonly<CreateBudgetPageProps>, prevState: Readonly<CreateBudgetPageState>, snapshot?: any): void {
-        if (prevProps.budget == null && this.props.budget != null) {
+        if (this.props.budget != null) {
             this.setState({
                 current_step: WizardStep.AddCategories,
                 budget_under_edit: this.props.budget,

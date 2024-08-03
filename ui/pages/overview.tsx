@@ -264,7 +264,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     }
 
     componentDidMount(): void {
-        this._data_service.getBudget("").then((data) => {
+        this._data_service.getBudget().then((data) => {
             if (data.length > 0) {
                 store.dispatch(
                     budgetSlice.actions.budget({
