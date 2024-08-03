@@ -56,7 +56,6 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
                     groupSeparator=""
                     value={used_up_budget}
                     precision={0}
-                    // prefix={<CheckCircleOutlined />}
                     suffix={"/ " + (this.state.total_allocations).toString()}
                     valueStyle={{ color: status_color }}
                 />
