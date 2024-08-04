@@ -59,10 +59,10 @@ class App extends React.Component<AppProps> {
       view: View.Overview,
       is_header_visible: true
     }
+    this.run_pre_run();
   }
 
   componentDidMount(): void {
-    this.run_pre_run();
   }
 
   render(): ReactNode {
@@ -104,7 +104,7 @@ class App extends React.Component<AppProps> {
 }
 function mapStateToProps(state: any): AppProps {
   let budget = null;
-  if (state.budget.budget_list && state.budget.selected_budget_index !== null) {
+  if (state.budget.budget_list && state.budget.selected_budget_index !== null && state.budget.budget_list.length > state.budget.selected_budget_index) {
     budget = state.budget.budget_list[state.budget.selected_budget_index];
   }
   return {
