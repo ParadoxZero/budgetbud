@@ -108,7 +108,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
                 context!.processing = true;
                 this.setState({ add_expense_mode_context: context });
                 this._data_service.updateExpense(budget.id, expense).then((data) => {
-                    store.dispatch(budgetSlice.actions.upadteBudget({ budget: data }));
+                    store.dispatch(budgetSlice.actions.updateCurrent({ budget: data }));
                     this.setState({ add_expense_mode_context: null });
                 }).catch(() => this.setState({ add_expense_mode_context: null }));
             } else {
@@ -266,7 +266,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
         this._data_service.getBudget().then((data) => {
             if (data.length > 0) {
                 store.dispatch(
-                    budgetSlice.actions.budget({
+                    budgetSlice.actions.set({
                         budget_list: data,
                         selected_budget_index: 0
                     })

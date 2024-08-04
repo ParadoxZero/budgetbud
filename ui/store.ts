@@ -43,15 +43,17 @@ export const budgetSlice = createSlice({
         selected_budget_index: null,
     } as any,
     reducers: {
-        budget: (state, action) => {
+        set: (state, action) => {
             state.budget_list = action.payload.budget_list;
             state.selected_budget_index = action.payload.selected_budget_index;
         },
-        upadteBudget: (state, action) => {
+        updateCurrent: (state, action) => {
             if (state.selected_budget_index == null) {
                 return;
             }
-            state.budget_list[state.selected_budget_index] = action.payload.budget;
+            let budget_list = state.budget_list;
+            budget_list[state.selected_budget_index] = action.payload;
+            state.budget_list = budget_list;
         },
         updateSelection: (state, action) => {
             const new_index = action.payload.index;

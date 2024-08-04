@@ -66,7 +66,7 @@ class EditCategoriesPage extends React.Component<EditCategoriesPageProps, EditCa
         const delete_question = "Are you sure to delete the category - " + title + "? All data will be lost.";
         const on_delete_click = () => {
             this._data_service.deleteCategory(this.props.budget.id, id)
-                .then((budget: Budget) => { store.dispatch(budgetSlice.actions.upadteBudget(budget)); });
+                .then((budget: Budget) => { store.dispatch(budgetSlice.actions.updateCurrent(budget)); });
         }
         return (
             <div style={{ margin: 0, marginTop: 10, marginBottom: 10, paddingRight: 20, paddingLeft: 20, minWidth: 300 }}>
