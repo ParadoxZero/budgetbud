@@ -142,6 +142,7 @@ class LocalDataService implements DataService {
                     user_action.payload = category;
                     budget_list[index].userActions.push(user_action);
 
+                    budget_list[index].last_updated = Date.now();
                     localStorage.setItem('userData', JSON.stringify(budget_list));
                     resolve(budget_list[index]);
                 } else {
@@ -233,6 +234,7 @@ class LocalDataService implements DataService {
                     budget_list[index].userActions.push(user_action);
                 }
 
+                budget_list[index].last_updated = Date.now();
                 localStorage.setItem('userData', JSON.stringify(budget_list));
                 resolve(budget_list[index]);
             }
@@ -257,6 +259,7 @@ class LocalDataService implements DataService {
             budget_list[index].categoryList = parsedCategories.map((c: Category) => {
                 if (c.id === category.id) {
                     found = true;
+                    category.expenseList = c.expenseList;
                     return category;
                 }
                 return c;
@@ -268,7 +271,7 @@ class LocalDataService implements DataService {
             user_action.type = UserActionType.updateCategory;
             user_action.payload = category;
             budget_list[index].userActions.push(user_action);
-
+            budget_list[index].last_updated = Date.now();
             localStorage.setItem('userData', JSON.stringify(budget_list));
             resolve(budget_list[index]);
         });
@@ -345,6 +348,7 @@ class LocalDataService implements DataService {
                         user_action.payload = expense;
                         budget_list[index].userActions.push(user_action);
 
+                        budget_list[index].last_updated = Date.now();
                         localStorage.setItem('userData', JSON.stringify(budget_list));
                         resolve(budget_list[index]);
                     } else {

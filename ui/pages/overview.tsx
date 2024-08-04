@@ -276,14 +276,21 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
             else {
                 this.navigate_to(View.NoBudgetAvailable);
             }
+        }).catch((e) => {
+            console.error(e);
+            setTimeout(() => this.componentDidMount(), 1000);
         });
+        this.update_calculations();
+        this.update_next_recurring();
     }
 
     componentDidUpdate(prevProps: Readonly<OverviewProps>, _prevState: Readonly<IState>, _snapshot?: any): void {
         if (this.props.selected_budget_index != null) {
             const current_budget = this.props.budget_list[this.props.selected_budget_index];
             if (prevProps.selected_budget_index != this.props.selected_budget_index ||
-                (prevProps.selected_budget_index != null && prevProps.budget_list[prevProps.selected_budget_index].last_updated != current_budget.last_updated)) {
+                (prevProps.selected_budget_index != null &&
+                    prevProps.budget_list[prevProps.selected_budget_index].last_updated != current_budget.last_updated)
+            ) {
                 {
                     this.update_calculations();
                     this.update_next_recurring();
@@ -297,6 +304,9 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     }
 
     private update_next_recurring() {
+        if (this.props.selected_budget_index == null || this.props.budget_list == null) {
+            return;
+        }
         const budget = this.props.budget_list[this.props.selected_budget_index!];
         const recurring_list: Recurring[] = budget.recurringList;
         const next_dates_ = recurring_list.map((recurring) => (
@@ -317,6 +327,9 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
 
     }
     private update_calculations() {
+        if (this.props.selected_budget_index == null || this.props.budget_list == null) {
+            return;
+        }
         const budget = this.props.budget_list[this.props.selected_budget_index!];
         let total_allocations = 0;
         budget?.categoryList.forEach((category) => {
