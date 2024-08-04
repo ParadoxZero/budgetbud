@@ -31,7 +31,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
         return (
             <Flex justify={justify} align="center" style={{ width: "100%", height: "100%" }} gap="small">
                 {this.render_budget_selector()}
-                <Button type="default" icon={<EditFilled />} size="large" onClick={() => { store.dispatch(navigation(View.CategoryEdit)) }}></Button>
+                <Button type="default" icon={<SettingOutlined />} size="large" onClick={() => { store.dispatch(navigation(View.CategoryEdit)) }}></Button>
                 <Button type="default" icon={<MoreOutlined />} size="large"></Button>
             </Flex>
         );
