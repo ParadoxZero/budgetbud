@@ -108,7 +108,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
                 context!.processing = true;
                 this.setState({ add_expense_mode_context: context });
                 this._data_service.updateExpense(budget.id, expense).then((data) => {
-                    store.dispatch(budgetSlice.actions.updateCurrent({ budget: data }));
+                    store.dispatch(budgetSlice.actions.updateCurrent(data));
                     this.setState({ add_expense_mode_context: null });
                 }).catch(() => this.setState({ add_expense_mode_context: null }));
             } else {
