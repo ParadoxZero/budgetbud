@@ -163,9 +163,11 @@ namespace budgetbud.Services
         public async Task DeleteBudgetAsync(string budget_id)
         {
             var user_data = await GetUserData(_identityService.GetUserIdentity());
+            var budget = await GetBudgetAsync(budget_id);
             user_data.BudgetIds.Remove(budget_id);
             await UpdateUserData(user_data);
             await _container.DeleteItemAsync<Budget>(budget_id, new PartitionKey(budget_id));
+            await _container.DeleteItemAsync<BudgetHistory>(budget.history_id, new PartitionKey(budget.history_id));
         }
 
         public async Task<Budget> DeleteCategoryAsync(string budget_id, int category_id)
