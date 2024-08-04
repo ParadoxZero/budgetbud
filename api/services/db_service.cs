@@ -133,8 +133,16 @@ namespace budgetbud.Services
         public async Task UpdateCategoryAsync(string budget_id, Category category)
         {
             Budget budget = await GetBudgetAsync(budget_id);
-            budget.categoryList[budget.categoryList.FindIndex(c => c.Id == category.Id)] = category;
-            category.LastUpdated = DateTime.UtcNow.Ticks;
+            foreach (Category cat in budget.categoryList)
+            {
+                if (cat.Id == category.Id)
+                {
+                    cat.Name = category.Name;
+                    cat.Allocation = category.Allocation;
+                    cat.LastUpdated = DateTime.UtcNow.Ticks;
+                    break;
+                }
+            }
             await UpdateBudgetAsync(budget);
         }
 
@@ -152,5 +160,17 @@ namespace budgetbud.Services
             await UpdateBudgetAsync(budget);
         }
 
+        public async Task DeleteBudgetAsync(string budget_id)
+        {
+            await _container.DeleteItemAsync<Budget>(budget_id, new PartitionKey(budget_id));
+        }
+
+        public async Task<Budget> DeleteCategoryAsync(string budget_id, int category_id)
+        {
+            Budget budget = await GetBudgetAsync(budget_id);
+            budget.categoryList.RemoveAll(c => c.Id == category_id);
+            await UpdateBudgetAsync(budget);
+            return budget;
+        }
     }
 }

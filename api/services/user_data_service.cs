@@ -46,4 +46,20 @@ public class UserDataService
         await _dbService.AddCategoryAsync(budget_id, categoryList);
         return await _dbService.GetBudgetAsync(budget_id);
     }
+
+    public async Task<Budget> UpdateCategory(string budget_id, Category category)
+    {
+        await _dbService.UpdateCategoryAsync(budget_id, category);
+        return await _dbService.GetBudgetAsync(budget_id);
+    }
+
+    public async Task DeleteBudget(string budget_id)
+    {
+        await _dbService.DeleteBudgetAsync(budget_id);
+    }
+
+    public async Task<Budget> DeleteCategory(string budget_id, int category_id)
+    {
+        return await _dbService.DeleteCategoryAsync(budget_id, category_id);
+    }
 }

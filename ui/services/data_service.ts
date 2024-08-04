@@ -4,6 +4,7 @@ import { Category, Expense, Budget, BudgetHistory, Recurring, Unplanned, UserAct
 export interface DataService {
     getBudget(): Promise<Budget[]>;
     createBudget(name: string): Promise<Budget>;
+    deleteBudget(budget_id: string): Promise<void>;
     getHistory(): Promise<BudgetHistory>;
     createCategories(budget_id: string, categories: Category[]): Promise<Budget>;
     updateCategory(budget_id: string, category: Category): Promise<Budget>;
@@ -33,9 +34,14 @@ class RemoteDataService implements DataService {
     constructor() {
         this.BASE_URL = "";
     }
+    deleteBudget(budget_id: string): Promise<void> {
+        const endpoint: string = `${this.BASE_URL}/api/Budget/${budget_id}`;
+        return fetch(endpoint, { method: 'DELETE' }).then(() => { });
+    }
 
     deleteCategory(_budget_id: string, _categoryId: number): Promise<Budget> {
-        throw new Error("Method not implemented.");
+        const endpoint: string = `${this.BASE_URL}/api/Budget/${_budget_id}/category/${_categoryId}`;
+        return fetch(endpoint, { method: 'DELETE' }).then((response) => response.json() as Promise<Budget>);
     }
 
     createBudget(name: string): Promise<Budget> {
@@ -59,7 +65,7 @@ class RemoteDataService implements DataService {
     }
 
     updateCategory(budger_id: string, category: Category): Promise<Budget> {
-        const endpoint: string = `${this.BASE_URL}/api/Budget/${budger_id}`;
+        const endpoint: string = `${this.BASE_URL}/api/Budget/${budger_id}/update_category`;
         return fetch(endpoint, {
             method: 'POST',
             body: JSON.stringify(category),
@@ -70,7 +76,7 @@ class RemoteDataService implements DataService {
     }
 
     createCategories(_budget_id: string, _categories: Category[]): Promise<Budget> {
-        const endpoint: string = `${this.BASE_URL}/api/Budget/${_budget_id}/categories`;
+        const endpoint: string = `${this.BASE_URL}/api/Budget/${_budget_id}/add_categories`;
         return fetch(endpoint, {
             method: 'POST',
             body: JSON.stringify(_categories),
@@ -117,6 +123,23 @@ class RemoteDataService implements DataService {
 }
 
 class LocalDataService implements DataService {
+    deleteBudget(budget_id: string): Promise<void> {
+        return new Promise((resolve, _reject) => {
+            // Implement the logic to delete a budget from local storage
+            // For example:
+            const userData = localStorage.getItem('userData');
+            if (userData) {
+                let budget_list: Budget[] = JSON.parse(userData);
+                const index = this.find_budget_by_id(budget_id, budget_list);
+                if (index === -1) {
+                    _reject();
+                }
+                budget_list.splice(index, 1);
+                localStorage.setItem('userData', JSON.stringify(budget_list));
+                resolve();
+            }
+        });
+    }
     deleteCategory(budget_id: string, categoryId: number): Promise<Budget> {
         return new Promise((resolve, reject) => {
             // Implement the logic to delete a category from local storage
