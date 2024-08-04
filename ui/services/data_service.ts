@@ -4,9 +4,11 @@ import { Category, Expense, Budget, BudgetHistory, Recurring, Unplanned, UserAct
 export interface DataService {
     getBudget(): Promise<Budget[]>;
     createBudget(name: string): Promise<Budget>;
+    deleteBudget(budget_id: string): Promise<void>;
     getHistory(): Promise<BudgetHistory>;
     createCategories(budget_id: string, categories: Category[]): Promise<Budget>;
     updateCategory(budget_id: string, category: Category): Promise<Budget>;
+    deleteCategory(budget_id: string, categoryId: number): Promise<Budget>;
     updateExpense(budget_id: string, expense: Expense): Promise<Budget>;
     deleteExpense(budget_id: string, expenseId: number): Promise<Budget>;
     updateRecurring(budget_id: string, recurring: Recurring): Promise<Budget>;
@@ -31,7 +33,15 @@ class RemoteDataService implements DataService {
 
     constructor() {
         this.BASE_URL = "";
-        console.log(`Using remote data service at ${this.BASE_URL}`);
+    }
+    deleteBudget(budget_id: string): Promise<void> {
+        const endpoint: string = `${this.BASE_URL}/api/Budget/${budget_id}`;
+        return fetch(endpoint, { method: 'DELETE' }).then(() => { });
+    }
+
+    deleteCategory(_budget_id: string, _categoryId: number): Promise<Budget> {
+        const endpoint: string = `${this.BASE_URL}/api/Budget/${_budget_id}/category/${_categoryId}`;
+        return fetch(endpoint, { method: 'DELETE' }).then((response) => response.json() as Promise<Budget>);
     }
 
     createBudget(name: string): Promise<Budget> {
@@ -55,7 +65,7 @@ class RemoteDataService implements DataService {
     }
 
     updateCategory(budger_id: string, category: Category): Promise<Budget> {
-        const endpoint: string = `${this.BASE_URL}/api/Budget/${budger_id}`;
+        const endpoint: string = `${this.BASE_URL}/api/Budget/${budger_id}/update_category`;
         return fetch(endpoint, {
             method: 'POST',
             body: JSON.stringify(category),
@@ -66,7 +76,7 @@ class RemoteDataService implements DataService {
     }
 
     createCategories(_budget_id: string, _categories: Category[]): Promise<Budget> {
-        const endpoint: string = `${this.BASE_URL}/api/Budget/${_budget_id}/categories`;
+        const endpoint: string = `${this.BASE_URL}/api/Budget/${_budget_id}/add_categories`;
         return fetch(endpoint, {
             method: 'POST',
             body: JSON.stringify(_categories),
@@ -113,6 +123,59 @@ class RemoteDataService implements DataService {
 }
 
 class LocalDataService implements DataService {
+    deleteBudget(budget_id: string): Promise<void> {
+        return new Promise((resolve, _reject) => {
+            // Implement the logic to delete a budget from local storage
+            // For example:
+            const userData = localStorage.getItem('userData');
+            if (userData) {
+                let budget_list: Budget[] = JSON.parse(userData);
+                const index = this.find_budget_by_id(budget_id, budget_list);
+                if (index === -1) {
+                    _reject();
+                }
+                budget_list.splice(index, 1);
+                localStorage.setItem('userData', JSON.stringify(budget_list));
+                resolve();
+            }
+        });
+    }
+    deleteCategory(budget_id: string, categoryId: number): Promise<Budget> {
+        return new Promise((resolve, reject) => {
+            // Implement the logic to delete a category from local storage
+            // For example:
+            const userData = localStorage.getItem('userData');
+            if (userData) {
+                let budget_list: Budget[] = JSON.parse(userData);
+                const index = this.find_budget_by_id(budget_id, budget_list);
+                if (index === -1) {
+                    reject();
+                }
+                let category: Category | null = null;
+                budget_list[index].categoryList = budget_list[index].categoryList.filter((c: Category) => {
+                    if (c.id === categoryId) {
+                        category = c;
+                        return false;
+                    }
+                    return true;
+                });
+                if (category) {
+                    const user_action: UserAction = DataModelFactory.createUserAction();
+                    user_action.type = UserActionType.deleteCategory;
+                    user_action.payload = category;
+                    budget_list[index].userActions.push(user_action);
+
+                    budget_list[index].last_updated = Date.now();
+                    localStorage.setItem('userData', JSON.stringify(budget_list));
+                    resolve(budget_list[index]);
+                } else {
+                    reject();
+                }
+            } else {
+                reject();
+            }
+        });
+    }
     find_budget_by_id(budget_id: string, budget_list: Budget[]): number {
         let found: number = -1;
         budget_list.forEach((b: Budget, index: number) => {
@@ -132,7 +195,6 @@ class LocalDataService implements DataService {
             if (userData) {
                 budgetList = JSON.parse(userData) ?? [];
             }
-            console.log(budgetList);
             resolve(budgetList);
         });
     }
@@ -195,6 +257,7 @@ class LocalDataService implements DataService {
                     budget_list[index].userActions.push(user_action);
                 }
 
+                budget_list[index].last_updated = Date.now();
                 localStorage.setItem('userData', JSON.stringify(budget_list));
                 resolve(budget_list[index]);
             }
@@ -219,6 +282,7 @@ class LocalDataService implements DataService {
             budget_list[index].categoryList = parsedCategories.map((c: Category) => {
                 if (c.id === category.id) {
                     found = true;
+                    category.expenseList = c.expenseList;
                     return category;
                 }
                 return c;
@@ -230,7 +294,7 @@ class LocalDataService implements DataService {
             user_action.type = UserActionType.updateCategory;
             user_action.payload = category;
             budget_list[index].userActions.push(user_action);
-
+            budget_list[index].last_updated = Date.now();
             localStorage.setItem('userData', JSON.stringify(budget_list));
             resolve(budget_list[index]);
         });
@@ -307,6 +371,7 @@ class LocalDataService implements DataService {
                         user_action.payload = expense;
                         budget_list[index].userActions.push(user_action);
 
+                        budget_list[index].last_updated = Date.now();
                         localStorage.setItem('userData', JSON.stringify(budget_list));
                         resolve(budget_list[index]);
                     } else {

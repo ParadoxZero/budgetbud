@@ -56,7 +56,6 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
                     groupSeparator=""
                     value={used_up_budget}
                     precision={0}
-                    // prefix={<CheckCircleOutlined />}
                     suffix={"/ " + (this.state.total_allocations).toString()}
                     valueStyle={{ color: status_color }}
                 />
@@ -109,7 +108,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
                 context!.processing = true;
                 this.setState({ add_expense_mode_context: context });
                 this._data_service.updateExpense(budget.id, expense).then((data) => {
-                    store.dispatch(budgetSlice.actions.upadteBudget({ budget: data }));
+                    store.dispatch(budgetSlice.actions.updateCurrent(data));
                     this.setState({ add_expense_mode_context: null });
                 }).catch(() => this.setState({ add_expense_mode_context: null }));
             } else {
@@ -264,27 +263,38 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     }
 
     componentDidMount(): void {
+        store.dispatch(headerSlice.actions.header({ is_visible: false }));
+        store.dispatch(budgetSlice.actions.clear());
+
         this._data_service.getBudget().then((data) => {
             if (data.length > 0) {
                 store.dispatch(
-                    budgetSlice.actions.budget({
+                    budgetSlice.actions.set({
                         budget_list: data,
                         selected_budget_index: 0
                     })
                 );
                 store.dispatch(headerSlice.actions.header({ is_visible: true }));
+                this.update_calculations();
+                this.update_next_recurring();
             }
             else {
                 this.navigate_to(View.NoBudgetAvailable);
             }
+        }).catch((e) => {
+            console.error(e);
+            setTimeout(() => this.componentDidMount(), 1000);
         });
+
     }
 
     componentDidUpdate(prevProps: Readonly<OverviewProps>, _prevState: Readonly<IState>, _snapshot?: any): void {
         if (this.props.selected_budget_index != null) {
             const current_budget = this.props.budget_list[this.props.selected_budget_index];
             if (prevProps.selected_budget_index != this.props.selected_budget_index ||
-                (prevProps.selected_budget_index != null && prevProps.budget_list[prevProps.selected_budget_index].last_updated != current_budget.last_updated)) {
+                (prevProps.selected_budget_index != null &&
+                    prevProps.budget_list[prevProps.selected_budget_index].last_updated != current_budget.last_updated)
+            ) {
                 {
                     this.update_calculations();
                     this.update_next_recurring();
@@ -298,6 +308,9 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     }
 
     private update_next_recurring() {
+        if (this.props.selected_budget_index == null || this.props.budget_list == null) {
+            return;
+        }
         const budget = this.props.budget_list[this.props.selected_budget_index!];
         const recurring_list: Recurring[] = budget.recurringList;
         const next_dates_ = recurring_list.map((recurring) => (
@@ -318,6 +331,9 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
 
     }
     private update_calculations() {
+        if (this.props.selected_budget_index == null || this.props.budget_list == null) {
+            return;
+        }
         const budget = this.props.budget_list[this.props.selected_budget_index!];
         let total_allocations = 0;
         budget?.categoryList.forEach((category) => {
