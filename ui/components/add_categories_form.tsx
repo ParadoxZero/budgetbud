@@ -1,4 +1,4 @@
-import { Button, Card, Empty, Form, FormInstance, Input, InputNumber } from "antd";
+import { Button, Card, Empty, Flex, Form, FormInstance, Input, InputNumber } from "antd";
 import React from "react";
 import { Budget, Category, DataModelFactory } from "../datamodel/datamodel";
 import { navigation, store, View } from "../store";
@@ -50,7 +50,7 @@ export class AddCategoriesForm extends React.Component<EditCategoriesFormProps, 
         return (
             <Form
                 name="add_categories"
-                style={{ maxWidth: 600 }}
+                style={{ maxWidth: 600, marginTop: 30 }}
                 autoComplete="off"
                 initialValues={{ categories: [] }}
                 ref={formRef}
@@ -58,20 +58,24 @@ export class AddCategoriesForm extends React.Component<EditCategoriesFormProps, 
             >
                 <Form.List name="categories">
                     {(fields, { add, remove }) => (
-                        <div style={{ display: 'flex', rowGap: 16, flexDirection: 'column', justifyContent: 'center' }}>
+                        <div style={{ display: 'flex', rowGap: 10, flexDirection: 'column', justifyContent: 'center' }}>
                             {fields.map((field) => (
-                                <Card
-                                    size="small"
+                                <Flex
+                                    gap={5}
+                                    justify="center"
+                                    align="center"
                                     key={field.key}
-                                    actions={[<CloseOutlined onClick={() => remove(field.name)} />]}
                                 >
-                                    <Form.Item label="Name" name={[field.name, 'name']} rules={[{ required: true, message: "Name is required" }]}>
-                                        <Input />
+                                    <Form.Item name={[field.name, 'name']} rules={[{ required: true, message: "Name is required" }]}>
+                                        <Input placeholder="name" />
                                     </Form.Item>
-                                    <Form.Item label="Allocated Amount" name={[field.name, 'allocation']} rules={[{ required: true, message: "Allocation is required" }]}>
-                                        <InputNumber type="number" inputMode="numeric" />
+                                    <Form.Item name={[field.name, 'allocation']} rules={[{ required: true, message: "Allocation is required" }]}>
+                                        <InputNumber type="number" inputMode="numeric" placeholder="Amount" />
                                     </Form.Item>
-                                </Card>
+                                    <Form.Item>
+                                        <Button shape="circle" danger icon={<CloseOutlined />} onClick={() => remove(field.name)} />
+                                    </Form.Item>
+                                </Flex>
                             ))}
                             {fields.length === 0 && (
                                 <Empty description="No Categories Added" />
