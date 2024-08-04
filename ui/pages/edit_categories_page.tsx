@@ -57,7 +57,19 @@ class EditCategoriesPage extends React.Component<EditCategoriesPageProps, EditCa
         return (
             <Flex align="center" justify="center" gap={10}>
                 <Button shape="default" type="primary" icon={<LeftOutlined />} onClick={on_back_click} disabled={this.state.is_loading}> Back </Button >
-                <Button danger shape="default" type="primary" icon={<DeleteFilled />} disabled={this.state.is_loading}> Delete Budget</Button>
+                <Popconfirm
+                    title="Delete Budget"
+                    description="Are you sure to delete the budget? All data will be lost."
+                    okText="Yes"
+                    cancelText="No"
+                    onConfirm={() => {
+                        this.setState({ is_loading: true }); this._data_service.deleteBudget(this.props.budget.id)
+                            .then(() => store.dispatch(navigation(View.Overview)))
+                            .finally(() => { this.setState({ is_loading: false }); })
+                    }}
+                >
+                    <Button danger shape="default" type="primary" icon={<DeleteFilled />} disabled={this.state.is_loading}> Delete Budget</Button>
+                </Popconfirm>
             </Flex>
         )
     }

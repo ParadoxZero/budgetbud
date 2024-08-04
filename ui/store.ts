@@ -61,6 +61,10 @@ export const budgetSlice = createSlice({
                 return;
             }
             state.selected_budget_index = new_index;
+        },
+        clear: (state) => {
+            state.budget_list = [];
+            state.selected_budget_index = null;
         }
     }
 })

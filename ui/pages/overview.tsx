@@ -263,6 +263,9 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     }
 
     componentDidMount(): void {
+        store.dispatch(headerSlice.actions.header({ is_visible: false }));
+        store.dispatch(budgetSlice.actions.clear());
+
         this._data_service.getBudget().then((data) => {
             if (data.length > 0) {
                 store.dispatch(
@@ -272,6 +275,8 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
                     })
                 );
                 store.dispatch(headerSlice.actions.header({ is_visible: true }));
+                this.update_calculations();
+                this.update_next_recurring();
             }
             else {
                 this.navigate_to(View.NoBudgetAvailable);
@@ -280,8 +285,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
             console.error(e);
             setTimeout(() => this.componentDidMount(), 1000);
         });
-        this.update_calculations();
-        this.update_next_recurring();
+
     }
 
     componentDidUpdate(prevProps: Readonly<OverviewProps>, _prevState: Readonly<IState>, _snapshot?: any): void {
