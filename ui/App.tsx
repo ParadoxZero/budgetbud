@@ -8,6 +8,8 @@ import { connect } from 'react-redux';
 import { ConfigProvider, Layout } from 'antd';
 import Header from './components/header';
 import Overview from './pages/overview';
+import EditCategoriesPage from './pages/edit_categories_page';
+import { Budget } from './datamodel/datamodel';
 
 
 interface PreRun {
@@ -19,6 +21,7 @@ interface PreRun {
 export interface AppProps {
   view: View;
   is_header_visible: boolean;
+  current_budget: Budget | null;
 }
 
 class App extends React.Component<AppProps> {
@@ -92,15 +95,22 @@ class App extends React.Component<AppProps> {
         return <Overview />
       case View.NoBudgetAvailable:
         return <CreateNewBudgetPage />
+      case View.CategoryEdit:
+        return <EditCategoriesPage budget={this.props.current_budget!} />
       default:
         return (<>Not Found</>)
     }
   }
 }
 function mapStateToProps(state: any): AppProps {
+  let budget = null;
+  if (state.budget.budget_list && state.budget.selected_budget_index !== null) {
+    budget = state.budget.budget_list[state.budget.selected_budget_index];
+  }
   return {
     view: state.navigation.current_view,
     is_header_visible: state.header.is_visible,
+    current_budget: budget
   }
 }
 

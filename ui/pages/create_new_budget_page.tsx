@@ -3,7 +3,7 @@ import React from 'react';
 import CreateBudgetForm from '../components/create_budget_form';
 import { Budget } from '../datamodel/datamodel';
 import { LoadingOutlined } from '@ant-design/icons';
-import { AddCategoriesForm } from '../components/edit_categories_form';
+import { AddCategoriesForm } from '../components/add_categories_form';
 import { navigation, store, View } from '../store';
 
 enum WizardStep {

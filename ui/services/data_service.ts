@@ -7,6 +7,7 @@ export interface DataService {
     getHistory(): Promise<BudgetHistory>;
     createCategories(budget_id: string, categories: Category[]): Promise<Budget>;
     updateCategory(budget_id: string, category: Category): Promise<Budget>;
+    deleteCategory(budget_id: string, categoryId: number): Promise<Budget>;
     updateExpense(budget_id: string, expense: Expense): Promise<Budget>;
     deleteExpense(budget_id: string, expenseId: number): Promise<Budget>;
     updateRecurring(budget_id: string, recurring: Recurring): Promise<Budget>;
@@ -31,6 +32,10 @@ class RemoteDataService implements DataService {
 
     constructor() {
         this.BASE_URL = "";
+    }
+
+    deleteCategory(_budget_id: string, _categoryId: number): Promise<Budget> {
+        throw new Error("Method not implemented.");
     }
 
     createBudget(name: string): Promise<Budget> {
@@ -112,6 +117,41 @@ class RemoteDataService implements DataService {
 }
 
 class LocalDataService implements DataService {
+    deleteCategory(budget_id: string, categoryId: number): Promise<Budget> {
+        return new Promise((resolve, reject) => {
+            // Implement the logic to delete a category from local storage
+            // For example:
+            const userData = localStorage.getItem('userData');
+            if (userData) {
+                let budget_list: Budget[] = JSON.parse(userData);
+                const index = this.find_budget_by_id(budget_id, budget_list);
+                if (index === -1) {
+                    reject();
+                }
+                let category: Category | null = null;
+                budget_list[index].categoryList = budget_list[index].categoryList.filter((c: Category) => {
+                    if (c.id === categoryId) {
+                        category = c;
+                        return false;
+                    }
+                    return true;
+                });
+                if (category) {
+                    const user_action: UserAction = DataModelFactory.createUserAction();
+                    user_action.type = UserActionType.deleteCategory;
+                    user_action.payload = category;
+                    budget_list[index].userActions.push(user_action);
+
+                    localStorage.setItem('userData', JSON.stringify(budget_list));
+                    resolve(budget_list[index]);
+                } else {
+                    reject();
+                }
+            } else {
+                reject();
+            }
+        });
+    }
     find_budget_by_id(budget_id: string, budget_list: Budget[]): number {
         let found: number = -1;
         budget_list.forEach((b: Budget, index: number) => {
