@@ -17,7 +17,7 @@ interface EditCategoriesFormState {
 
 }
 
-export class EditCategoriesForm extends React.Component<EditCategoriesFormProps, EditCategoriesFormState> {
+export class AddCategoriesForm extends React.Component<EditCategoriesFormProps, EditCategoriesFormState> {
     data_service: DataService;
 
     constructor(props: EditCategoriesFormProps) {
