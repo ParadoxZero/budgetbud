@@ -3,8 +3,9 @@ import { connect } from "react-redux";
 import { Budget, DataModelFactory } from "../datamodel/datamodel";
 import { budgetSlice, navigation, store, View } from "../store";
 import { Button, Card, Divider, Flex, Input, Popconfirm, Typography } from "antd";
-import { BackwardFilled, CheckOutlined, CloseOutlined, DeleteFilled, LeftOutlined, SendOutlined, UpOutlined } from "@ant-design/icons";
+import { BackwardFilled, CheckOutlined, CloseOutlined, DeleteFilled, LeftOutlined, PlusOutlined, SendOutlined, UpOutlined } from "@ant-design/icons";
 import { DataService, getDataService } from "../services/data_service";
+import { AddCategoriesForm } from "../components/add_categories_form";
 
 
 
@@ -14,6 +15,7 @@ export interface EditCategoriesPageProps {
 
 interface EditCategoriesPageState {
     is_loading: boolean;
+    add_category_mode: boolean;
 }
 
 class EditCategoriesPage extends React.Component<EditCategoriesPageProps, EditCategoriesPageState> {
@@ -24,6 +26,7 @@ class EditCategoriesPage extends React.Component<EditCategoriesPageProps, EditCa
         this._data_service = getDataService();
         this.state = {
             is_loading: false,
+            add_category_mode: false,
         };
     }
 
@@ -31,9 +34,27 @@ class EditCategoriesPage extends React.Component<EditCategoriesPageProps, EditCa
         return (
             <Flex vertical align="center" justify="center" style={{ marginTop: 20 }}>
                 {this.render_control_buttons()}
-                {this.render_categories()}
+                {this.render_body()}
             </Flex>
         );
+    }
+
+    render_body() {
+        if (this.state.add_category_mode) {
+            return this.render_add_category();
+        } else {
+            return this.render_categories();
+        }
+    }
+
+    render_add_category() {
+        return (
+            <AddCategoriesForm budget_id={this.props.budget.id} onCategoriesAdded={() => {
+                store.dispatch(navigation(View.Overview));
+            }} onCancel={() => {
+                this.setState({ add_category_mode: false });
+            }} />
+        )
     }
 
     render_categories() {
@@ -52,11 +73,19 @@ class EditCategoriesPage extends React.Component<EditCategoriesPageProps, EditCa
 
     render_control_buttons() {
         const on_back_click = () => {
+            if (this.state.add_category_mode) {
+                this.setState({ add_category_mode: false });
+                return;
+            }
             store.dispatch(navigation(View.Overview));
         }
+        const on_add_category_click = () => {
+            this.setState({ add_category_mode: true });
+        }
         return (
-            <Flex align="center" justify="center" gap={10}>
+            <Flex align="center" justify="center" gap={10} wrap>
                 <Button shape="default" type="primary" icon={<LeftOutlined />} onClick={on_back_click} disabled={this.state.is_loading}> Back </Button >
+                <Button shape="default" type="default" icon={<PlusOutlined />} onClick={on_add_category_click}>Add Categories</Button>
                 <Popconfirm
                     title="Delete Budget"
                     description="Are you sure to delete the budget? All data will be lost."
@@ -68,7 +97,7 @@ class EditCategoriesPage extends React.Component<EditCategoriesPageProps, EditCa
                             .finally(() => { this.setState({ is_loading: false }); })
                     }}
                 >
-                    <Button danger shape="default" type="primary" icon={<DeleteFilled />} disabled={this.state.is_loading}> Delete Budget</Button>
+                    <Button danger shape="default" type="primary" icon={<DeleteFilled />} disabled={this.state.is_loading}> Delete Budget </Button>
                 </Popconfirm>
             </Flex>
         )
