@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { Budget, DataModelFactory } from "../datamodel/datamodel";
-import { budgetSlice, navigation, store, View } from "../store";
+import { budgetSlice, navigate, store, View } from "../store";
 import { Button, Card, Divider, Flex, Input, Popconfirm, Typography } from "antd";
 import { BackwardFilled, CheckOutlined, CloseOutlined, DeleteFilled, LeftOutlined, PlusOutlined, SendOutlined, UpOutlined } from "@ant-design/icons";
 import { DataService, getDataService } from "../services/data_service";
@@ -50,7 +50,7 @@ class EditCategoriesPage extends React.Component<EditCategoriesPageProps, EditCa
     render_add_category() {
         return (
             <AddCategoriesForm budget_id={this.props.budget.id} onCategoriesAdded={() => {
-                store.dispatch(navigation(View.Overview));
+                store.dispatch(navigate(View.Overview));
             }} onCancel={() => {
                 this.setState({ add_category_mode: false });
             }} />
@@ -77,7 +77,7 @@ class EditCategoriesPage extends React.Component<EditCategoriesPageProps, EditCa
                 this.setState({ add_category_mode: false });
                 return;
             }
-            store.dispatch(navigation(View.Overview));
+            store.dispatch(navigate(View.Overview));
         }
         const on_add_category_click = () => {
             this.setState({ add_category_mode: true });
@@ -88,12 +88,12 @@ class EditCategoriesPage extends React.Component<EditCategoriesPageProps, EditCa
                 <Button shape="default" type="default" icon={<PlusOutlined />} onClick={on_add_category_click}>Add Categories</Button>
                 <Popconfirm
                     title="Delete Budget"
-                    description="Are you sure to delete the budget? All data will be lost."
+                    description="Are you sure? All data will be lost."
                     okText="Yes"
                     cancelText="No"
                     onConfirm={() => {
                         this.setState({ is_loading: true }); this._data_service.deleteBudget(this.props.budget.id)
-                            .then(() => store.dispatch(navigation(View.Overview)))
+                            .then(() => store.dispatch(navigate(View.Overview)))
                             .finally(() => { this.setState({ is_loading: false }); })
                     }}
                 >
@@ -105,7 +105,7 @@ class EditCategoriesPage extends React.Component<EditCategoriesPageProps, EditCa
 
     render_catogory_list_row(id: number, title: string, allocation: number) {
         const delete_title = "Delete '" + title + "' category";
-        const delete_question = "Are you sure to delete the category - " + title + "? All data will be lost.";
+        const delete_question = "Are you sure? All data will be lost.";
 
         let updated_title = title;
         let updated_allocation = allocation;

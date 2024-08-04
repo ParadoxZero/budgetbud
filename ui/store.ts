@@ -14,10 +14,15 @@ export const navigationSlice = createSlice({
     name: 'navigation',
     initialState: {
         current_view: View.Overview,
+        selected_category_id: null,
     },
     reducers: {
         navigation: (state, action) => {
             state.current_view = action.payload;
+        },
+        to_category_view: (state, action) => {
+            state.current_view = View.CategoryDetails;
+            state.selected_category_id = action.payload;
         }
     },
 })
@@ -70,7 +75,7 @@ export const budgetSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { navigation } = navigationSlice.actions
+export const { navigation: navigate, to_category_view } = navigationSlice.actions
 const navigation_reducer = navigationSlice.reducer
 
 export var store = configureStore({

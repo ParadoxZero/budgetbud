@@ -10,7 +10,7 @@ export interface DataService {
     updateCategory(budget_id: string, category: Category): Promise<Budget>;
     deleteCategory(budget_id: string, categoryId: number): Promise<Budget>;
     updateExpense(budget_id: string, expense: Expense): Promise<Budget>;
-    deleteExpense(budget_id: string, expenseId: number): Promise<Budget>;
+    deleteExpense(budget_id: string, category_id: number, expenseId: number): Promise<Budget>;
     updateRecurring(budget_id: string, recurring: Recurring): Promise<Budget>;
     deleteRecurring(budget_id: string, recurringId: number): Promise<Budget>;
     updateUnplanned(budget_id: string, unplanned: Unplanned): Promise<Budget>;
@@ -97,7 +97,7 @@ class RemoteDataService implements DataService {
         }).then((response) => response.json() as Promise<Budget>);
     }
 
-    deleteExpense(_budget_id: string, _expenseId: number): Promise<Budget> {
+    deleteExpense(_budget_id: string, category_id: number, _expenseId: number): Promise<Budget> {
         throw new Error("Not implemented");
     }
 
