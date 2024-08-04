@@ -177,5 +177,15 @@ namespace budgetbud.Services
             await UpdateBudgetAsync(budget);
             return budget;
         }
+
+        internal async Task<Budget> DeleteExpenseAsync(string budget_id, int category_id, int expense_id)
+        {
+            Budget budget = await GetBudgetAsync(budget_id);
+            Category category = budget.categoryList.Find(c => c.Id == category_id) ?? throw new Exception("Category not found");
+            category.ExpenseList.RemoveAll(e => e.Id == expense_id);
+            category.LastUpdated = DateTime.UtcNow.Ticks;
+            await UpdateBudgetAsync(budget);
+            return budget;
+        }
     }
 }

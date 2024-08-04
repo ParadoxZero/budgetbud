@@ -62,4 +62,9 @@ public class UserDataService
     {
         return await _dbService.DeleteCategoryAsync(budget_id, category_id);
     }
+
+    internal async Task<Budget> DeleteExpense(string budget_id, int category_id, int expense_id)
+    {
+        return await _dbService.DeleteExpenseAsync(budget_id, category_id, expense_id);
+    }
 }
