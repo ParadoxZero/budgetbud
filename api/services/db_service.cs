@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.Azure.Cosmos;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace budgetbud.Services
@@ -91,15 +92,20 @@ namespace budgetbud.Services
             await _container.UpsertItemAsync(budget, new PartitionKey(budget.id));
         }
 
-        public async Task AddExpenseAsync(string budget_id, Expense expense)
+        public async Task<Budget> AddExpenseAsync(string budget_id, Expense expense)
         {
             Budget budget = await GetBudgetAsync(budget_id);
             Category cat = budget.categoryList?.Find(c => c.Id == expense.CategoryId) ?? throw new Exception("Category not found");
-            expense.Id = cat.ExpenseList.LastOrDefault()?.Id ?? 0;
+            do
+            {
+                expense.Id = RandomNumberGenerator.GetInt32(0, int.MaxValue);
+            } while (cat.ExpenseList.Exists(e => e.Id == expense.Id));
+
             expense.Timestamp = DateTime.UtcNow.Ticks;
             cat.ExpenseList.Add(expense);
             cat.LastUpdated = DateTime.UtcNow.Ticks;
             await UpdateBudgetAsync(budget);
+            return budget;
         }
 
         public async Task UpdateExpenseAsync(string budget_id, Expense expense)
