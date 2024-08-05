@@ -37,8 +37,7 @@ public class UserDataService
 
     public async Task<Budget> AddExpenseToBudget(string budget_id, Expense expense)
     {
-        await _dbService.AddExpenseAsync(budget_id, expense);
-        return await _dbService.GetBudgetAsync(budget_id);
+        return await _dbService.AddExpenseAsync(budget_id, expense);
     }
 
     public async Task<Budget> AddCategoryToBudget(string budget_id, List<Category> categoryList)
