@@ -1,6 +1,6 @@
 import React, { Children } from "react";
 import { Budget } from "../datamodel/datamodel";
-import { headerSlice, navigate, store, View } from "../store";
+import { budgetSlice, headerSlice, navigate, store, View } from "../store";
 import { Button, Divider, Empty, Flex, Popconfirm, Select, Space, Statistic, Timeline, Typography } from "antd";
 import { ClearOutlined, DeleteFilled, DeleteOutlined, EditFilled, LeftOutlined, MoreOutlined, PlusCircleFilled } from "@ant-design/icons";
 import { connect } from "react-redux";
@@ -22,7 +22,8 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps> {
     }
 
     componentDidMount(): void {
-        store.dispatch(headerSlice.actions.setTitle({ title: this.props.budget.categoryList[this.props.categoryId].name, show_title: true }));
+        let title = this.props.budget.categoryList.find((category) => category.id === this.props.categoryId)?.name;
+        store.dispatch(headerSlice.actions.setTitle({ title: title, show_title: true }));
     }
     render() {
         return (
@@ -64,7 +65,9 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps> {
         const item_list = expense_list.map((expense) => {
             const date_string = (new Date(expense.timestamp)).toDateString();
             const on_delete_click = () => {
-                this._data_service.deleteExpense(this.props.budget.id, this.props.categoryId, expense.id);
+                this._data_service.deleteExpense(this.props.budget.id, this.props.categoryId, expense.id).then((budget) => {
+                    store.dispatch(budgetSlice.actions.updateCurrent(budget));
+                });
             }
             const ui = (
                 <div>
@@ -74,7 +77,7 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps> {
                             <Statistic title='Amount' value={expense.amount} suffix={expense.title} />
                         </Flex>
                         <Flex gap={5} justify="space-between" align="center">
-                            <Popconfirm title="Are you sure?" okText="Yes" showArrow>
+                            <Popconfirm title="Are you sure?" okText="Yes" showArrow onConfirm={on_delete_click}>
                                 <Button type="primary" size="small" icon={<DeleteFilled />} danger />
                             </Popconfirm>
                         </Flex>

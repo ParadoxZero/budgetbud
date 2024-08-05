@@ -347,7 +347,7 @@ class LocalDataService implements DataService {
         });
     }
 
-    deleteExpense(_budget_id: string, expenseId: number): Promise<Budget> {
+    deleteExpense(_budget_id: string, category_id: number, expenseId: number): Promise<Budget> {
         return new Promise((resolve, reject) => {
             // Implement the logic to delete an expense from local storage
             // For example:
@@ -356,7 +356,8 @@ class LocalDataService implements DataService {
                 const budget_list: Budget[] = JSON.parse(userData);
                 const index = this.find_budget_by_id(_budget_id, budget_list);
                 if (index !== -1) {
-                    const category = budget_list[index].categoryList.find((c: Category) => c.expenseList.some((e: Expense) => e.id === expenseId));
+
+                    const category = budget_list[index].categoryList.find((c: Category) => c.id === category_id);
                     if (category) {
                         let expense: Expense | null = null;
                         category.expenseList = category.expenseList.filter((e: Expense) => {
