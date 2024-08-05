@@ -1,10 +1,11 @@
 import React, { Children } from "react";
 import { Budget } from "../datamodel/datamodel";
-import { navigate, store, View } from "../store";
-import { Button, Divider, Empty, Flex, Popconfirm, Space, Statistic, Timeline, Typography } from "antd";
-import { DeleteFilled, DeleteOutlined, EditFilled, LeftOutlined } from "@ant-design/icons";
+import { headerSlice, navigate, store, View } from "../store";
+import { Button, Divider, Empty, Flex, Popconfirm, Select, Space, Statistic, Timeline, Typography } from "antd";
+import { ClearOutlined, DeleteFilled, DeleteOutlined, EditFilled, LeftOutlined, MoreOutlined, PlusCircleFilled } from "@ant-design/icons";
 import { connect } from "react-redux";
 import { DataService, getDataService } from "../services/data_service";
+import header from "../components/header";
 
 
 export interface ViewExpensePageProps {
@@ -19,12 +20,18 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps> {
         super(props);
         this._data_service = getDataService();
     }
+
+    componentDidMount(): void {
+        store.dispatch(headerSlice.actions.setTitle({ title: this.props.budget.categoryList[this.props.categoryId].name, show_title: true }));
+    }
     render() {
         return (
-            <Flex vertical align="center" justify="center" gap={50} style={{
-                marginTop: 20, minWidth: 300
+            <Flex vertical align="center" justify="center" style={{
+                minWidth: 300
             }}>
+                <Divider />
                 {this.render_control_buttons()}
+                <Divider />
                 {this.render_body()}
             </ Flex>
         );
@@ -36,9 +43,13 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps> {
         }
 
         return (
-            <Flex align="center" justify="center" gap={10} wrap>
-                <Button shape="default" type="primary" icon={<LeftOutlined />} onClick={on_back_click} > Back </Button >
-            </Flex>
+            <>
+                <Flex align="center" justify="center" gap={10} wrap>
+                    <Button shape="default" type="primary" icon={<LeftOutlined />} onClick={on_back_click} > Back </Button >
+                    <Button shape="default" icon={<PlusCircleFilled />} disabled>Add new</Button >
+                    <Button shape="default" icon={<ClearOutlined />} danger disabled> Clear All </Button >
+                </Flex>
+            </>
         )
     }
 
@@ -62,9 +73,9 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps> {
                             <Typography.Text>{expense.title}</Typography.Text>
                             <Statistic title='Amount' value={expense.amount} suffix={expense.title} />
                         </Flex>
-                        <Flex vertical gap={5} justify="space-between" align="center">
-                            <Popconfirm title="Are you sure?" okText="Yes">
-                                <Button type="primary" icon={<DeleteFilled />} danger />
+                        <Flex gap={5} justify="space-between" align="center">
+                            <Popconfirm title="Are you sure?" okText="Yes" showArrow>
+                                <Button type="primary" size="small" icon={<DeleteFilled />} danger />
                             </Popconfirm>
                         </Flex>
                     </Flex>
@@ -98,7 +109,7 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps> {
 
 function mapStateToProps(state: any) {
     return {
-        categoryId: state.navigation.selected_category_id
+        categoryId: state.navigation.selected_category_id,
     }
 }
 
