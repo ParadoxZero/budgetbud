@@ -32,8 +32,10 @@ class EditCategoriesPage extends React.Component<EditCategoriesPageProps, EditCa
 
     render() {
         return (
-            <Flex vertical align="center" justify="center" style={{ marginTop: 20 }}>
+            <Flex vertical align="center" justify="center">
+                <Divider />
                 {this.render_control_buttons()}
+                <Divider />
                 {this.render_body()}
             </Flex>
         );
@@ -83,23 +85,25 @@ class EditCategoriesPage extends React.Component<EditCategoriesPageProps, EditCa
             this.setState({ add_category_mode: true });
         }
         return (
-            <Flex align="center" justify="center" gap={10} wrap>
-                <Button shape="default" type="primary" icon={<LeftOutlined />} onClick={on_back_click} disabled={this.state.is_loading}> Back </Button >
-                <Button shape="default" type="default" icon={<PlusOutlined />} onClick={on_add_category_click}>Add Categories</Button>
-                <Popconfirm
-                    title="Delete Budget"
-                    description="Are you sure? All data will be lost."
-                    okText="Yes"
-                    cancelText="No"
-                    onConfirm={() => {
-                        this.setState({ is_loading: true }); this._data_service.deleteBudget(this.props.budget.id)
-                            .then(() => store.dispatch(navigate(View.Overview)))
-                            .finally(() => { this.setState({ is_loading: false }); })
-                    }}
-                >
-                    <Button danger shape="default" type="primary" icon={<DeleteFilled />} disabled={this.state.is_loading}> Delete Budget </Button>
-                </Popconfirm>
-            </Flex>
+            <>
+                <Flex align="center" justify="center" gap={10} wrap>
+                    <Button shape="default" type="primary" icon={<LeftOutlined />} onClick={on_back_click} disabled={this.state.is_loading}> Back </Button >
+                    <Button shape="default" type="default" icon={<PlusOutlined />} onClick={on_add_category_click}>Add Categories</Button>
+                    <Popconfirm
+                        title="Delete Budget"
+                        description="Are you sure? All data will be lost."
+                        okText="Yes"
+                        cancelText="No"
+                        onConfirm={() => {
+                            this.setState({ is_loading: true }); this._data_service.deleteBudget(this.props.budget.id)
+                                .then(() => store.dispatch(navigate(View.Overview)))
+                                .finally(() => { this.setState({ is_loading: false }); })
+                        }}
+                    >
+                        <Button danger shape="default" icon={<DeleteFilled />} disabled={this.state.is_loading}> Delete Budget </Button>
+                    </Popconfirm>
+                </Flex>
+            </>
         )
     }
 
