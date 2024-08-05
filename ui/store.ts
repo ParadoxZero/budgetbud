@@ -30,13 +30,21 @@ export const navigationSlice = createSlice({
 export const headerSlice = createSlice({
     name: 'header',
     initialState: {
-        title: 'BudgetBud',
+        title: '',
         is_visible: false,
+        show_title: false,
     },
     reducers: {
         header: (state, action) => {
-            state.title = action.payload.title;
             state.is_visible = action.payload.is_visible;
+        },
+        setTitle: (state, action) => {
+            state.title = action.payload.title;
+            state.show_title = action.payload.show_title;
+        },
+        showBudgetSelect: (state) => {
+            state.title = '';
+            state.show_title = false;
         }
     }
 })

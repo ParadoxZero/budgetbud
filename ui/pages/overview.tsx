@@ -268,6 +268,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
 
     componentDidMount(): void {
         store.dispatch(headerSlice.actions.header({ is_visible: false }));
+        store.dispatch(headerSlice.actions.showBudgetSelect());
         store.dispatch(budgetSlice.actions.clear());
 
         this._data_service.getBudget().then((data) => {

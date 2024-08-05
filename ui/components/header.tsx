@@ -15,6 +15,7 @@ export interface HeaderProps {
     isVisible: boolean;
     budget_list: HeaderBudgetDetails[];
     selected_budget_index: number | null;
+    show_title: boolean;
 }
 
 interface HeaderState {
@@ -24,6 +25,14 @@ interface HeaderState {
 class Header extends React.Component<HeaderProps, HeaderState> {
 
     render() {
+        if (this.props.show_title) {
+            return (
+                <Flex justify="center" align="center" style={{ width: "100%", height: "100%" }}>
+                    <Typography.Title level={2}>{this.props.title}</Typography.Title>
+                </Flex>
+            )
+        }
+
         let justify = "space-between";
         if (GetScreenSize() != ScreenSize.mobile) {
             justify = "center";
@@ -110,7 +119,8 @@ function mapStateToProps(state: any): HeaderProps {
         budget_list: state.budget.budget_list,
         selected_budget_index: state.budget.selected_budget_index,
         title: state.header.title,
-        isVisible: state.header.is_visible
+        isVisible: state.header.is_visible,
+        show_title: state.header.show_title,
     };
 }
 
