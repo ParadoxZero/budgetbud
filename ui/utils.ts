@@ -66,7 +66,7 @@ export function CreateDummyData() {
     }
 
     function generateRandomExpense() {
-        return DataModelFactory.createExpense(1, last_cat_id, getRandomExpense());
+        return DataModelFactory.createExpense(Math.floor(Math.random() * 1000), last_cat_id, getRandomExpense());
     }
 
     let last_cat_id = 0;

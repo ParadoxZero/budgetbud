@@ -4,7 +4,7 @@ import CreateBudgetForm from '../components/create_budget_form';
 import { Budget } from '../datamodel/datamodel';
 import { LoadingOutlined } from '@ant-design/icons';
 import { AddCategoriesForm } from '../components/add_categories_form';
-import { navigation, store, View } from '../store';
+import { navigate, store, View } from '../store';
 
 enum WizardStep {
     CreateBudget,
@@ -38,9 +38,9 @@ export class CreateNewBudgetPage extends React.Component<CreateBudgetPageProps, 
                 return (<CreateBudgetForm onFinish={(budget: Budget) => { this.setState({ current_step: WizardStep.AddCategories, budget_under_edit: budget }) }} />);
             case WizardStep.AddCategories:
                 return (< AddCategoriesForm budget_id={this.state.budget_under_edit!.id} onCategoriesAdded={function (): void {
-                    store.dispatch(navigation(View.Overview));
+                    store.dispatch(navigate(View.Overview));
                 }} onCancel={function (): void {
-                    store.dispatch(navigation(View.Overview));
+                    store.dispatch(navigate(View.Overview));
                 }} />);
 
             default:

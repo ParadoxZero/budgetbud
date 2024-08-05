@@ -1,7 +1,7 @@
 import { Button, Card, Empty, Flex, Form, FormInstance, Input, InputNumber } from "antd";
 import React from "react";
 import { Budget, Category, DataModelFactory } from "../datamodel/datamodel";
-import { navigation, store, View } from "../store";
+import { navigate, store, View } from "../store";
 import { CloseOutlined } from "@ant-design/icons";
 import { DataService, getDataService } from "../services/data_service";
 

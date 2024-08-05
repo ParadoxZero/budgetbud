@@ -2,7 +2,7 @@ import { Button, Card, Empty, Form, FormInstance, FormProps, Input, InputNumber,
 import React from "react";
 
 import { DataService, getDataService } from "../services/data_service";
-import { navigation, store, View } from "../store";
+import { navigate, store, View } from "../store";
 import { CloseCircleOutlined, CloseOutlined, CloseSquareFilled, LoadingOutlined, RightOutlined } from "@ant-design/icons";
 import { Budget, Category, DataModelFactory } from "../datamodel/datamodel";
 import { connect } from "react-redux";

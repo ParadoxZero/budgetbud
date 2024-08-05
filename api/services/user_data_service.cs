@@ -37,8 +37,7 @@ public class UserDataService
 
     public async Task<Budget> AddExpenseToBudget(string budget_id, Expense expense)
     {
-        await _dbService.AddExpenseAsync(budget_id, expense);
-        return await _dbService.GetBudgetAsync(budget_id);
+        return await _dbService.AddExpenseAsync(budget_id, expense);
     }
 
     public async Task<Budget> AddCategoryToBudget(string budget_id, List<Category> categoryList)
@@ -61,5 +60,10 @@ public class UserDataService
     public async Task<Budget> DeleteCategory(string budget_id, int category_id)
     {
         return await _dbService.DeleteCategoryAsync(budget_id, category_id);
+    }
+
+    internal async Task<Budget> DeleteExpense(string budget_id, int category_id, int expense_id)
+    {
+        return await _dbService.DeleteExpenseAsync(budget_id, category_id, expense_id);
     }
 }

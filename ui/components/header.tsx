@@ -2,7 +2,7 @@ import { EditFilled, FileOutlined, MoreOutlined, PlusOutlined, SettingOutlined }
 import { Avatar, Button, Divider, Flex, Input, InputRef, Select, Space, Typography } from "antd";
 import React from "react";
 import { connect } from "react-redux";
-import { budgetSlice, headerSlice, navigation, store, View } from "../store";
+import { budgetSlice, headerSlice, navigate, store, View } from "../store";
 import { GetScreenSize, ScreenSize } from "../utils";
 
 export interface HeaderBudgetDetails {
@@ -15,6 +15,7 @@ export interface HeaderProps {
     isVisible: boolean;
     budget_list: HeaderBudgetDetails[];
     selected_budget_index: number | null;
+    show_title: boolean;
 }
 
 interface HeaderState {
@@ -24,6 +25,14 @@ interface HeaderState {
 class Header extends React.Component<HeaderProps, HeaderState> {
 
     render() {
+        if (this.props.show_title) {
+            return (
+                <Flex justify="center" align="center" style={{ width: "100%", height: "100%" }}>
+                    <Typography.Title level={2}>{this.props.title}</Typography.Title>
+                </Flex>
+            )
+        }
+
         let justify = "space-between";
         if (GetScreenSize() != ScreenSize.mobile) {
             justify = "center";
@@ -31,7 +40,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
         return (
             <Flex justify={justify} align="center" style={{ width: "100%", height: "100%" }} gap="small">
                 {this.render_budget_selector()}
-                <Button type="default" icon={<SettingOutlined />} size="large" onClick={() => { store.dispatch(navigation(View.CategoryEdit)) }}></Button>
+                <Button type="default" icon={<SettingOutlined />} size="large" onClick={() => { store.dispatch(navigate(View.CategoryEdit)) }}></Button>
                 <Button type="default" icon={<MoreOutlined />} size="large"></Button>
             </Flex>
         );
@@ -62,14 +71,14 @@ class Header extends React.Component<HeaderProps, HeaderState> {
             e.preventDefault();
             store.dispatch(headerSlice.actions.header({ is_visible: false }));
             store.dispatch(budgetSlice.actions.updateSelection({ index: null }));
-            store.dispatch(navigation(View.NoBudgetAvailable));
+            store.dispatch(navigate(View.NoBudgetAvailable));
         };
         const onSelectionChanged = (value: number) => {
             store.dispatch(budgetSlice.actions.updateSelection({ index: value }));
         }
         const onSettingsClicked = () => {
             this.setState({ is_budget_selector_visible: false });
-            store.dispatch(navigation(View.NoBudgetAvailable));
+            store.dispatch(navigate(View.NoBudgetAvailable));
         }
 
         return (
@@ -110,7 +119,8 @@ function mapStateToProps(state: any): HeaderProps {
         budget_list: state.budget.budget_list,
         selected_budget_index: state.budget.selected_budget_index,
         title: state.header.title,
-        isVisible: state.header.is_visible
+        isVisible: state.header.is_visible,
+        show_title: state.header.show_title,
     };
 }
 

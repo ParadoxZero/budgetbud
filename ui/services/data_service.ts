@@ -10,7 +10,7 @@ export interface DataService {
     updateCategory(budget_id: string, category: Category): Promise<Budget>;
     deleteCategory(budget_id: string, categoryId: number): Promise<Budget>;
     updateExpense(budget_id: string, expense: Expense): Promise<Budget>;
-    deleteExpense(budget_id: string, expenseId: number): Promise<Budget>;
+    deleteExpense(budget_id: string, category_id: number, expenseId: number): Promise<Budget>;
     updateRecurring(budget_id: string, recurring: Recurring): Promise<Budget>;
     deleteRecurring(budget_id: string, recurringId: number): Promise<Budget>;
     updateUnplanned(budget_id: string, unplanned: Unplanned): Promise<Budget>;
@@ -97,8 +97,9 @@ class RemoteDataService implements DataService {
         }).then((response) => response.json() as Promise<Budget>);
     }
 
-    deleteExpense(_budget_id: string, _expenseId: number): Promise<Budget> {
-        throw new Error("Not implemented");
+    deleteExpense(_budget_id: string, category_id: number, _expenseId: number): Promise<Budget> {
+        const endpoint: string = `${this.BASE_URL}/api/Budget/${_budget_id}/category/${category_id}/expense/${_expenseId}`;
+        return fetch(endpoint, { method: 'DELETE' }).then((response) => response.json() as Promise<Budget>);
     }
 
     updateRecurring(_budget_id: string, _recurring: Recurring): Promise<Budget> {
@@ -347,7 +348,7 @@ class LocalDataService implements DataService {
         });
     }
 
-    deleteExpense(_budget_id: string, expenseId: number): Promise<Budget> {
+    deleteExpense(_budget_id: string, category_id: number, expenseId: number): Promise<Budget> {
         return new Promise((resolve, reject) => {
             // Implement the logic to delete an expense from local storage
             // For example:
@@ -356,7 +357,8 @@ class LocalDataService implements DataService {
                 const budget_list: Budget[] = JSON.parse(userData);
                 const index = this.find_budget_by_id(_budget_id, budget_list);
                 if (index !== -1) {
-                    const category = budget_list[index].categoryList.find((c: Category) => c.expenseList.some((e: Expense) => e.id === expenseId));
+
+                    const category = budget_list[index].categoryList.find((c: Category) => c.id === category_id);
                     if (category) {
                         let expense: Expense | null = null;
                         category.expenseList = category.expenseList.filter((e: Expense) => {

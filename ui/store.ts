@@ -14,10 +14,15 @@ export const navigationSlice = createSlice({
     name: 'navigation',
     initialState: {
         current_view: View.Overview,
+        selected_category_id: null,
     },
     reducers: {
         navigation: (state, action) => {
             state.current_view = action.payload;
+        },
+        to_category_view: (state, action) => {
+            state.current_view = View.CategoryDetails;
+            state.selected_category_id = action.payload;
         }
     },
 })
@@ -25,13 +30,21 @@ export const navigationSlice = createSlice({
 export const headerSlice = createSlice({
     name: 'header',
     initialState: {
-        title: 'BudgetBud',
+        title: '',
         is_visible: false,
+        show_title: false,
     },
     reducers: {
         header: (state, action) => {
-            state.title = action.payload.title;
             state.is_visible = action.payload.is_visible;
+        },
+        setTitle: (state, action) => {
+            state.title = action.payload.title;
+            state.show_title = action.payload.show_title;
+        },
+        showBudgetSelect: (state) => {
+            state.title = '';
+            state.show_title = false;
         }
     }
 })
@@ -70,7 +83,7 @@ export const budgetSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { navigation } = navigationSlice.actions
+export const { navigation: navigate, to_category_view } = navigationSlice.actions
 const navigation_reducer = navigationSlice.reducer
 
 export var store = configureStore({

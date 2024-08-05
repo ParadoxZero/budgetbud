@@ -1,4 +1,4 @@
-import { navigation, store, View } from './store'
+import { navigate, store, View } from './store'
 import { CreateDummyData } from './utils';
 import { PingRemote } from './services/ping_service';
 import CreateNewBudgetPage from './pages/create_new_budget_page';
@@ -10,6 +10,7 @@ import Header from './components/header';
 import Overview from './pages/overview';
 import EditCategoriesPage from './pages/edit_categories_page';
 import { Budget } from './datamodel/datamodel';
+import CategoryDetails from './pages/view_expense_page';
 
 
 interface PreRun {
@@ -72,6 +73,8 @@ class App extends React.Component<AppProps> {
           Layout: {
             headerBg: 'white',
             bodyBg: 'white',
+          },
+          Timeline: {
           }
         }
       }}>
@@ -97,8 +100,9 @@ class App extends React.Component<AppProps> {
         return <CreateNewBudgetPage />
       case View.CategoryEdit:
         return <EditCategoriesPage budget={this.props.current_budget!} />
-      default:
-        return (<>Not Found</>)
+      case View.CategoryDetails:
+        return <CategoryDetails budget={this.props.current_budget!} />
+      default: return (<>Not Found</>)
     }
   }
 }

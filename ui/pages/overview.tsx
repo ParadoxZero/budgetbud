@@ -7,7 +7,7 @@ import { DataModelFactory, Recurring, Budget } from "../datamodel/datamodel";
 import { Typography } from "antd";
 import { RecurringCalculatorService } from "../services/recurring_date_service";
 import { BaseType } from "antd/es/typography/Base";
-import { navigation, View, store, headerSlice, budgetSlice } from '../store';
+import { navigate, View, store, headerSlice, budgetSlice, to_category_view } from '../store';
 
 import '../main.css';
 import { connect } from "react-redux";
@@ -180,6 +180,10 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
             this.setState({ add_expense_mode_context: { category_id: id, filled: false, processing: false } });
         }
 
+        const on_right_button_click = () => {
+            store.dispatch(to_category_view(id));
+        }
+
         return (
             <div style={{ margin: 0, marginTop: 10, marginBottom: 10, paddingRight: 20, paddingLeft: 20, minWidth: 300 }} className='touchahble' onClick={on_click}>
                 <Flex align="center" justify="space-between">
@@ -190,7 +194,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
                             <Text strong type={text_type}>{total - value} / {total} </Text>
                             {progress}
                         </Flex>
-                        <Button shape="circle" type="default" icon={<RightOutlined />} style={{ padding: 20, marginLeft: 20 }} onClick={(e) => { alert('button'); e.stopPropagation(); }} disabled></Button>
+                        <Button shape="circle" type="default" icon={<RightOutlined />} style={{ padding: 20, marginLeft: 20 }} onClick={on_right_button_click} ></Button>
                     </Flex>
                 </Flex>
             </div >
@@ -264,6 +268,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
 
     componentDidMount(): void {
         store.dispatch(headerSlice.actions.header({ is_visible: false }));
+        store.dispatch(headerSlice.actions.showBudgetSelect());
         store.dispatch(budgetSlice.actions.clear());
 
         this._data_service.getBudget().then((data) => {
@@ -304,7 +309,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     }
 
     private navigate_to(view: View) {
-        store.dispatch(navigation(view));
+        store.dispatch(navigate(view));
     }
 
     private update_next_recurring() {
