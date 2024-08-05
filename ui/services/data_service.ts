@@ -98,7 +98,8 @@ class RemoteDataService implements DataService {
     }
 
     deleteExpense(_budget_id: string, category_id: number, _expenseId: number): Promise<Budget> {
-        throw new Error("Not implemented");
+        const endpoint: string = `${this.BASE_URL}/api/Budget/${_budget_id}/category/${category_id}/expense/${_expenseId}`;
+        return fetch(endpoint, { method: 'DELETE' }).then((response) => response.json() as Promise<Budget>);
     }
 
     updateRecurring(_budget_id: string, _recurring: Recurring): Promise<Budget> {
