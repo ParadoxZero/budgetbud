@@ -24,6 +24,8 @@ public class AzureIdentityService : IIdentityService
             {
                 case "github":
                     return ProcessGithub(claims);
+                case "google":
+                    return ProcessGoogle(claims);
                 default:
                     throw new AuthException("Provider not supported" + claims);
             }
@@ -40,6 +42,19 @@ public class AzureIdentityService : IIdentityService
             if (claim.typ == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")
             {
                 return "github:" + claim.val;
+            }
+        }
+        throw new AuthException("Name claim not found");
+    }
+
+    private static string ProcessGoogle(dynamic json)
+    {
+        JArray claims = json.claims;
+        foreach (dynamic claim in claims)
+        {
+            if (claim.typ == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")
+            {
+                return "google:" + claim.val;
             }
         }
         throw new AuthException("Name claim not found");
