@@ -1,5 +1,5 @@
-import { EditFilled, FileOutlined, MoreOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
-import { Avatar, Button, Divider, Flex, Input, InputRef, Select, Space, Typography } from "antd";
+import { EditFilled, FileOutlined, LogoutOutlined, MoreOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
+import { Avatar, Button, Divider, Dropdown, Flex, Input, InputRef, MenuProps, Select, Space, Typography } from "antd";
 import React from "react";
 import { connect } from "react-redux";
 import { budgetSlice, headerSlice, navigate, store, View } from "../store";
@@ -41,7 +41,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
             <Flex justify={justify} align="center" style={{ width: "100%", height: "100%" }} gap="small">
                 {this.render_budget_selector()}
                 <Button type="default" icon={<SettingOutlined />} size="large" onClick={() => { store.dispatch(navigate(View.CategoryEdit)) }}></Button>
-                <Button type="default" icon={<MoreOutlined />} size="large"></Button>
+                {this.render_more_menu()}
             </Flex>
         );
     }
@@ -109,6 +109,23 @@ class Header extends React.Component<HeaderProps, HeaderState> {
                 )}
                 variant="outlined"
             />
+        );
+    }
+
+    render_more_menu() {
+        const items: MenuProps['items'] = [
+            {
+                label: 'Sign Out',
+                key: '1',
+                icon: <LogoutOutlined />,
+                onClick: () => { window.location.href = "/.auth/logout" },
+            },
+        ];
+        return (
+            <Dropdown menu={{ items }}>
+
+                <Button type="default" icon={< MoreOutlined />} size="large" ></Button>
+            </Dropdown>
         );
     }
 
