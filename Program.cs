@@ -1,4 +1,5 @@
 using budgetbud.Services;
+using budgetbud.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
@@ -19,12 +20,14 @@ else
     builder.Services.AddSingleton<IIdentityService, AzureIdentityService>();
 }
 
-
 builder.Services.AddSingleton<DbService>();
 builder.Services.AddSingleton<UserDataService>();
 
-
 var app = builder.Build();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseMiddleware<RedirectToLoginMiddleware>();
+}
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
@@ -35,7 +38,6 @@ if (use_swagger)
     app.UseSwaggerUI();
 }
 
-app.MapGet("/hello-world", () => "Hello World!");
 app.MapControllers();
 
 app.Run();
