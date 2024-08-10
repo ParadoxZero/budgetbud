@@ -116,3 +116,16 @@ export function CreateDummyData() {
 
     return [user_data];
 }
+
+export function TicksToDate(ticks: number): Date {
+    // C# ticks are in 100-nanosecond intervals since 1/1/0001
+    // JavaScript Date is in milliseconds since 1/1/1970
+    const epochTicks = 621355968000000000; // Ticks at Unix epoch (1/1/1970)
+    const ticksPerMillisecond = 10000; // Number of ticks per millisecond
+
+    // Calculate the number of milliseconds since Unix epoch
+    const millisecondsSinceEpoch = (ticks - epochTicks) / ticksPerMillisecond;
+
+    // Create a new JavaScript Date object
+    return new Date(millisecondsSinceEpoch);
+}

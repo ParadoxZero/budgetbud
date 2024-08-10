@@ -26,6 +26,7 @@ import { ClearOutlined, DeleteFilled, DeleteOutlined, EditFilled, LeftOutlined, 
 import { connect } from "react-redux";
 import { DataService, getDataService } from "../services/data_service";
 import header from "../components/header";
+import { TicksToDate } from "../utils";
 
 
 export interface ViewExpensePageProps {
@@ -83,7 +84,7 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps> {
         }
 
         const item_list = expense_list.map((expense) => {
-            const date_string = (new Date(expense.timestamp)).toDateString();
+            const date_string = TicksToDate(expense.timestamp).toDateString();
             const on_delete_click = () => {
                 this._data_service.deleteExpense(this.props.budget.id, this.props.categoryId, expense.id).then((budget) => {
                     store.dispatch(budgetSlice.actions.updateCurrent(budget));
