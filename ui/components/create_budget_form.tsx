@@ -50,20 +50,20 @@ class CreateBudgetForm extends React.Component<CreateBudgetFormProps, {}> {
         }
         return (
             <Form name="Create Budget"
-                labelCol={{ span: 5 }}
-                wrapperCol={{ span: 10 }}
+
+
                 labelAlign="left"
                 onFinish={onFinish}
                 style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
                 layout="vertical">
                 <Form.Item<FieldType>
-                    label="Name"
+                    label="Please enter a name for the budget"
                     name="name"
                     rules={[{ required: true, message: "Please enter a name for the budget" }]}>
                     <Input />
                 </Form.Item>
                 <Form.Item<FieldType>
-                    label="Description"
+                    label="Add any notes or description for the budget"
                     name="description"
                     rules={[{ required: false }]}>
                     <Input.TextArea />

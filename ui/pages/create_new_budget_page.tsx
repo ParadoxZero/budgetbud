@@ -18,14 +18,16 @@ interface CreateBudgetPageState {
     budget_under_edit: null | Budget;
 }
 export interface CreateBudgetPageProps {
+    is_other_budget_available: boolean;
 }
 export class CreateNewBudgetPage extends React.Component<CreateBudgetPageProps, CreateBudgetPageState> {
     render() {
         return (
-            <Card title={this.getTitle()} >
-                <Alert message="As of now, categories cannot be edited once added. So please configure your budget carefully." type="warning" />
-                {this.render_form()}
-            </Card>
+            <Flex style={{ width: '100vw', height: '100vh' }} vertical align='center' justify='center'>
+                <Card title={this.getTitle()}>
+                    {this.render_form()}
+                </Card>
+            </Flex>
         );
     }
 
@@ -33,9 +35,12 @@ export class CreateNewBudgetPage extends React.Component<CreateBudgetPageProps, 
         if (this.state.is_loading) {
             return (<Spin indicator={<LoadingOutlined spin />} size="large" />);
         }
+
         switch (this.state.current_step) {
             case WizardStep.CreateBudget:
-                return (<CreateBudgetForm onFinish={(budget: Budget) => { this.setState({ current_step: WizardStep.AddCategories, budget_under_edit: budget }) }} />);
+                return (<CreateBudgetForm
+                    onCancel={this.props.is_other_budget_available ? () => { store.dispatch(navigate(View.Overview)) } : undefined}
+                    onFinish={(budget: Budget) => { this.setState({ current_step: WizardStep.AddCategories, budget_under_edit: budget }) }} />);
             case WizardStep.AddCategories:
                 return (< AddCategoriesForm budget_id={this.state.budget_under_edit!.id} onCategoriesAdded={function (): void {
                     store.dispatch(navigate(View.Overview));

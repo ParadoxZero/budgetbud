@@ -23,6 +23,7 @@ export interface AppProps {
   view: View;
   is_header_visible: boolean;
   current_budget: Budget | null;
+  is_budgets_available: boolean;
 }
 
 class App extends React.Component<AppProps> {
@@ -97,7 +98,7 @@ class App extends React.Component<AppProps> {
       case View.Overview:
         return <Overview />
       case View.NoBudgetAvailable:
-        return <CreateNewBudgetPage />
+        return <CreateNewBudgetPage is_other_budget_available={this.props.is_budgets_available} />
       case View.CategoryEdit:
         return <EditCategoriesPage budget={this.props.current_budget!} />
       case View.CategoryDetails:
@@ -114,7 +115,8 @@ function mapStateToProps(state: any): AppProps {
   return {
     view: state.navigation.current_view,
     is_header_visible: state.header.is_visible,
-    current_budget: budget
+    current_budget: budget,
+    is_budgets_available: state.budget.budget_list.length > 0
   }
 }
 
