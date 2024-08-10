@@ -30,10 +30,10 @@ namespace budgetbud.Services
 {
     public class DbService
     {
-        private CosmosClient _cosmosClient;
-        private Database _database;
-        private Container _container;
-        private IIdentityService _identityService;
+        private readonly CosmosClient _cosmosClient;
+        private readonly Database _database;
+        private readonly Container _container;
+        private readonly IIdentityService _identityService;
 
         public DbService(IConfiguration configuration, IIdentityService identityService)
         {
