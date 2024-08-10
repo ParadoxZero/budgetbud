@@ -16,13 +16,13 @@ class App extends React.Component {
                             <Typography.Title level={1}>BudgetBud</Typography.Title>
                             <Button type='primary'
                                 style={{ backgroundColor: '#f5222d' }}
-                                href='.auth/login/google'
+                                href='.auth/login/google?post_login_redirect_uri=/index.html'
                                 size='large' block icon={<GoogleOutlined />}>
                                 Login With Google
                             </Button>
                             <Button type='primary'
                                 style={{ backgroundColor: '#262626' }}
-                                href='.auth/login/github'
+                                href='.auth/login/github?post_login_redirect_uri=/index.html'
                                 size='large' block icon={<GithubOutlined />}>
                                 Login With Github
                             </Button>
