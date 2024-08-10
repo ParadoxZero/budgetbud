@@ -1,4 +1,4 @@
-import { EditFilled, FileOutlined, LinkOutlined, LogoutOutlined, MoreOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
+import { ArrowUpOutlined, CalendarOutlined, FileOutlined, LineChartOutlined, LinkOutlined, LogoutOutlined, MoreOutlined, PlusOutlined, SettingOutlined, UpOutlined, UpSquareFilled } from "@ant-design/icons";
 import { Avatar, Button, Divider, Dropdown, Flex, Input, InputRef, MenuProps, Select, Space, Typography } from "antd";
 import React from "react";
 import { connect } from "react-redux";
@@ -118,19 +118,47 @@ class Header extends React.Component<HeaderProps, HeaderState> {
     }
 
     render_more_menu() {
+
         const items: MenuProps['items'] = [
             {
-                label: 'Sign Out',
+                label: 'Proceed Next Month',
+                icon: <ArrowUpOutlined />,
                 key: '1',
+                disabled: true,
+            },
+            {
+                label: 'Share Budget',
+                key: '2',
+                icon: <LinkOutlined />,
+                onClick: () => { },
+                disabled: true,
+            },
+            {
+                label: 'History',
+                key: '3',
+                icon: <CalendarOutlined />,
+                onClick: () => { },
+                disabled: true,
+            },
+            {
+                label: 'Trends',
+                key: '4',
+                icon: <LineChartOutlined />,
+                onClick: () => { },
+                disabled: true,
+
+            },
+            {
+                label: 'Sign Out',
+                key: '5',
                 icon: <LogoutOutlined />,
                 onClick: () => { window.location.href = "/.auth/logout" },
             },
         ];
         return (
-            <Dropdown menu={{ items }}>
-
+            <Dropdown menu={{ items }} arrow >
                 <Button type="default" icon={< MoreOutlined />} size="large" ></Button>
-            </Dropdown>
+            </Dropdown >
         );
     }
 
