@@ -1,4 +1,4 @@
-import { EditFilled, FileOutlined, LogoutOutlined, MoreOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
+import { EditFilled, FileOutlined, LinkOutlined, LogoutOutlined, MoreOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
 import { Avatar, Button, Divider, Dropdown, Flex, Input, InputRef, MenuProps, Select, Space, Typography } from "antd";
 import React from "react";
 import { connect } from "react-redux";
@@ -96,9 +96,14 @@ class Header extends React.Component<HeaderProps, HeaderState> {
                         {menu}
                         <Divider style={{ margin: '8px 0' }} />
                         <Space style={{ padding: '0 8px 4px' }}>
-                            <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
-                                Add Budget
-                            </Button>
+                            <Flex gap={10}>
+                                <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
+                                    Add Budget
+                                </Button>
+                                <Button type="text" icon={<LinkOutlined />} disabled onClick={addItem}>
+                                    Link Budget
+                                </Button>
+                            </Flex>
                         </Space>
                     </>
                 )}
