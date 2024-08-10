@@ -57,7 +57,7 @@ export class CreateNewBudgetPage extends React.Component<CreateBudgetPageProps, 
             case WizardStep.CreateBudget:
                 return "Create Budget";
             case WizardStep.AddCategories:
-                return "Add Categories";
+                return "Allocate Money to Categories";
             case WizardStep.CreateReucrringExpenses:
                 return "Create Recurring Expenses";
             default:

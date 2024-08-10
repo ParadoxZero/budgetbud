@@ -50,7 +50,7 @@ export class AddCategoriesForm extends React.Component<EditCategoriesFormProps, 
         return (
             <Form
                 name="add_categories"
-                style={{ maxWidth: 600, marginTop: 30 }}
+                style={{ minWidth: 300, marginTop: 30, minHeight: 200 }}
                 autoComplete="off"
                 initialValues={{ categories: [] }}
                 ref={formRef}
@@ -67,7 +67,7 @@ export class AddCategoriesForm extends React.Component<EditCategoriesFormProps, 
                                     key={field.key}
                                 >
                                     <Form.Item name={[field.name, 'name']} rules={[{ required: true, message: "Name is required" }]}>
-                                        <Input placeholder="name" />
+                                        <Input placeholder="Category" />
                                     </Form.Item>
                                     <Form.Item name={[field.name, 'allocation']} rules={[{ required: true, message: "Allocation is required" }]}>
                                         <InputNumber type="number" inputMode="numeric" placeholder="Amount" />
@@ -81,7 +81,7 @@ export class AddCategoriesForm extends React.Component<EditCategoriesFormProps, 
                                 <Empty description="No Categories Added" />
                             )}
 
-                            <Button type="dashed" onClick={() => add()} block>
+                            <Button type="default" onClick={() => add()} block>
                                 + Add Category
                             </Button>
 
