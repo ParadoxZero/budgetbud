@@ -124,7 +124,7 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps> {
                     mode="left"
                     items={item_list}
                     style={{ minWidth: 300 }}
-
+                    reverse
                 />
             </>
         )
