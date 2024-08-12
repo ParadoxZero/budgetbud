@@ -118,7 +118,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
                         <Space style={{ padding: '0 8px 4px' }}>
                             <Flex gap={10}>
                                 <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
-                                    Add Budget
+                                    New Budget
                                 </Button>
                                 <Button type="text" icon={<LinkOutlined />} disabled onClick={addItem}>
                                     Link Budget
