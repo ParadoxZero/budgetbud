@@ -23,27 +23,38 @@ import React from "react";
 
 import { DataService, getDataService } from "../services/data_service";
 import { navigate, store, View } from "../store";
-import { CloseCircleOutlined, CloseOutlined, CloseSquareFilled, LoadingOutlined, RightOutlined } from "@ant-design/icons";
+import { CloseCircleOutlined, CloseOutlined, CloseSquareFilled, LinkOutlined, LoadingOutlined, RightOutlined } from "@ant-design/icons";
 import { Budget, Category, DataModelFactory } from "../datamodel/datamodel";
 import { connect } from "react-redux";
+import { LinkBudgetModal } from "./link_budget_modal";
 
 export interface CreateBudgetFormProps {
     onFinish: (budget: Budget) => void;
     onCancel?: () => void;
 }
 
-class CreateBudgetForm extends React.Component<CreateBudgetFormProps, {}> {
+export interface CreateBudgetFormState {
+    is_link_modal_open: boolean;
+}
+
+class CreateBudgetForm extends React.Component<CreateBudgetFormProps, CreateBudgetFormState> {
     data_service: DataService;
 
     constructor(props: CreateBudgetFormProps) {
         super(props);
         this.data_service = getDataService();
+        this.state = {
+            is_link_modal_open: false
+        };
     }
 
     render() {
         return (
             <>
                 {this.render_create_budget()}
+                <LinkBudgetModal isOpen={this.state.is_link_modal_open}
+                    onClose={() => this.setState({ is_link_modal_open: false })}
+                    onDone={() => store.dispatch(navigate(View.Overview))} />
             </>
         );
     }
@@ -54,7 +65,6 @@ class CreateBudgetForm extends React.Component<CreateBudgetFormProps, {}> {
             description?: string;
         };
         const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-            this.setState({ is_loading: true });
             this.data_service.createBudget(values.name!).then((value: Budget) => {
                 this.props.onFinish(value);
             }).catch((error) => {
@@ -92,6 +102,11 @@ class CreateBudgetForm extends React.Component<CreateBudgetFormProps, {}> {
                 <Form.Item >
                     <Button type="primary" htmlType="submit" block>
                         Next
+                    </Button>
+                </Form.Item>
+                <Form.Item >
+                    <Button type="default" block icon={<LinkOutlined />} onClick={()=>{this.setState({is_link_modal_open:true})}}>
+                        Add Existing Budget
                     </Button>
                 </Form.Item>
                 {render_cancel_button()}
