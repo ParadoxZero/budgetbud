@@ -19,21 +19,27 @@
  */
 
 import { ExceptionOutlined, ExclamationCircleFilled, ExclamationOutlined, FileExclamationOutlined, LoadingOutlined } from "@ant-design/icons";
-import { Button, Flex, Modal, Space, Spin, Typography } from "antd"
-import { useState } from "react"
+import { Alert, Button, Flex, message, Modal, Space, Spin, Typography } from "antd"
+import { useEffect, useState } from "react"
 import { GetShareKey } from "../services/share_service";
 
 
 export function ShareBudgetModal(props: { isOpen: boolean, budget_id: string, onDone: () => void }) {
     let [share_key, setShareKey] = useState("");
+    const [messageApi, contextHolder] = message.useMessage();
+    useEffect(() => {setShareKey("")}, [props.budget_id]);
 
-
-    if (props.isOpen) {
-        GetShareKey(props.budget_id).then((response) => { setShareKey(response.shareKey) });
+    if (props.isOpen && share_key.length == 0) {
+        GetShareKey(props.budget_id).then((response) => { setShareKey(response.shareKey) })
+        .catch(()=>{
+            messageApi.error("Failed to create share code.", 5);
+            props.onDone();
+        });
     }
 
     return (
-        <>
+        <div>
+            {contextHolder}
             <Modal
                 loading={share_key.length == 0}
                 centered
@@ -61,6 +67,6 @@ export function ShareBudgetModal(props: { isOpen: boolean, budget_id: string, on
                     <Space/>
                 </Flex>
             </Modal>
-        </>
+        </div>
     )
 }

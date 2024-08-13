@@ -26,9 +26,9 @@ export interface ShareKeyResponse {
 
 export async function GetShareKey(budget_id: string): Promise<ShareKeyResponse> {
     if (import.meta.env.VITE_USE_LOCAL_DATA_SERVICE === 'true') {
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise((resolve,_reject) => _reject("Failed"));
         return { shareKey: "2U0T0Y05" };
     }
-    const response = await fetchData("/api/Social/share/{budget_id}", {});
+    const response = await fetchData(`/api/Social/share_code/${budget_id}`, {method:"POST"});
     return await response.json();
 }
