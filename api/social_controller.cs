@@ -47,7 +47,7 @@ public class SocialController : ControllerBase
         _dbService = dbService;
     }
 
-    [HttpPost("share/{budget_id}")]
+    [HttpPost("share_code/{budget_id}")]
     public async Task<IActionResult> ShareBudget(string budget_id)
     {
         try
