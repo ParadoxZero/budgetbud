@@ -22,7 +22,7 @@ import { Button, Card, Empty, Flex, Form, FormInstance, Input, InputNumber } fro
 import React from "react";
 import { Budget, Category, DataModelFactory } from "../datamodel/datamodel";
 import { navigate, store, View } from "../store";
-import { CloseOutlined } from "@ant-design/icons";
+import { CloseOutlined, DeleteFilled } from "@ant-design/icons";
 import { DataService, getDataService } from "../services/data_service";
 
 
@@ -93,7 +93,7 @@ export class AddCategoriesForm extends React.Component<EditCategoriesFormProps, 
                                         <InputNumber type="number" inputMode="numeric" placeholder="Amount" />
                                     </Form.Item>
                                     <Form.Item>
-                                        <Button shape="circle" danger icon={<CloseOutlined />} onClick={() => remove(field.name)} />
+                                        <Button shape="circle" type="primary" danger icon={<DeleteFilled />} onClick={() => remove(field.name)} />
                                     </Form.Item>
                                 </Flex>
                             ))}
