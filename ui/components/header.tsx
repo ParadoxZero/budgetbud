@@ -115,16 +115,15 @@ class Header extends React.Component<HeaderProps, HeaderState> {
                     <>
                         {menu}
                         <Divider style={{ margin: '8px 0' }} />
-                        <Space style={{ padding: '0 8px 4px' }}>
-                            <Flex gap={10}>
-                                <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
-                                    New Budget
-                                </Button>
-                                <Button type="text" icon={<LinkOutlined />} disabled onClick={addItem}>
-                                    Link Budget
-                                </Button>
-                            </Flex>
-                        </Space>
+                        <Space style={{ padding: '0 8px 4px' }} />
+                        <Flex gap={10} justify="space-evenly">
+                            <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
+                                New
+                            </Button>
+                            <Button type="text" icon={<LinkOutlined />} disabled onClick={addItem}>
+                                Link
+                            </Button>
+                        </Flex>
                     </>
                 )}
                 labelRender={(label) => (

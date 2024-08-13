@@ -75,11 +75,11 @@ export class CreateNewBudgetPage extends React.Component<CreateBudgetPageProps, 
     getTitle(): string {
         switch (this.state.current_step) {
             case WizardStep.CreateBudget:
-                return "Create Budget";
+                return "Create a new Budget";
             case WizardStep.AddCategories:
                 return "Allocate Money to Categories";
             case WizardStep.CreateReucrringExpenses:
-                return "Create Recurring Expenses";
+                return "Add Recurring Expenses";
             default:
                 return "Create Budget";
         }
