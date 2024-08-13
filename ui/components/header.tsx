@@ -24,6 +24,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { budgetSlice, headerSlice, navigate, store, View } from "../store";
 import { GetScreenSize, ScreenSize } from "../utils";
+import { ShareBudgetModal } from "./share_budget_modal";
 
 export interface HeaderBudgetDetails {
     name: string;
@@ -40,6 +41,7 @@ export interface HeaderProps {
 
 interface HeaderState {
     is_budget_selector_visible: boolean;
+    open_share_modal: boolean;
 }
 
 class Header extends React.Component<HeaderProps, HeaderState> {
@@ -70,6 +72,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
         super(props);
         this.state = {
             is_budget_selector_visible: false,
+            open_share_modal: false,
         };
     }
 
@@ -137,7 +140,6 @@ class Header extends React.Component<HeaderProps, HeaderState> {
     }
 
     render_more_menu() {
-
         const items: MenuProps['items'] = [
             {
                 label: 'Proceed Next Month',
@@ -149,8 +151,8 @@ class Header extends React.Component<HeaderProps, HeaderState> {
                 label: 'Share Budget',
                 key: '2',
                 icon: <LinkOutlined />,
-                onClick: () => { },
-                disabled: true,
+                onClick: () => { this.setState({ open_share_modal: true }) },
+                disabled: false,
             },
             {
                 label: 'History',
@@ -174,10 +176,19 @@ class Header extends React.Component<HeaderProps, HeaderState> {
                 onClick: () => { window.location.href = "/.auth/logout" },
             },
         ];
+        let defaultValue: number = this.props.selected_budget_index ?? 0;
+        let selected_budget = this.props.budget_list[defaultValue];
         return (
-            <Dropdown menu={{ items }} arrow >
-                <Button type="default" icon={< MoreOutlined />} size="large" ></Button>
-            </Dropdown >
+            <>
+                <Dropdown menu={{ items }} arrow >
+                    <Button type="default" icon={< MoreOutlined />} size="large" ></Button>
+                </Dropdown >
+                <ShareBudgetModal
+                    isOpen={this.state.open_share_modal}
+                    budget_id={selected_budget?.id}
+                    onDone={() => { this.setState({ open_share_modal: false }) }}
+                />
+            </>
         );
     }
 
