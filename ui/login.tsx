@@ -40,7 +40,7 @@ class App extends React.Component<{}, AppState> {
     componentDidMount(): void {
         fetch('/.auth/refresh').then((response) => {
             if (response.ok) {
-                window.location.href = '/index.html'
+                // window.location.href = '/index.html'
             }
         }).finally(() => {
             this.setState({ is_loading: false })
@@ -53,7 +53,7 @@ class App extends React.Component<{}, AppState> {
                 <Spin size='large' indicator={<LoadingOutlined />} />
             )
         } else {
-            (
+            return (
                 <>
                     <Button type='primary'
                         style={{ backgroundColor: '#f5222d' }}
