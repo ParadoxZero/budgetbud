@@ -37,27 +37,6 @@ jobs:
         run: |
           dotnet publish --configuration Release --output dist
       
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
-        with:
-          name: dotnet-app
-          path: 'dist/'
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    permissions:
-      id-token: write #This is required for requesting the JWT
-
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: dotnet-app
-      
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -71,5 +50,4 @@ jobs:
         with:
           app-name: 'budgetbud'
           slot-name: 'Production'
-          package: .
-          
+          package: dist
