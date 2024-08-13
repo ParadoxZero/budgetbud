@@ -50,6 +50,7 @@ interface IState {
     filled_allocations: { [key: number]: number };
     upcoming_expense: { name: string, amount: number } | null;
     add_expense_mode_context: AddExpenseContext | null;
+    previous_budget_index: number | null;
 }
 
 class OverviewPage extends React.Component<OverviewProps, IState> {
@@ -282,23 +283,30 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
             total_allocations: 0,
             filled_allocations: {},
             upcoming_expense: null,
-            add_expense_mode_context: null
+            add_expense_mode_context: null,
+            previous_budget_index: null
         }
     }
 
     componentDidMount(): void {
+        this.setState({previous_budget_index: this.props.selected_budget_index});
         store.dispatch(headerSlice.actions.header({ is_visible: false }));
         store.dispatch(headerSlice.actions.showBudgetSelect());
         store.dispatch(budgetSlice.actions.clear());
 
         this._data_service.getBudget().then((data) => {
-            if (data.length > 0) {
+            if (data.length) {
+                let selected_index = 0;
+                if (this.state.previous_budget_index != null && this.state.previous_budget_index < data.length) {
+                    selected_index = this.state.previous_budget_index;
+                }
                 store.dispatch(
                     budgetSlice.actions.set({
                         budget_list: data,
-                        selected_budget_index: 0
+                        selected_budget_index: selected_index
                     })
                 );
+                this.setState({ previous_budget_index: selected_index });
                 store.dispatch(headerSlice.actions.header({ is_visible: true }));
                 this.update_calculations();
                 this.update_next_recurring();
