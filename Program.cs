@@ -23,6 +23,7 @@ using budgetbud.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
+builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 bool use_swagger = builder.Configuration.GetValue<bool>("EnableSwagger");
