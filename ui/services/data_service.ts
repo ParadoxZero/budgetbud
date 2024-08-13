@@ -54,19 +54,32 @@ class RemoteDataService implements DataService {
     constructor() {
         this.BASE_URL = "";
     }
+
+    async fetchData(url: string, options: RequestInit): Promise<Response> {
+        const response = await fetch(url, options);
+        if (response.status === 401) {
+            // Redirect to login screen
+            window.location.href = "/login";
+        }
+        if (!response.ok) {
+            throw new Error("API request failed");
+        }
+        return response;
+    }
+
     deleteBudget(budget_id: string): Promise<void> {
         const endpoint: string = `${this.BASE_URL}/api/Budget/${budget_id}`;
-        return fetch(endpoint, { method: 'DELETE' }).then(() => { });
+        return this.fetchData(endpoint, { method: 'DELETE' }).then(() => { });
     }
 
     deleteCategory(_budget_id: string, _categoryId: number): Promise<Budget> {
         const endpoint: string = `${this.BASE_URL}/api/Budget/${_budget_id}/category/${_categoryId}`;
-        return fetch(endpoint, { method: 'DELETE' }).then((response) => response.json() as Promise<Budget>);
+        return this.fetchData(endpoint, { method: 'DELETE' }).then((response) => response.json() as Promise<Budget>);
     }
 
     createBudget(name: string): Promise<Budget> {
         const endpoint: string = `${this.BASE_URL}/api/Budget`;
-        return fetch(endpoint, {
+        return this.fetchData(endpoint, {
             method: 'POST',
             body: JSON.stringify({ name: name }),
             headers: {
@@ -77,7 +90,7 @@ class RemoteDataService implements DataService {
 
     getBudget(): Promise<Budget[]> {
         const endpoint: string = `${this.BASE_URL}/api/Budget`;
-        return fetch(endpoint, { method: 'GET' }).then((response) => response.json() as Promise<Budget[]>);
+        return this.fetchData(endpoint, { method: 'GET' }).then((response) => response.json() as Promise<Budget[]>);
     }
 
     getHistory(): Promise<BudgetHistory> {
@@ -86,7 +99,7 @@ class RemoteDataService implements DataService {
 
     updateCategory(budger_id: string, category: Category): Promise<Budget> {
         const endpoint: string = `${this.BASE_URL}/api/Budget/${budger_id}/update_category`;
-        return fetch(endpoint, {
+        return this.fetchData(endpoint, {
             method: 'POST',
             body: JSON.stringify(category),
             headers: {
@@ -97,7 +110,7 @@ class RemoteDataService implements DataService {
 
     createCategories(_budget_id: string, _categories: Category[]): Promise<Budget> {
         const endpoint: string = `${this.BASE_URL}/api/Budget/${_budget_id}/add_categories`;
-        return fetch(endpoint, {
+        return this.fetchData(endpoint, {
             method: 'POST',
             body: JSON.stringify(_categories),
             headers: {
@@ -108,7 +121,7 @@ class RemoteDataService implements DataService {
 
     updateExpense(_budget_id: string, expense: Expense): Promise<Budget> {
         const endpoint: string = `${this.BASE_URL}/api/Budget/${_budget_id}/expense`;
-        return fetch(endpoint, {
+        return this.fetchData(endpoint, {
             method: 'POST',
             body: JSON.stringify(expense),
             headers: {

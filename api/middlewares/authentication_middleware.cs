@@ -27,7 +27,7 @@ public class RedirectToLoginMiddleware
 {
     private readonly RequestDelegate _next;
 
-    private readonly string[] _allowedPaths = new string[] {
+    private readonly string[] _unauthenticatedPaths = [
         "/login.html",
         "/favicon.ico",
         "/css",
@@ -37,7 +37,11 @@ public class RedirectToLoginMiddleware
         "/icons",
         "/assets",
         "vite.svg"
-    };
+    ];
+
+    private readonly string[] _apiPaths = [
+        "/api"
+    ];
 
     public RedirectToLoginMiddleware(RequestDelegate next)
     {
@@ -46,11 +50,17 @@ public class RedirectToLoginMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        if (context.Request.Path.HasValue && !_allowedPaths.Any(path => context.Request.Path.Value.StartsWith(path)))
+        if (!context.Request.Headers.ContainsKey("X-MS-CLIENT-PRINCIPAL"))
         {
-            if (!context.Request.Headers.ContainsKey("X-MS-CLIENT-PRINCIPAL"))
+            if (!context.Request.Path.HasValue || !_unauthenticatedPaths.Any(path => context.Request.Path.Value.StartsWith(path)))
             {
                 context.Response.Redirect("/login.html");
+                return;
+            }
+            else if (_apiPaths.Any(path => context.Request.Path.Value.StartsWith(path)))
+            {
+                context.Response.StatusCode = 401;
+                await context.Response.WriteAsync("Unauthorized");
                 return;
             }
         }
