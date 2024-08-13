@@ -38,12 +38,18 @@ class App extends React.Component<{}, AppState> {
     }
 
     componentDidMount(): void {
-        fetch('/.auth/refresh').then((response) => {
+        fetch('/.auth/me').then((response) => {
             if (response.ok) {
-                // window.location.href = '/index.html'
+                window.location.href = '/index.html'
+            } else {
+                fetch('/.auth/refresh').then((response) => {
+                    if (response.ok) {
+                        window.location.href = '/index.html'
+                    }
+                }).finally(() => {
+                    this.setState({ is_loading: false })
+                });
             }
-        }).finally(() => {
-            this.setState({ is_loading: false })
         });
     }
 
