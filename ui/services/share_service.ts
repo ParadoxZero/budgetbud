@@ -26,9 +26,18 @@ export interface ShareKeyResponse {
 
 export async function GetShareKey(budget_id: string): Promise<ShareKeyResponse> {
     if (import.meta.env.VITE_USE_LOCAL_DATA_SERVICE === 'true') {
-        await new Promise((resolve,_reject) => _reject("Failed"));
+        await new Promise((resolve,_reject) => setTimeout(resolve, 3000));
         return { shareKey: "2U0T0Y05" };
     }
     const response = await fetchData(`/api/Social/share_code/${budget_id}`, {method:"POST"});
     return await response.json();
+}
+
+export async function LinkBudget(share_key: string): Promise<void> {
+    if (import.meta.env.VITE_USE_LOCAL_DATA_SERVICE === 'true') {
+        await new Promise((resolve,_reject) => setTimeout(resolve, 3000));
+        return;
+    }
+    await fetchData(`/api/Social/link/${share_key}`, {method:"POST"});
+    return;
 }

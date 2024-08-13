@@ -25,6 +25,7 @@ import { connect } from "react-redux";
 import { budgetSlice, headerSlice, navigate, store, View } from "../store";
 import { GetScreenSize, ScreenSize } from "../utils";
 import { ShareBudgetModal } from "./share_budget_modal";
+import { LinkBudgetModal } from "./link_budget_modal";
 
 export interface HeaderBudgetDetails {
     name: string;
@@ -42,6 +43,7 @@ export interface HeaderProps {
 interface HeaderState {
     is_budget_selector_visible: boolean;
     open_share_modal: boolean;
+    open_link_modal: boolean;
 }
 
 class Header extends React.Component<HeaderProps, HeaderState> {
@@ -73,6 +75,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
         this.state = {
             is_budget_selector_visible: false,
             open_share_modal: false,
+            open_link_modal: false,
         };
     }
 
@@ -96,15 +99,20 @@ class Header extends React.Component<HeaderProps, HeaderState> {
             store.dispatch(budgetSlice.actions.updateSelection({ index: null }));
             store.dispatch(navigate(View.NoBudgetAvailable));
         };
+        const linkBudget = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+            this.setState({ open_link_modal: true });
+            e.preventDefault();
+        }
         const onSelectionChanged = (value: number) => {
             store.dispatch(budgetSlice.actions.updateSelection({ index: value }));
-        }
+        };
         const onSettingsClicked = () => {
             this.setState({ is_budget_selector_visible: false });
             store.dispatch(navigate(View.NoBudgetAvailable));
-        }
+        };
 
         return (
+            <>
             <Select
                 size="large"
                 style={{ width: 300 }}
@@ -123,7 +131,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
                             <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
                                 New
                             </Button>
-                            <Button type="text" icon={<LinkOutlined />} disabled onClick={addItem}>
+                            <Button type="text" icon={<LinkOutlined />}  onClick={linkBudget}>
                                 Link
                             </Button>
                         </Flex>
@@ -136,6 +144,12 @@ class Header extends React.Component<HeaderProps, HeaderState> {
                 )}
                 variant="outlined"
             />
+            <LinkBudgetModal 
+                isOpen={this.state.open_link_modal} 
+                onDone={() => { store.dispatch(navigate(View.Overview)); }}
+                onClose={() => { this.setState({ open_link_modal: false }) }}
+            />
+            </>
         );
     }
 
