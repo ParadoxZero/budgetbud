@@ -84,7 +84,9 @@ public class SocialController : ControllerBase
                 string user_id = _identityService.GetUserIdentity();
                 UserData user_data = await _dbService.GetUserData(user_id);
                 budget.authorized_users.Add(user_id);
+                budget.authorized_users = budget.authorized_users.Distinct().ToList();
                 user_data.BudgetIds.Add(budget.id);
+                user_data.BudgetIds = user_data.BudgetIds.Distinct().ToList();
                 await _dbService.UpdateBudgetAsync(budget);
                 await _dbService.UpdateUserData(user_data);
                 return Ok();
