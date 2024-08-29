@@ -1,16 +1,16 @@
-ui-install:
+setup:
 	npm install
 
-ui: ui-install
+ui-build:
 	npm run build
 
-run: ui
+run: ui-build
 	dotnet run
 
 publish: ui
 	dotnet publish -c Release -o publish
 
-run-ui:
+ui-run:
 	npm run dev
 
 clean:
