@@ -18,7 +18,6 @@
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
 
-import { navigate, store, View } from './store'
 import { CreateDummyData } from './utils';
 import { PingRemote } from './services/ping_service';
 import CreateNewBudgetPage from './pages/create_new_budget_page';
@@ -31,6 +30,7 @@ import Overview from './pages/overview';
 import EditCategoriesPage from './pages/edit_categories_page';
 import { Budget } from './datamodel/datamodel';
 import CategoryDetails from './pages/view_expense_page';
+import { View } from './store';
 
 
 interface PreRun {
