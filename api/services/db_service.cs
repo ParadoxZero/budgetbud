@@ -71,6 +71,10 @@ namespace budgetbud.Services
             return await _container.ReadItemAsync<Budget>(budget_id, new PartitionKey(budget_id));
         }
 
+        public async Task<BudgetHistory> GetHistoryAsync(string history_id)
+        {
+            return await _container.ReadItemAsync<BudgetHistory>(history_id, new PartitionKey(history_id));
+        }
         public async Task<Budget> CreateNewBudgetAsync(string name)
         {
             BudgetHistory history = new BudgetHistory
@@ -110,6 +114,11 @@ namespace budgetbud.Services
         {
             budget.last_updated = DateTime.UtcNow.Ticks;
             await _container.UpsertItemAsync(budget, new PartitionKey(budget.id));
+        }
+
+        public async Task UpdateHistoryAsync(BudgetHistory history)
+        {
+            await _container.UpsertItemAsync(history, new PartitionKey(history.id));
         }
 
         public async Task<Budget> AddExpenseAsync(string budget_id, Expense expense)

@@ -19,6 +19,7 @@
  */
 
 using System.Collections.Generic;
+using budgetbud.Exceptions;
 using budgetbud.Models;
 
 namespace budgetbud.Services;
@@ -82,8 +83,24 @@ public class UserDataService
         return await _dbService.DeleteCategoryAsync(budget_id, category_id);
     }
 
-    internal async Task<Budget> DeleteExpense(string budget_id, int category_id, int expense_id)
+    public async Task<Budget> DeleteExpense(string budget_id, int category_id, int expense_id)
     {
         return await _dbService.DeleteExpenseAsync(budget_id, category_id, expense_id);
+    }
+
+    public async Task<Budget> RolloverBudget(string budget_id)
+    {
+        Budget budget = await _dbService.GetBudgetAsync(budget_id);
+        BudgetHistory history = await _dbService.GetHistoryAsync(budget.history_id);
+        history.history.Append(budget);
+        await _dbService.UpdateHistoryAsync(history);
+        budget.categoryList.ForEach((Category c) => { c.ExpenseList.Clear(); });
+        var next_period = budget.period.Increment();
+        if (!(next_period.Month == DateTime.Now.Month && next_period.Year == DateTime.Now.Year))
+        {
+            throw new InvalidInputException("You cannot rollover right now, please use force operation if required");
+        }
+        await _dbService.UpdateBudgetAsync(budget);
+        return budget;
     }
 }

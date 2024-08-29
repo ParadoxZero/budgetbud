@@ -1,3 +1,4 @@
+
 /* 
  * BudgetBug - Budgeting and Expense Tracker with WebUI and API server
  * Copyright (C) 2024  Sidhin S Thomas <sidhin.thomas@gmail.com>
@@ -18,25 +19,17 @@
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
 
-namespace budgetbud.Models;
-public class TimeUnit
-{
-    public int Month { get; set; }
-    public int Year { get; set; }
 
-    public TimeUnit Increment()
+namespace budgetbud.Exceptions
+{
+    public class InvalidInputException : Exception
     {
-        TimeUnit next = new TimeUnit();
-        if (this.Month == 12)
+        public InvalidInputException(string message) : base(message)
         {
-            next.Month = 0;
-            next.Year = this.Year + 1;
         }
-        else
+
+        public InvalidInputException(string message, Exception innerException) : base(message, innerException)
         {
-            next.Month = this.Month + 1;
-            next.Year = this.Year;
         }
-        return next;
     }
 }

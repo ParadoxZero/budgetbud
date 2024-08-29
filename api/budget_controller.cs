@@ -18,6 +18,7 @@
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
 
+using budgetbud.Exceptions;
 using budgetbud.Models;
 using budgetbud.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -86,4 +87,16 @@ public class BudgetController : ControllerBase
         return Ok(await _userDataService.DeleteExpense(budget_id, category_id, expense_id));
     }
 
+    [HttpPost("{budget_id}/rollover")]
+    public async Task<IActionResult> Rollover(string budget_id)
+    {
+        try
+        {
+            return Ok(await _userDataService.RolloverBudget(budget_id));
+        }
+        catch (InvalidInputException e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
 }
