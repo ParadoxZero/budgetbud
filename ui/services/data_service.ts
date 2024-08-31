@@ -49,6 +49,16 @@ export function getDataService(): DataService {
         return new RemoteDataService();
     }
 }
+
+export async function RolloverBudget(budget_id: string): Promise<Budget> {
+    if (import.meta.env.VITE_USE_LOCAL_DATA_SERVICE === 'true') {
+        await new Promise((resolve, _reject) => setTimeout(resolve, 3000));
+        return getDataService().createBudget("Rollover Budget");
+    }
+    const response = await fetchData(`/api/Budget/${budget_id}/rollover/`, { method: "POST" });
+    return await response.json();
+}
+
 class RemoteDataService implements DataService {
     BASE_URL: string;
 

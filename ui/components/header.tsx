@@ -26,10 +26,15 @@ import { budgetSlice, headerSlice, navigate, store, View } from "../store";
 import { GetScreenSize, ScreenSize } from "../utils";
 import { ShareBudgetModal } from "./share_budget_modal";
 import { LinkBudgetModal } from "./link_budget_modal";
+import { RolloverModal } from "./rollover_modal";
 
 export interface HeaderBudgetDetails {
     name: string;
     id: string;
+    period: {
+        month: number;
+        year: number;
+    };
 }
 
 export interface HeaderProps {
@@ -44,6 +49,7 @@ interface HeaderState {
     is_budget_selector_visible: boolean;
     open_share_modal: boolean;
     open_link_modal: boolean;
+    open_rollover_modal: boolean;
 }
 
 class Header extends React.Component<HeaderProps, HeaderState> {
@@ -76,6 +82,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
             is_budget_selector_visible: false,
             open_share_modal: false,
             open_link_modal: false,
+            open_rollover_modal: false,
         };
     }
 
@@ -113,53 +120,61 @@ class Header extends React.Component<HeaderProps, HeaderState> {
 
         return (
             <>
-            <Select
-                size="large"
-                style={{ width: 300 }}
-                placeholder="Select Budget"
-                options={items.map((item) => ({ label: item.name, value: item.value }))}
-                defaultValue={defaultValue}
-                onChange={onSelectionChanged}
-                onDropdownVisibleChange={(visible) => { this.setState({ is_budget_selector_visible: visible }) }}
-                open={this.state.is_budget_selector_visible}
-                dropdownRender={(menu) => (
-                    <>
-                        {menu}
-                        <Divider style={{ margin: '8px 0' }} />
-                        <Space style={{ padding: '0 8px 4px' }} />
-                        <Flex gap={10} justify="space-evenly">
-                            <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
-                                New
-                            </Button>
-                            <Button type="text" icon={<LinkOutlined />}  onClick={linkBudget}>
-                                Link
-                            </Button>
+                <Select
+                    size="large"
+                    style={{ width: 300 }}
+                    placeholder="Select Budget"
+                    options={items.map((item) => ({ label: item.name, value: item.value }))}
+                    defaultValue={defaultValue}
+                    onChange={onSelectionChanged}
+                    onDropdownVisibleChange={(visible) => { this.setState({ is_budget_selector_visible: visible }) }}
+                    open={this.state.is_budget_selector_visible}
+                    dropdownRender={(menu) => (
+                        <>
+                            {menu}
+                            <Divider style={{ margin: '8px 0' }} />
+                            <Space style={{ padding: '0 8px 4px' }} />
+                            <Flex gap={10} justify="space-evenly">
+                                <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
+                                    New
+                                </Button>
+                                <Button type="text" icon={<LinkOutlined />} onClick={linkBudget}>
+                                    Link
+                                </Button>
+                            </Flex>
+                        </>
+                    )}
+                    labelRender={(label) => (
+                        <Flex justify="space-between" align="center" style={{ color: 'rgba(0, 0, 0, 0.25)' }}>
+                            <Typography style={{ color: 'rgba(0, 0, 0, 0.25)' }}>{label.label}</Typography>
                         </Flex>
-                    </>
-                )}
-                labelRender={(label) => (
-                    <Flex justify="space-between" align="center" style={{ color: 'rgba(0, 0, 0, 0.25)' }}>
-                        <Typography style={{ color: 'rgba(0, 0, 0, 0.25)' }}>{label.label}</Typography>
-                    </Flex>
-                )}
-                variant="outlined"
-            />
-            <LinkBudgetModal 
-                isOpen={this.state.open_link_modal} 
-                onDone={() => { store.dispatch(navigate(View.Overview)); }}
-                onClose={() => { this.setState({ open_link_modal: false }) }}
-            />
+                    )}
+                    variant="outlined"
+                />
+                <LinkBudgetModal
+                    isOpen={this.state.open_link_modal}
+                    onDone={() => { store.dispatch(navigate(View.Overview)); }}
+                    onClose={() => { this.setState({ open_link_modal: false }) }}
+                />
             </>
         );
     }
 
     render_more_menu() {
+        const current_budget = this.props.budget_list[this.props.selected_budget_index ?? 0];
+        let enable_proceed_next_month = false;
+        if (current_budget) {
+            const now = new Date(Date.now());
+            enable_proceed_next_month = current_budget.period.month != (now.getMonth() + 1);
+            enable_proceed_next_month = enable_proceed_next_month || current_budget.period.year != now.getFullYear();
+        }
         const items: MenuProps['items'] = [
             {
                 label: 'Proceed Next Month',
                 icon: <ArrowUpOutlined />,
                 key: '1',
-                disabled: true,
+                disabled: !enable_proceed_next_month,
+                onClick: () => { this.setState({ open_rollover_modal: true }) },
             },
             {
                 label: 'Share Budget',
@@ -202,6 +217,12 @@ class Header extends React.Component<HeaderProps, HeaderState> {
                     budget_id={selected_budget?.id}
                     onDone={() => { this.setState({ open_share_modal: false }) }}
                 />
+                <RolloverModal
+                    isOpen={this.state.open_rollover_modal}
+                    budget_id={selected_budget?.id}
+                    onDone={() => { this.setState({ open_rollover_modal: false }) }}
+                    onClose={() => { this.setState({ open_rollover_modal: false }) }} />
+
             </>
         );
     }

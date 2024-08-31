@@ -39,7 +39,7 @@ public class UserDataService
         string user_id = _identityService.GetUserIdentity();
 
         List<string> budgets = (await _dbService.GetUserData(user_id)).BudgetIds;
-        List<Budget> budgetList = [];
+        List<Budget> budgetList = new List<Budget>();
         foreach (string budgetId in budgets)
         {
             budgetList.Add(await _dbService.GetBudgetAsync(budgetId));
@@ -92,14 +92,16 @@ public class UserDataService
     {
         Budget budget = await _dbService.GetBudgetAsync(budget_id);
         BudgetHistory history = await _dbService.GetHistoryAsync(budget.history_id);
-        history.history.Append(budget);
+        IList<Budget> history_list = new List<Budget>(history.history);
+        history_list.Add(budget);
+        history.history = history_list.ToArray();
         await _dbService.UpdateHistoryAsync(history);
         budget.categoryList.ForEach((Category c) => { c.ExpenseList.Clear(); });
-        var next_period = budget.period.Increment();
-        if (!(next_period.Month == DateTime.Now.Month && next_period.Year == DateTime.Now.Year))
+        if (budget.period.Month == DateTime.Now.Month && budget.period.Year == DateTime.Now.Year)
         {
-            throw new InvalidInputException("You cannot rollover right now, please use force operation if required");
+            throw new InvalidInputException("You cannot rollover right now, please use force api operation if required");
         }
+        budget.period = budget.period.Increment();
         await _dbService.UpdateBudgetAsync(budget);
         return budget;
     }
