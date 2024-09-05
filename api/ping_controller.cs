@@ -54,7 +54,25 @@ public class PingController : ControllerBase
         }
         catch (AuthException e)
         {
-            return BadRequest(e.Message);
+            return Unauthorized(e.Message);
+        }
+    }
+
+    [HttpGet("auth_provider")]
+    public IActionResult GetAuthProvider()
+    {
+        try
+        {
+            string auth_provider = _identityService.GetAuthProvider();
+            dynamic auth_details = new
+            {
+                provider = auth_provider,
+            };
+            return Ok(auth_details);
+        }
+        catch (AuthException e)
+        {
+            return Unauthorized(e.Message);
         }
     }
 }

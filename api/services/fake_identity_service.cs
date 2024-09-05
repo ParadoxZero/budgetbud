@@ -29,6 +29,11 @@ public class FakeIdentityService : IIdentityService
         _environment = environment;
     }
 
+    public string GetAuthProvider()
+    {
+        return "fake";
+    }
+
     public string GetUserIdentity()
     {
         if (_environment.IsProduction())

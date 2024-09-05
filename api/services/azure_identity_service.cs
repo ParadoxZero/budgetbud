@@ -54,6 +54,18 @@ public class AzureIdentityService : IIdentityService
         throw new AuthException("X-MS-CLIENT-PRINCIPAL-ID header not found");
     }
 
+    public string GetAuthProvider()
+    {
+        if (_httpContextAccessor.HttpContext != null && _httpContextAccessor.HttpContext!.Request.Headers.TryGetValue("X-MS-CLIENT-PRINCIPAL", out var userId))
+        {
+            string decoded_userId = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(userId!));
+            dynamic claims = JsonConvert.DeserializeObject(decoded_userId) ?? throw new Exception("Claims not valid JSON");
+            return claims.auth_typ;
+        }
+
+        throw new AuthException("X-MS-CLIENT-PRINCIPAL-ID header not found");
+    }
+
     private static string ProcessGithub(dynamic json)
     {
         JArray claims = json.claims;
