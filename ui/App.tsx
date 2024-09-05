@@ -19,7 +19,7 @@
  */
 
 import { CreateDummyData } from './utils';
-import { PingRemote } from './services/ping_service';
+import { GetAuthDetails, PingRemote } from './services/ping_service';
 import CreateNewBudgetPage from './pages/create_new_budget_page';
 import { ReactNode } from 'react';
 import React from 'react';
@@ -52,7 +52,9 @@ class App extends React.Component<AppProps> {
       condition: import.meta.env.VITE_PING_REMOTE === 'true',
       action:
         () => {
-          PingRemote().then((response) => { console.log(response) }).catch((error) => { console.log(error) }).catch((error) => { console.log(error) });
+          PingRemote()
+            .then((response) => { console.log(response) })
+            .catch((error) => { console.log(error) });
         }
     },
     {
@@ -84,10 +86,8 @@ class App extends React.Component<AppProps> {
     this.run_pre_run();
   }
 
-  componentDidMount(): void {
-  }
-
   render(): ReactNode {
+    GetAuthDetails().then((response: any) => { console.log(response) });
     return (
       <ConfigProvider theme={{
         components: {

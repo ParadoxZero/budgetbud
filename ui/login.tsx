@@ -46,14 +46,31 @@ class App extends React.Component<{}, AppState> {
                     if (response.ok) {
                         window.location.href = '/index.html'
                     }
+                    console.log(response);
                 }).finally(() => {
                     this.setState({ is_loading: false })
                 });
             }
         });
+
     }
 
     renderCallToAction() {
+        if (!this.state.is_loading) {
+            const last_login_provider = localStorage.getItem('auth_provider');
+            localStorage.clear();
+            switch (last_login_provider) {
+                case 'google':
+                    window.location.href = '.auth/login/google?post_login_redirect_uri=/index.html&access_type=offline';
+                    break;
+                case 'github':
+                    window.location.href = '.auth/login/github?post_login_redirect_uri=/index.html';
+                    break;
+                default:
+                    break;
+            }
+        }
+
         if (this.state.is_loading) {
             return (
                 <Spin size='large' indicator={<LoadingOutlined />} />

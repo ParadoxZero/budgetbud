@@ -19,13 +19,21 @@
  */
 
 
-const remote_domain: string = "https://budgetbud.azurewebsites.net";
-const ping_endpoint: string = "/.auth/me";
+const azure_ping_endpoint: string = "/.auth/me";
 
 
 export async function PingRemote(): Promise<Object> {
     try {
-        const response = await fetch(remote_domain + ping_endpoint);
+        const response = await fetch(azure_ping_endpoint);
+        return JSON.parse(await response.text());
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export async function GetAuthDetails(): Promise<Object> {
+    try {
+        const response = await fetch('/ping/auth_provider');
         return JSON.parse(await response.text());
     } catch (error) {
         return Promise.reject(error);
