@@ -33,7 +33,7 @@ export async function PingRemote(): Promise<Object> {
 
 export async function GetAuthDetails(): Promise<Object> {
     try {
-        const response = await fetch('/ping/auth_provider');
+        const response = await fetch('/api/ping/auth_provider');
         return JSON.parse(await response.text());
     } catch (error) {
         return Promise.reject(error);

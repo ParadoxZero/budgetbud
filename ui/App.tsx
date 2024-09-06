@@ -87,7 +87,12 @@ class App extends React.Component<AppProps> {
   }
 
   render(): ReactNode {
-    GetAuthDetails().then((response: any) => { console.log(response) });
+    GetAuthDetails()
+      .then((response: any) => {
+        console.log(response);
+        localStorage.setItem('auth_provider', response.provider);
+      });
+
     return (
       <ConfigProvider theme={{
         components: {
