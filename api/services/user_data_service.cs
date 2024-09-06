@@ -18,7 +18,6 @@
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
 
-using System.Collections.Generic;
 using budgetbud.Exceptions;
 using budgetbud.Models;
 
