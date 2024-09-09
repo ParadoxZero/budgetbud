@@ -55,7 +55,8 @@ class App extends React.Component<{}, AppState> {
 
     }
 
-    renderCallToAction() {
+    componentDidUpdate(prevProps: Readonly<{}>, prevState: Readonly<AppState>, snapshot?: any): void {
+
         if (!this.state.is_loading) {
             const last_login_provider = localStorage.getItem('auth_provider');
             localStorage.clear();
@@ -67,9 +68,13 @@ class App extends React.Component<{}, AppState> {
                     window.location.href = '.auth/login/github?post_login_redirect_uri=/index.html';
                     break;
                 default:
+                    console.log('No last login provider');
                     break;
             }
         }
+    }
+
+    renderCallToAction() {
 
         if (this.state.is_loading) {
             return (
