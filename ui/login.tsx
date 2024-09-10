@@ -28,12 +28,14 @@ import { GithubOutlined, GoogleOutlined, Loading3QuartersOutlined, LoadingOutlin
 
 interface AppState {
     is_loading: boolean;
+    show_buttons: boolean;
 }
 class App extends React.Component<{}, AppState> {
     constructor(props: {}) {
         super(props)
         this.state = {
-            is_loading: true
+            is_loading: true,
+            show_buttons: false
         }
     }
 
@@ -57,7 +59,7 @@ class App extends React.Component<{}, AppState> {
 
     componentDidUpdate(prevProps: Readonly<{}>, prevState: Readonly<AppState>, snapshot?: any): void {
 
-        if (!this.state.is_loading) {
+        if (!this.state.is_loading && prevState !== this.state) {
             const last_login_provider = localStorage.getItem('auth_provider');
             localStorage.clear();
             switch (last_login_provider) {
@@ -71,12 +73,13 @@ class App extends React.Component<{}, AppState> {
                     console.log('No last login provider');
                     break;
             }
+            this.setState({ show_buttons: true })
         }
     }
 
     renderCallToAction() {
 
-        if (this.state.is_loading) {
+        if (!this.state.show_buttons) {
             return (
                 <Spin size='large' indicator={<LoadingOutlined />} />
             )
