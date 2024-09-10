@@ -59,7 +59,7 @@ class App extends React.Component<{}, AppState> {
 
     componentDidUpdate(prevProps: Readonly<{}>, prevState: Readonly<AppState>, snapshot?: any): void {
 
-        if (!this.state.is_loading && prevState !== this.state) {
+        if (!this.state.is_loading && prevState.is_loading !== this.state.is_loading) {
             const last_login_provider = localStorage.getItem('auth_provider');
             localStorage.clear();
             switch (last_login_provider) {
@@ -73,7 +73,7 @@ class App extends React.Component<{}, AppState> {
                     console.log('No last login provider');
                     break;
             }
-            this.setState({ show_buttons: true })
+            this.setState({ show_buttons: true, is_loading: false })
         }
     }
 
