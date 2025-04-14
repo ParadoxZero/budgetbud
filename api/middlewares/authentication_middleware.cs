@@ -29,6 +29,7 @@ public class RedirectToLoginMiddleware
 
     private readonly string[] _unauthenticatedPaths = [
         "/login.html",
+        "/privacy.html",
         "/favicon.ico",
         "/css",
         "/js",
