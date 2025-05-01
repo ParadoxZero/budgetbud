@@ -238,7 +238,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
 
     render_categories() {
 
-        const minWidth = GetScreenSize() == ScreenSize.desktop ? 500 : 0;
+        const minWidth = GetScreenSize() != ScreenSize.mobile ? 500 : 0;
 
         if (this.props.selected_budget_index != null) {
             const budget = this.props.budget_list[this.props.selected_budget_index];
