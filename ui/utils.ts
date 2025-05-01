@@ -40,11 +40,14 @@ export enum Status {
     success = 0,
     error = 1,
     warning = 2,
+    completed = 3,
 }
 
 export function GetStatusFromPercent(percent: number): Status {
-    if (percent > 90) {
+    if (percent > 100) {
         return Status.error;
+    } else if (percent === 100) {
+        return Status.completed;
     } else if (percent > 75) {
         return Status.warning;
     } else {

@@ -69,6 +69,9 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
             case Status.warning:
                 status_color = 'ffa940';
                 break;
+            case Status.completed:
+                status_color = '#4096ff';
+                break;
         }
         return (
             <Card bordered={false} hoverable style={{ margin: 10 }} >
@@ -181,6 +184,10 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
                 progress_color = '#ffa940';
                 text_type = "warning";
                 break;
+            case Status.completed:
+                progress_color = '#4096ff';
+                text_type = "secondary";
+                break; 
         }
 
         const progress = <Progress
@@ -191,7 +198,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
                 marginBottom: 14,
                 minWidth: 100
             }}
-            status={percent < 100 ? "active" : "exception"}
+            status={percent <= 100 ? "active" : "exception"}
         />
 
         const on_click = () => {
