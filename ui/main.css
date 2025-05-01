@@ -1,18 +1,20 @@
 .touchahble {
-    cursor: pointer;
-    transition: box-shadow 0.3s, border 0.3s;
-    border-radius: 5px;
+  cursor: pointer;
+  transition:
+    box-shadow 0.3s,
+    border 0.3s;
+  border-radius: 5px;
 }
 
 .touchahble:hover {
-    cursor: pointer;
-    background: linear-gradient(to right, #fff, #f2f2f2);
-    background-size: 200% 200%;
-    animation: gradientAnimation 1s ease forwards;
+  cursor: pointer;
+  background: linear-gradient(to right, #fff, #f2f2f2);
+  background-size: 200% 200%;
+  animation: gradientAnimation 1s ease forwards;
 }
 
 .touchahble:active {
-    /* cursor: pointer;
+  /* cursor: pointer;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
     border: 1px solid #ccc;
     background: linear-gradient(to bottom, #fff, #f2f2f2);
@@ -20,34 +22,34 @@
 }
 
 @keyframes gradientAnimation {
-    0% {
-        background-position: 0% 0%;
-    }
+  0% {
+    background-position: 0% 0%;
+  }
 
-    50% {
-        background-position: 100% 100%;
-    }
+  50% {
+    background-position: 100% 100%;
+  }
 
-    100% {
-        background-position: 0% 0%;
-    }
+  100% {
+    background-position: 0% 0%;
+  }
 }
 
 body {
-    -webkit-touch-callout: none;
-    /* Safari */
-    -webkit-user-select: none;
-    /* Chrome */
-    -moz-user-select: none;
-    /* Firefox */
-    -ms-user-select: none;
-    /* Internet Explorer/Edge */
-    user-select: none;
-    min-height: 100vh;
-    padding: 0;
-    margin: 0;
+  -webkit-touch-callout: none;
+  /* Safari */
+  -webkit-user-select: none;
+  /* Chrome */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
 }
 
 #root {
-    height: 100vh;
+  height: 100vh;
 }
