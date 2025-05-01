@@ -187,7 +187,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
             case Status.completed:
                 progress_color = '#4096ff';
                 text_type = "secondary";
-                break; 
+                break;
         }
 
         const progress = <Progress
@@ -238,10 +238,12 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
 
     render_categories() {
 
+        const minWidth = GetScreenSize() == ScreenSize.desktop ? 500 : 0;
+
         if (this.props.selected_budget_index != null) {
             const budget = this.props.budget_list[this.props.selected_budget_index];
             return (
-                <Card bordered={false} style={{ margin: 0, marginTop: 0, marginBottom: 10, padding: 0 }}>
+                <Card bordered={false} style={{ margin: 0, marginTop: 0, marginBottom: 10, padding: 0, minWidth: minWidth }}>
                     <Flex align="stretch" justify="space-around" vertical>
                         < Divider style={{ margin: 0, padding: 0 }} />
                         {budget?.categoryList.map((category) => (
@@ -296,7 +298,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     }
 
     componentDidMount(): void {
-        this.setState({previous_budget_index: this.props.selected_budget_index});
+        this.setState({ previous_budget_index: this.props.selected_budget_index });
         store.dispatch(headerSlice.actions.header({ is_visible: false }));
         store.dispatch(headerSlice.actions.showBudgetSelect());
         store.dispatch(budgetSlice.actions.clear());
