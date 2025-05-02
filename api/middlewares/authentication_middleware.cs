@@ -53,17 +53,24 @@ public class RedirectToLoginMiddleware
     {
         if (!context.Request.Headers.ContainsKey("X-MS-CLIENT-PRINCIPAL"))
         {
-            if (!context.Request.Path.HasValue || !_unauthenticatedPaths.Any(path => context.Request.Path.Value.StartsWith(path)))
-            {
-                context.Response.Redirect("/login.html");
-                return;
-            }
-            else if (_apiPaths.Any(path => context.Request.Path.Value.StartsWith(path)))
+            if (!context.Request.Path.HasValue ||
+                _apiPaths.Any(
+                    path => context.Request.Path.Value.StartsWith(path)
+            ))
             {
                 context.Response.StatusCode = 401;
                 await context.Response.WriteAsync("Unauthorized");
                 return;
             }
+
+            if (!_unauthenticatedPaths.Any(
+                path => context.Request.Path.Value.StartsWith(path))
+            )
+            {
+                context.Response.Redirect("/login.html");
+                return;
+            }
+
         }
 
         await _next(context);
