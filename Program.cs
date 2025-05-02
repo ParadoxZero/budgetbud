@@ -47,7 +47,7 @@ builder.Services.AddSingleton<UserDataService>();
 var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
-    app.UseMiddleware<RedirectToLoginMiddleware>();
+    // app.UseMiddleware<RedirectToLoginMiddleware>();
 }
 
 app.UseDefaultFiles();
