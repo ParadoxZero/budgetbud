@@ -27,18 +27,8 @@ public class RedirectToLoginMiddleware
 {
     private readonly RequestDelegate _next;
 
-    private readonly string[] _unauthenticatedPaths = [
-        "/login.html",
-        "/privacy.html",
-        "/favicon.ico",
-        "/css",
-        "/js",
-        "/img",
-        "/lib",
-        "/icons",
-        "/assets",
-        "/.auth",
-        "vite.svg"
+    private readonly string[] _authenticatedPaths = [
+        "/index.html",
     ];
 
     private readonly string[] _apiPaths = [
@@ -64,7 +54,7 @@ public class RedirectToLoginMiddleware
                 return;
             }
 
-            if (!_unauthenticatedPaths.Any(
+            if (_authenticatedPaths.Any(
                 path => context.Request.Path.Value.StartsWith(path))
             )
             {
