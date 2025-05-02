@@ -265,7 +265,8 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     value: number,
     total: number,
   ) {
-    const percent = Math.floor((value / total) * 100);
+    const percent = total + value === 0 ? // 0/0 case
+      100 : Math.floor((value / total) * 100); // Will be NaN if total is 0
     let progress_color = "#3f8600";
     let text_type: BaseType = "success";
 
