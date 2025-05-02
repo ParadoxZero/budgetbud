@@ -59,7 +59,7 @@ export default defineConfig({
           },
           {
             urlPattern: ({ request }) => request.destination === 'document',
-            handler: 'NetworkFirst', // Always try network first
+            handler: 'NetworkOnly',
           },
           {
             urlPattern: ({ request }) =>
