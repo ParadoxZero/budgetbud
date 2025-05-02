@@ -37,6 +37,7 @@ public class RedirectToLoginMiddleware
         "/lib",
         "/icons",
         "/assets",
+        "/.auth",
         "vite.svg"
     ];
 
