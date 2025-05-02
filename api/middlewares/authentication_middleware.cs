@@ -44,7 +44,7 @@ public class RedirectToLoginMiddleware
     {
         if (!context.Request.Headers.ContainsKey("X-MS-CLIENT-PRINCIPAL"))
         {
-            if (!context.Request.Path.HasValue ||
+            if (context.Request.Path.HasValue &&
                 _apiPaths.Any(
                     path => context.Request.Path.Value.StartsWith(path)
             ))
@@ -54,7 +54,7 @@ public class RedirectToLoginMiddleware
                 return;
             }
 
-            if (_authenticatedPaths.Any(
+            if (context.Request.Path.HasValue && _authenticatedPaths.Any(
                 path => context.Request.Path.Value.StartsWith(path))
             )
             {
