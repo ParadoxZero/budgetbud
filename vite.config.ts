@@ -55,9 +55,7 @@ export default defineConfig({
           {
             urlPattern: ({ url }) => url.pathname.startsWith('/api') || url.pathname.startsWith('/.auth'),
             handler: 'NetworkOnly',
-            options: {
-              cacheName: 'do-not-cache', // Doesn’t really cache anything
-            },
+
           },
           {
             urlPattern: ({ request }) => request.destination === 'document',
@@ -72,8 +70,8 @@ export default defineConfig({
             urlPattern: ({ request }) => request.destination === 'script',
             handler: 'NetworkFirst',
           },
-
         ],
+        navigateFallbackDenylist: [/^\/api/, /^\/.auth/],
       },
     }),
   ],
