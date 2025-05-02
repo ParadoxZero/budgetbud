@@ -25,7 +25,7 @@ export async function fetchData(
   const response = await fetch(url, options);
   if (response.status === 401) {
     // Redirect to login screen
-    window.location.href = "/login";
+    window.location.href = "/login.html";
   }
   if (!response.ok) {
     throw new Error("API request failed");
