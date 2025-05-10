@@ -45,7 +45,7 @@ import {
   Status,
 } from "../utils";
 import { DataService, getDataService } from "../services/data_service";
-import { DataModelFactory, Recurring, Budget } from "../datamodel/datamodel";
+import { DataModelFactory, Recurring, Budget, Expense } from "../datamodel/datamodel";
 import { Typography } from "antd";
 import { RecurringCalculatorService } from "../services/recurring_date_service";
 import { BaseType } from "antd/es/typography/Base";
@@ -60,6 +60,7 @@ import {
 
 import "../main.css";
 import { connect } from "react-redux";
+import { AddExpenseModal } from "../components/add_expense_modal";
 
 const { Text } = Typography;
 
@@ -70,8 +71,10 @@ interface OverviewProps {
 
 interface AddExpenseContext {
   category_id: number;
+  amount: number;
   filled: boolean;
   processing: boolean;
+  isModalOpen: boolean;
 }
 
 interface IState {
@@ -152,42 +155,37 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     );
   }
 
+  add_expense(title: string) {
+    const budget = this.props.budget_list[this.props.selected_budget_index!];
+    let context = this.state.add_expense_mode_context;
+    if (!context || context.amount == 0) {
+      this.setState({
+        add_expense_mode_context: null
+      });
+      return;
+    }
+    const expense = DataModelFactory.createExpense(
+      0,
+      context.category_id,
+      context.amount,
+      title,
+    );
+
+    this._data_service
+      .updateExpense(budget.id, expense)
+      .then((data) => {
+        store.dispatch(budgetSlice.actions.updateCurrent(data));
+        this.setState({ add_expense_mode_context: null });
+      })
+      .catch(() => this.setState({ add_expense_mode_context: null }));
+
+  }
+
   render_add_single_category_expense() {
     let context = this.state.add_expense_mode_context;
 
     const handle_add_expense = () => {
-      const entered_amount = parseFloat(
-        (document.getElementById("expense_amount") as HTMLInputElement).value,
-      );
-      if (entered_amount > 0) {
-        const category_id = context!.category_id;
-        if (this.props.selected_budget_index == null) {
-          return;
-        }
-        const budget = this.props.budget_list[this.props.selected_budget_index];
-        const list_of_expenses =
-          budget.categoryList.find((category) => category.id == category_id)
-            ?.expenseList ?? [];
-        const last_expense_id =
-          list_of_expenses?.reduce((acc, curr) => Math.max(acc, curr.id), 0) ??
-          0;
-        const expense = DataModelFactory.createExpense(
-          last_expense_id,
-          context!.category_id,
-          entered_amount,
-        );
-        context!.processing = true;
-        this.setState({ add_expense_mode_context: context });
-        this._data_service
-          .updateExpense(budget.id, expense)
-          .then((data) => {
-            store.dispatch(budgetSlice.actions.updateCurrent(data));
-            this.setState({ add_expense_mode_context: null });
-          })
-          .catch(() => this.setState({ add_expense_mode_context: null }));
-      } else {
-        this.setState({ add_expense_mode_context: null });
-      }
+      this.add_expense("");
     };
 
     const handle_input_change = () => {
@@ -195,6 +193,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
         (document.getElementById("expense_amount") as HTMLInputElement).value,
       );
       context!.filled = entered_amount > 0;
+      context!.amount = entered_amount;
       this.setState({ add_expense_mode_context: context });
     };
 
@@ -248,10 +247,13 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
               icon={<RightOutlined />}
               style={{ padding: 20, marginLeft: 20 }}
               onClick={(e) => {
-                alert("button");
-                e.stopPropagation();
+                let context = this.state.add_expense_mode_context;
+                if (context) {
+                  context.isModalOpen = true;
+                }
+                this.setState({ add_expense_mode_context: context });
               }}
-              disabled
+              disabled={this.state.add_expense_mode_context?.isModalOpen || false}
             ></Button>
           </Flex>
         </Flex>
@@ -311,6 +313,8 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
           category_id: id,
           filled: false,
           processing: false,
+          isModalOpen: false,
+          amount: 0,
         },
       });
     };
@@ -367,6 +371,47 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
       return this.render_add_single_category_expense();
     }
     return this.render_view_single_category(id, title, value, total);
+  }
+
+  render_add_expense_modal() {
+    if (this.props.selected_budget_index == null) return null;
+
+    const budget = this.props.budget_list[this.props.selected_budget_index];
+    const categories = budget.categoryList.map((category) => ({
+      id: category.id,
+      name: category.name,
+    }));
+
+    return (
+      <AddExpenseModal
+        isOpen={this.state.add_expense_mode_context?.isModalOpen || false}
+        categories={categories}
+        defaultCategoryId={categories[0]?.id || 0}
+        defaultAmount={this.state.add_expense_mode_context?.amount || 0}
+        isLoading= {
+          this.state.add_expense_mode_context?.processing || false
+        }
+        onClose={() => {
+          let context = this.state.add_expense_mode_context;
+          if (context) {
+            context.isModalOpen = false;
+          }
+          this.setState({ add_expense_mode_context: context });
+        }}
+        onSubmit={(title, amount, categoryId) => {
+          this.setState({
+            add_expense_mode_context: {
+              category_id: categoryId,
+              filled: false,
+              processing: true,
+              isModalOpen: false,
+              amount: amount,
+            },
+          });
+          this.add_expense(title);
+        }}
+      />
+    );
   }
 
   render_categories() {
@@ -427,6 +472,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
       >
         {this.header()}
         {this.render_categories()}
+        {this.render_add_expense_modal()}
       </Flex>
     );
   }

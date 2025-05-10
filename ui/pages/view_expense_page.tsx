@@ -144,15 +144,11 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps> {
             gap={10}
             style={{ minWidth: 100 }}
           >
-            <Flex vertical>
-              <Typography.Text>{expense.title}</Typography.Text>
+            <Flex vertical gap={15} justify="space-evenly" align="start">
               <Statistic
-                title="Amount"
+                title={date_string}
                 value={expense.amount}
-                suffix={expense.title}
               />
-            </Flex>
-            <Flex gap={5} justify="space-between" align="center">
               <Popconfirm
                 title="Are you sure?"
                 okText="Yes"
@@ -160,11 +156,12 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps> {
                 onConfirm={on_delete_click}
               >
                 <Button
-                  type="primary"
-                  size="small"
+                  size="middle"
                   icon={<DeleteFilled />}
+                  shape="default"
+
                   danger
-                />
+                > Delete </Button>
               </Popconfirm>
             </Flex>
           </Flex>
@@ -173,8 +170,7 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps> {
       );
       const label_ui = (
         <Flex vertical gap={5} style={{ minWidth: 10 }}>
-          <Typography.Text>On</Typography.Text>
-          <Typography.Text>{date_string}</Typography.Text>
+          <Typography.Title level={3}>{expense.title}</Typography.Title>
         </Flex>
       );
       return {
@@ -186,7 +182,7 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps> {
     return (
       <>
         <Timeline
-          mode="left"
+          mode="alternate"
           items={item_list}
           style={{ minWidth: 300 }}
           reverse
