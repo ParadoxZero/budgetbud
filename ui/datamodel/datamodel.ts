@@ -133,11 +133,12 @@ export class DataModelFactory {
     lastUsedId: number,
     categoryId: number,
     amount: number,
+    title: string = "",
   ): Expense {
     const id = lastUsedId + 1;
     return {
       id,
-      title: "",
+      title,
       amount: amount,
       categoryId,
       timestamp: Date.now(),
