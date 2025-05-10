@@ -61,6 +61,8 @@ import {
 import "../main.css";
 import { connect } from "react-redux";
 import { AddExpenseModal } from "../components/add_expense_modal";
+import SingleCategory from "../components/single_category";
+import EditCategory from "../components/edit_category";
 
 const { Text } = Typography;
 
@@ -182,7 +184,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
   }
 
   render_add_single_category_expense() {
-    let context = this.state.add_expense_mode_context;
+    const context = this.state.add_expense_mode_context;
 
     const handle_add_expense = () => {
       this.add_expense("");
@@ -195,66 +197,20 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
       this.setState({ add_expense_mode_context: context });
     };
 
-    let feature_button_icon = <CloseOutlined />;
-    if (context?.processing) {
-      feature_button_icon = <LoadingOutlined />;
-    } else if (context?.filled) {
-      feature_button_icon = <PlusOutlined />;
-    }
-
     return (
-      <div
-        style={{
-          margin: 0,
-          marginTop: 10,
-          marginBottom: 10,
-          paddingRight: 20,
-          paddingLeft: 20,
-          minWidth: 300,
+      <EditCategory
+        context={context}
+        onAddExpense={handle_add_expense}
+        onInputChange={handle_input_change}
+        onModalRequested={() => {
+          this.setState({
+            add_expense_mode_context: {
+              ...context!,
+              isModalOpen: true,
+            },
+          });
         }}
-        className="touchahble"
-      >
-        <Flex align="center" justify="space-between" style={{ minHeight: 80 }}>
-          <Input
-            id="expense_amount"
-            size="large"
-            type="number"
-            placeholder="Spent amount"
-            autoFocus
-            variant="borderless"
-            minLength={250}
-            inputMode="numeric"
-            style={{ padding: 0 }}
-            onPressEnter={handle_add_expense}
-            onInput={handle_input_change}
-            disabled={context?.processing}
-          />
-          <Flex align="center" justify="right">
-            <Button
-              shape="circle"
-              type="default"
-              icon={feature_button_icon}
-              style={{ padding: 20, marginLeft: 20 }}
-              onClick={() => {
-                handle_add_expense();
-              }}
-            ></Button>
-            <Button
-              shape="circle"
-              type="default"
-              icon={<RightOutlined />}
-              style={{ padding: 20, marginLeft: 20 }}
-              onClick={(e) => {
-                let context = this.state.add_expense_mode_context!;
-                context.isModalOpen = true;
-                console.log("Modal open", context);
-                this.setState({ add_expense_mode_context: context });
-              }}
-              disabled={this.state.add_expense_mode_context?.isModalOpen || false}
-            ></Button>
-          </Flex>
-        </Flex>
-      </div>
+      />
     );
   }
 
@@ -264,39 +220,8 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     value: number,
     total: number,
   ) {
-    const percent = total + value === 0 ? // 0/0 case
-      100 : Math.floor((value / total) * 100); // Will be NaN if total is 0
-    let progress_color = "#3f8600";
-    let text_type: BaseType = "success";
-
+    const percent = total + value === 0 ? 100 : Math.floor((value / total) * 100);
     const status = GetStatusFromPercent(percent);
-    switch (status) {
-      case Status.error:
-        progress_color = "#ff4d4f";
-        text_type = "danger";
-        break;
-      case Status.warning:
-        progress_color = "#ffa940";
-        text_type = "warning";
-        break;
-      case Status.completed:
-        progress_color = "#4096ff";
-        text_type = "secondary";
-        break;
-    }
-
-    const progress = (
-      <Progress
-        type="line"
-        percent={percent}
-        strokeColor={progress_color}
-        style={{
-          marginBottom: 14,
-          minWidth: 100,
-        }}
-        status={percent <= 100 ? "active" : "exception"}
-      />
-    );
 
     const on_click = () => {
       if (
@@ -321,40 +246,16 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     };
 
     return (
-      <div
-        style={{
-          margin: 0,
-          marginTop: 10,
-          marginBottom: 10,
-          paddingRight: 20,
-          paddingLeft: 20,
-          minWidth: 300,
-        }}
-        className="touchahble"
+      <SingleCategory
+        id={id}
+        title={title}
+        value={value}
+        total={total}
+        percent={percent}
+        status={status}
         onClick={on_click}
-      >
-        <Flex align="center" justify="space-between">
-          <Text strong type="secondary" style={{ fontSize: 18 }}>
-            {title}
-          </Text>
-          <Flex align="center" justify="right">
-            <Flex align="flex-end" justify="center" vertical>
-              <Text type="secondary"> Remaining</Text>
-              <Text strong type={text_type}>
-                {total - value} / {total}{" "}
-              </Text>
-              {progress}
-            </Flex>
-            <Button
-              shape="circle"
-              type="default"
-              icon={<RightOutlined />}
-              style={{ padding: 20, marginLeft: 20 }}
-              onClick={on_right_button_click}
-            ></Button>
-          </Flex>
-        </Flex>
-      </div>
+        onRightButtonClick={on_right_button_click}
+      />
     );
   }
 
@@ -463,6 +364,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
         justify={
           GetScreenSize() == ScreenSize.desktop ? "center" : "space-between"
         }
+        align="stretch"
       >
         {this.header()}
         {this.render_categories()}

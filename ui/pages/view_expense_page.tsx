@@ -144,7 +144,7 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps> {
             gap={10}
             style={{ minWidth: 100 }}
           >
-            <Flex vertical gap={15} justify="space-evenly" align="start">
+            <Flex vertical gap={15} justify="space-evenly" align="stretch">
               <Statistic
                 title={date_string}
                 value={expense.amount}
@@ -170,7 +170,7 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps> {
       );
       const label_ui = (
         <Flex vertical gap={5} style={{ minWidth: 10 }}>
-          <Typography.Title level={3}>{expense.title}</Typography.Title>
+          <Typography.Title level={5}>{expense.title}</Typography.Title>
         </Flex>
       );
       return {

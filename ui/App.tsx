@@ -71,6 +71,15 @@ class App extends React.Component<AppProps> {
         localStorage.setItem("userData", JSON.stringify(CreateDummyData()));
       },
     },
+    {
+      condition: import.meta.env.PROD,
+      action: () => {
+        GetAuthDetails().then((response: any) => {
+          console.log(response);
+          localStorage.setItem("auth_provider", response.provider);
+        });
+      },
+    },
   ];
 
   run_pre_run() {
@@ -89,10 +98,6 @@ class App extends React.Component<AppProps> {
   }
 
   render(): ReactNode {
-    GetAuthDetails().then((response: any) => {
-      console.log(response);
-      localStorage.setItem("auth_provider", response.provider);
-    });
 
     return (
       <ConfigProvider
