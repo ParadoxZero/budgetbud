@@ -111,7 +111,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     }
     const remaining_budget = this.state.total_allocations - used_up_budget;
     return (
-      <Card bordered={false} hoverable style={{ margin: 10 }}>
+      <div style={{ margin: 10 }}>
         <Statistic
           title="Budget Remaining"
           groupSeparator=""
@@ -120,7 +120,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
           suffix={"/ " + this.state.total_allocations.toString()}
           valueStyle={{ color: status_color }}
         />
-      </Card>
+      </div>
 
     );
   }
@@ -175,7 +175,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     );
 
     return (
-      <Card bordered={false} hoverable style={{ margin: 10 }}>
+      <div style={{ margin: 10 }}>
         <Flex vertical gap={10} align="center" justify="space-between">
           <Typography.Paragraph style={{ margin: 0 }}>
             Add a new expense
@@ -183,7 +183,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
           {content}
 
         </Flex>
-      </Card>
+      </div>
     );
   }
 
@@ -250,6 +250,9 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
               isModalOpen: true,
             },
           });
+        }}
+        onCloseRequested={() => {
+          this.setState({ add_expense_mode_context: null });
         }}
       />
     );

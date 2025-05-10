@@ -13,6 +13,7 @@ interface EditCategoryProps {
   onAddExpense: () => void;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onModalRequested: () => void;
+  onCloseRequested: () => void;
 }
 
 const EditCategory: React.FC<EditCategoryProps> = ({
@@ -20,6 +21,7 @@ const EditCategory: React.FC<EditCategoryProps> = ({
   onAddExpense,
   onInputChange,
   onModalRequested,
+  onCloseRequested,
 }) => {
   let feature_button_icon = <CloseOutlined />;
   if (state === EditCategoryState.Processing) {
@@ -27,6 +29,14 @@ const EditCategory: React.FC<EditCategoryProps> = ({
   } else if (state === EditCategoryState.Filled) {
     feature_button_icon = <PlusOutlined />;
   }
+
+  const handle_action_button_click = () => {
+    if (state === EditCategoryState.Filled) {
+      onAddExpense();
+    } else if (state === EditCategoryState.Unfilled) {
+      onCloseRequested();
+    }
+  };
 
   return (
     <div
@@ -51,7 +61,7 @@ const EditCategory: React.FC<EditCategoryProps> = ({
           minLength={250}
           inputMode="numeric"
           style={{ padding: 0 }}
-          onPressEnter={onAddExpense}
+          onPressEnter={handle_action_button_click}
           onInput={onInputChange}
           disabled={state === EditCategoryState.Processing}
         />
@@ -61,7 +71,7 @@ const EditCategory: React.FC<EditCategoryProps> = ({
             type="default"
             icon={feature_button_icon}
             style={{ padding: 20, marginLeft: 20 }}
-            onClick={onAddExpense}
+            onClick={handle_action_button_click}
           ></Button>
           <Button
             shape="circle"

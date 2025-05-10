@@ -98,7 +98,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
       >
         {this.render_budget_selector()}
         <Button
-          type="default"
+          type="text"
           icon={<SettingOutlined />}
           size="large"
           onClick={() => {
@@ -279,7 +279,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
     return (
       <>
         <Dropdown menu={{ items }} arrow>
-          <Button type="default" icon={<MoreOutlined />} size="large"></Button>
+          <Button type="text" icon={<MoreOutlined />} size="large"></Button>
         </Dropdown>
         <ShareBudgetModal
           isOpen={this.state.open_share_modal}
