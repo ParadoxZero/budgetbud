@@ -151,6 +151,8 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
   }
 
   render_add_expense_button() {
+    const budget = this.props.budget_list[this.props.selected_budget_index!];
+    const first_category_id = budget.categoryList[0].id;
     const content = (
       <Button
         type="primary"
@@ -160,7 +162,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
         onClick={() => {
           this.setState({
             add_expense_mode_context: {
-              category_id: 0,
+              category_id: first_category_id,
               filled: false,
               processing: false,
               isModalOpen: true,
@@ -188,7 +190,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
 
   header() {
     return (
-      <Flex vertical={GetScreenSize() == ScreenSize.desktop}>
+      <Flex vertical={GetScreenSize() == ScreenSize.desktop} align="stretch" justify="space-evenly">
         {this.render_available_budget()}
         {this.render_add_expense_button()}
       </Flex>
@@ -394,10 +396,10 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
       <Flex
         vertical={GetScreenSize() != ScreenSize.desktop}
         justify={
-          GetScreenSize() != ScreenSize.desktop ? "space-between" : "center"
+          GetScreenSize() != ScreenSize.desktop ? "stretch" : "center"
         }
         align={
-          GetScreenSize() != ScreenSize.desktop ? "center" : "flex-start"
+          GetScreenSize() != ScreenSize.desktop ? "stretch" : "flex-start"
         }
       >
         {this.header()}
