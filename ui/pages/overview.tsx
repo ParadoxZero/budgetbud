@@ -32,10 +32,8 @@ import {
 } from "antd";
 import {
   CheckCircleOutlined,
-  CloseOutlined,
   LoadingOutlined,
-  PlusOutlined,
-  RightOutlined,
+  PlusCircleFilled,
   WalletOutlined,
 } from "@ant-design/icons";
 import {
@@ -153,36 +151,28 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
   render_add_expense_button() {
     const budget = this.props.budget_list[this.props.selected_budget_index!];
     const first_category_id = budget.categoryList[0].id;
-    const content = (
-      <Button
-        type="primary"
-        shape="default"
-        icon={<PlusOutlined />}
-        size="large"
-        onClick={() => {
-          this.setState({
-            add_expense_mode_context: {
-              category_id: first_category_id,
-              filled: false,
-              processing: false,
-              isModalOpen: true,
-              amount: 0,
-            },
-          });
-        }}
-      >
-      </Button>
-    );
 
     return (
       <div style={{ margin: 10 }}>
-        <Flex vertical gap={10} align="center" justify="space-between">
-          <Typography.Paragraph style={{ margin: 0 }}>
-            Add a new expense
-          </Typography.Paragraph>
-          {content}
+        <Button
+          type="default"
+          icon={<PlusCircleFilled />}
+          size="large"
+          onClick={() => {
+            this.setState({
+              add_expense_mode_context: {
+                category_id: first_category_id,
+                filled: false,
+                processing: false,
+                isModalOpen: true,
+                amount: 0,
+              },
+            });
+          }}
+        >
+          Add Expense
+        </Button>
 
-        </Flex>
       </div>
     );
   }
@@ -190,7 +180,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
 
   header() {
     return (
-      <Flex vertical={GetScreenSize() == ScreenSize.desktop} align="stretch" justify="space-evenly">
+      <Flex vertical={GetScreenSize() == ScreenSize.desktop} align="center" justify="space-evenly">
         {this.render_available_budget()}
         {this.render_add_expense_button()}
       </Flex>
