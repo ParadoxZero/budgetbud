@@ -188,10 +188,8 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
       this.add_expense("");
     };
 
-    const handle_input_change = () => {
-      const entered_amount = parseFloat(
-        (document.getElementById("expense_amount") as HTMLInputElement).value,
-      );
+    const handle_input_change = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const entered_amount = parseFloat(e.target.value);
       context!.filled = entered_amount > 0;
       context!.amount = entered_amount;
       this.setState({ add_expense_mode_context: context });
@@ -247,10 +245,9 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
               icon={<RightOutlined />}
               style={{ padding: 20, marginLeft: 20 }}
               onClick={(e) => {
-                let context = this.state.add_expense_mode_context;
-                if (context) {
-                  context.isModalOpen = true;
-                }
+                let context = this.state.add_expense_mode_context!;
+                context.isModalOpen = true;
+                console.log("Modal open", context);
                 this.setState({ add_expense_mode_context: context });
               }}
               disabled={this.state.add_expense_mode_context?.isModalOpen || false}
@@ -381,28 +378,25 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
       id: category.id,
       name: category.name,
     }));
-
+    const context = this.state.add_expense_mode_context;
+    if (!context) return null;
     return (
       <AddExpenseModal
-        isOpen={this.state.add_expense_mode_context?.isModalOpen || false}
+        isOpen={context.isModalOpen || false}
         categories={categories}
         defaultCategoryId={categories[0]?.id || 0}
-        defaultAmount={this.state.add_expense_mode_context?.amount || 0}
+        defaultAmount={context.amount}
         isLoading= {
-          this.state.add_expense_mode_context?.processing || false
+          context.processing
         }
         onClose={() => {
-          let context = this.state.add_expense_mode_context;
-          if (context) {
-            context.isModalOpen = false;
-          }
-          this.setState({ add_expense_mode_context: context });
+          this.setState({ add_expense_mode_context: null });
         }}
         onSubmit={(title, amount, categoryId) => {
           this.setState({
             add_expense_mode_context: {
               category_id: categoryId,
-              filled: false,
+              filled: amount != 0,
               processing: true,
               isModalOpen: false,
               amount: amount,
