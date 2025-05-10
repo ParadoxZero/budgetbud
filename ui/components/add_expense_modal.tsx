@@ -37,7 +37,7 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
   return (
     <Modal
       title="Add Expense"
-      visible={isOpen}
+      open={isOpen}
       loading={isLoading}
       onCancel={onClose}
       footer={[
