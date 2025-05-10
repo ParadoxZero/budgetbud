@@ -47,31 +47,13 @@ export default defineConfig({
         ],
         theme_color: "#ffffff",
         background_color: "#ffffff",
-        description: "Budgeting and Expense Tracker with ability to share budgets with friends and family",
+        description: 
+          "Budgeting and Expense Tracker with ability to share budgets " +
+          "with friends and family",
         categories: ["finance", "productivity"],
       },
       workbox: {
-        runtimeCaching: [
-          {
-            urlPattern: ({ url }) => url.pathname.startsWith('/api') || url.pathname.startsWith('/.auth'),
-            handler: 'NetworkOnly',
-
-          },
-          {
-            urlPattern: ({ request }) => request.destination === 'document',
-            handler: 'NetworkOnly',
-          },
-          {
-            urlPattern: ({ request }) =>
-              ['style', 'image', 'font'].includes(request.destination),
-            handler: 'CacheFirst', // Cache static assets
-          },
-          {
-            urlPattern: ({ request }) => request.destination === 'script',
-            handler: 'NetworkFirst',
-          },
-        ],
-        navigateFallbackDenylist: [/^\/api/, /^\/.auth/],
+        globIgnores:["*"],
       },
     }),
   ],
