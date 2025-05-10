@@ -180,7 +180,10 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
 
   header() {
     return (
-      <Flex vertical={GetScreenSize() == ScreenSize.desktop} align="center" justify="space-evenly">
+      <Flex vertical={GetScreenSize() == ScreenSize.desktop}
+        style={{ marginBottom: 10 }}
+        align="center"
+        justify="space-evenly">
         {this.render_available_budget()}
         {this.render_add_expense_button()}
       </Flex>
