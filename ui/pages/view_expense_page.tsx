@@ -165,7 +165,6 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps> {
               </Popconfirm>
             </Flex>
           </Flex>
-          <Divider />
         </div>
       );
       const label_ui = (

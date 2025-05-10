@@ -342,8 +342,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     if (this.props.selected_budget_index != null) {
       const budget = this.props.budget_list[this.props.selected_budget_index];
       return (
-        <Card
-          bordered={false}
+        <div
           style={{
             margin: 0,
             marginTop: 0,
@@ -366,7 +365,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
               </div>
             ))}
           </Flex>
-        </Card>
+        </div>
       );
     }
     return (
