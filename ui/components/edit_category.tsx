@@ -2,29 +2,29 @@ import React from "react";
 import { Button, Input, Flex } from "antd";
 import { CloseOutlined, LoadingOutlined, PlusOutlined, RightOutlined } from "@ant-design/icons";
 
+export enum EditCategoryState {
+  Unfilled,
+  Filled,
+  Processing,
+}
+
 interface EditCategoryProps {
-  context: {
-    category_id: number;
-    amount: number;
-    filled: boolean;
-    processing: boolean;
-    isModalOpen: boolean;
-  } | null;
+  state: EditCategoryState;
   onAddExpense: () => void;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onModalRequested: () => void;
 }
 
 const EditCategory: React.FC<EditCategoryProps> = ({
-  context,
+  state,
   onAddExpense,
   onInputChange,
   onModalRequested,
 }) => {
   let feature_button_icon = <CloseOutlined />;
-  if (context?.processing) {
+  if (state === EditCategoryState.Processing) {
     feature_button_icon = <LoadingOutlined />;
-  } else if (context?.filled) {
+  } else if (state === EditCategoryState.Filled) {
     feature_button_icon = <PlusOutlined />;
   }
 
@@ -53,7 +53,7 @@ const EditCategory: React.FC<EditCategoryProps> = ({
           style={{ padding: 0 }}
           onPressEnter={onAddExpense}
           onInput={onInputChange}
-          disabled={context?.processing}
+          disabled={state === EditCategoryState.Processing}
         />
         <Flex align="center" justify="right">
           <Button
@@ -68,7 +68,6 @@ const EditCategory: React.FC<EditCategoryProps> = ({
             type="default"
             icon={<RightOutlined />}
             style={{ padding: 20, marginLeft: 20 }}
-            disabled={context?.isModalOpen || false}
             onClick={onModalRequested}
           ></Button>
         </Flex>

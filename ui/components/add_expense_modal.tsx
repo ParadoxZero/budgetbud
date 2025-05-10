@@ -33,7 +33,6 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
         console.error("Validation Failed:", info);
       });
   };
-
   return (
     <Modal
       title="Add Expense"
@@ -55,7 +54,7 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
           name="categoryId"
           rules={[{ required: true, message: "Please select a category" }]}
         >
-          <Select>
+          <Select placeholder="Select a category">
             {categories.map((category) => (
               <Select.Option key={category.id} value={category.id}>
                 {category.name}

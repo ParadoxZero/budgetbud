@@ -89,14 +89,9 @@ class Header extends React.Component<HeaderProps, HeaderState> {
         </Flex>
       );
     }
-
-    let justify = "space-between";
-    if (GetScreenSize() != ScreenSize.mobile) {
-      justify = "center";
-    }
     return (
       <Flex
-        justify={justify}
+        justify="center"
         align="center"
         style={{ width: "100%", height: "100%" }}
         gap="small"

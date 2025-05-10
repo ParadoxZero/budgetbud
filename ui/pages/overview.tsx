@@ -62,7 +62,7 @@ import "../main.css";
 import { connect } from "react-redux";
 import { AddExpenseModal } from "../components/add_expense_modal";
 import SingleCategory from "../components/single_category";
-import EditCategory from "../components/edit_category";
+import EditCategory, { EditCategoryState } from "../components/edit_category";
 
 const { Text } = Typography;
 
@@ -109,17 +109,19 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
         status_color = "#4096ff";
         break;
     }
+    const remaining_budget = this.state.total_allocations - used_up_budget;
     return (
       <Card bordered={false} hoverable style={{ margin: 10 }}>
         <Statistic
-          title="Budget Used"
+          title="Budget Remaining"
           groupSeparator=""
-          value={used_up_budget}
+          value={remaining_budget}
           precision={0}
           suffix={"/ " + this.state.total_allocations.toString()}
           valueStyle={{ color: status_color }}
         />
       </Card>
+
     );
   }
 
@@ -148,31 +150,60 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     );
   }
 
+  render_add_expense_button() {
+    const content = (
+      <Button
+        type="primary"
+        shape="default"
+        icon={<PlusOutlined />}
+        size="large"
+        onClick={() => {
+          this.setState({
+            add_expense_mode_context: {
+              category_id: 0,
+              filled: false,
+              processing: false,
+              isModalOpen: true,
+              amount: 0,
+            },
+          });
+        }}
+      >
+      </Button>
+    );
+
+    return (
+      <Card bordered={false} hoverable style={{ margin: 10 }}>
+        <Flex vertical gap={10} align="center" justify="space-between">
+          <Typography.Paragraph style={{ margin: 0 }}>
+            Add a new expense
+          </Typography.Paragraph>
+          {content}
+
+        </Flex>
+      </Card>
+    );
+  }
+
+
   header() {
     return (
       <Flex vertical={GetScreenSize() == ScreenSize.desktop}>
         {this.render_available_budget()}
-        {this.render_upcoming()}
+        {this.render_add_expense_button()}
       </Flex>
     );
   }
 
-  add_expense(title: string) {
+  add_expense(category_id: number, title: string, amount: number) {
     const budget = this.props.budget_list[this.props.selected_budget_index!];
-    let context = this.state.add_expense_mode_context;
-    if (!context || context.amount == 0) {
-      this.setState({
-        add_expense_mode_context: null
-      });
-      return;
-    }
     const expense = DataModelFactory.createExpense(
       0,
-      context.category_id,
-      context.amount,
+      category_id,
+      amount,
       title,
     );
-
+    console.log("Adding expense", expense);
     this._data_service
       .updateExpense(budget.id, expense)
       .then((data) => {
@@ -185,27 +216,35 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
 
   render_add_single_category_expense() {
     const context = this.state.add_expense_mode_context;
+    if (!context) return null;
 
     const handle_add_expense = () => {
-      this.add_expense("");
+      this.add_expense(context!.category_id, "", context!.amount);
     };
 
     const handle_input_change = (e: React.ChangeEvent<HTMLInputElement>) => {
       const entered_amount = parseFloat(e.target.value);
-      context!.filled = entered_amount > 0;
-      context!.amount = entered_amount;
+      context.filled = entered_amount > 0;
+      context.amount = entered_amount;
       this.setState({ add_expense_mode_context: context });
     };
 
+    let state = EditCategoryState.Unfilled;
+    if (context.processing) {
+      state = EditCategoryState.Processing;
+    } else if (context.filled) {
+      state = EditCategoryState.Filled;
+    }
+
     return (
       <EditCategory
-        context={context}
+        state={state}
         onAddExpense={handle_add_expense}
         onInputChange={handle_input_change}
         onModalRequested={() => {
           this.setState({
             add_expense_mode_context: {
-              ...context!,
+              ...context,
               isModalOpen: true,
             },
           });
@@ -265,7 +304,8 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     value: number,
     total: number,
   ) {
-    if (this.state.add_expense_mode_context?.category_id == id) {
+    const add_expense_mode_context = this.state.add_expense_mode_context;
+    if (add_expense_mode_context && add_expense_mode_context.category_id === id) {
       return this.render_add_single_category_expense();
     }
     return this.render_view_single_category(id, title, value, total);
@@ -285,7 +325,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
       <AddExpenseModal
         isOpen={context.isModalOpen || false}
         categories={categories}
-        defaultCategoryId={categories[0]?.id || 0}
+        defaultCategoryId={context.category_id}
         defaultAmount={context.amount}
         isLoading= {
           context.processing
@@ -294,16 +334,8 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
           this.setState({ add_expense_mode_context: null });
         }}
         onSubmit={(title, amount, categoryId) => {
-          this.setState({
-            add_expense_mode_context: {
-              category_id: categoryId,
-              filled: amount != 0,
-              processing: true,
-              isModalOpen: false,
-              amount: amount,
-            },
-          });
-          this.add_expense(title);
+          console.log("Adding expense", title, amount, categoryId);
+          this.add_expense(categoryId, title, amount);
         }}
       />
     );
@@ -362,9 +394,11 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
       <Flex
         vertical={GetScreenSize() != ScreenSize.desktop}
         justify={
-          GetScreenSize() == ScreenSize.desktop ? "center" : "space-between"
+          GetScreenSize() != ScreenSize.desktop ? "space-between" : "center"
         }
-        align="stretch"
+        align={
+          GetScreenSize() != ScreenSize.desktop ? "center" : "flex-start"
+        }
       >
         {this.header()}
         {this.render_categories()}
