@@ -133,7 +133,7 @@ class App extends React.Component<{}, AppState> {
           align="center"
           justify="center"
         >
-          <Card bordered style={{ width: 300 }} hoverable>
+          <Card bordered style={{ width: 300 }}>
             <Flex justify="center" align="center" vertical gap={20}>
               <Typography.Title level={1}>BudgetBud</Typography.Title>
               {this.renderCallToAction()}
