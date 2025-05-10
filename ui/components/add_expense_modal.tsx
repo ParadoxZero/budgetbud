@@ -66,7 +66,7 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
         <Form.Item
           label="Title"
           name="title"
-          rules={[{ required: true, message: "Please enter a title for the expense" }]}
+          rules={[{ required: false, message: "Please enter a title for the expense" }]}
         >
           <Input placeholder="Expense Title" />
         </Form.Item>

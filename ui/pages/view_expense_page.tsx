@@ -19,7 +19,7 @@
  */
 
 import React, { Children } from "react";
-import { Budget } from "../datamodel/datamodel";
+import { Budget, DataModelFactory } from "../datamodel/datamodel";
 import { budgetSlice, headerSlice, navigate, store, View } from "../store";
 import {
   Button,
@@ -29,6 +29,7 @@ import {
   Popconfirm,
   Select,
   Space,
+  Spin,
   Statistic,
   Timeline,
   Typography,
@@ -39,6 +40,7 @@ import {
   DeleteOutlined,
   EditFilled,
   LeftOutlined,
+  LoadingOutlined,
   MoreOutlined,
   PlusCircleFilled,
 } from "@ant-design/icons";
@@ -46,18 +48,28 @@ import { connect } from "react-redux";
 import { DataService, getDataService } from "../services/data_service";
 import header from "../components/header";
 import { TicksToDate } from "../utils";
+import { AddExpenseModal } from "../components/add_expense_modal";
 
 export interface ViewExpensePageProps {
   budget: Budget;
   categoryId: number;
 }
 
-class ViewExpensePage extends React.Component<ViewExpensePageProps> {
+interface ViewExpensePageState {
+  isAddExpenseModalOpen: boolean;
+  isLoading: boolean;
+}
+
+class ViewExpensePage extends React.Component<ViewExpensePageProps, ViewExpensePageState> {
   _data_service: DataService;
 
   constructor(props: ViewExpensePageProps) {
     super(props);
     this._data_service = getDataService();
+    this.state = {
+      isAddExpenseModalOpen: false,
+      isLoading: false,
+    };
   }
 
   componentDidMount(): void {
@@ -69,6 +81,14 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps> {
     );
   }
   render() {
+    if (this.state.isLoading) {
+      return <Flex vertical align="center" justify="center">
+        <Spin
+          size="large"
+          indicator={<LoadingOutlined style={{ fontSize: 48 }} />}
+        />
+      </Flex>;
+    }
     return (
       <Flex
         vertical
@@ -82,7 +102,46 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps> {
         {this.render_control_buttons()}
         <Divider />
         {this.render_body()}
+        {this.render_add_expense_modal()}
       </Flex>
+    );
+  }
+
+  render_add_expense_modal() {
+
+    const budget = this.props.budget;
+    const categories = budget.categoryList.map((category) => ({
+      id: category.id,
+      name: category.name,
+    }));
+   
+    return (
+      <AddExpenseModal
+        isOpen={this.state.isAddExpenseModalOpen}
+        categories={categories}
+        defaultCategoryId={this.props.categoryId}
+        defaultAmount={0}
+        onClose={() => {
+          this.setState({ isAddExpenseModalOpen: false });
+        }}
+        onSubmit={(title, amount, categoryId) => {
+          console.log("Adding expense", title, amount, categoryId);
+          const expense = DataModelFactory.createExpense(
+            0,
+            categoryId,
+            amount,
+            title
+          );
+          this._data_service
+            .updateExpense(this.props.budget.id, expense)
+            .then((budget) => {
+              store.dispatch(budgetSlice.actions.updateCurrent(budget));
+            }).finally(() => {
+              this.setState({ isLoading: false });
+            });
+          this.setState({ isAddExpenseModalOpen: false, isLoading: true });
+        }}
+      />
     );
   }
 
@@ -90,6 +149,10 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps> {
     const on_back_click = () => {
       store.dispatch(navigate(View.Overview));
     };
+
+    const on_add_click = () => {
+      this.setState({ isAddExpenseModalOpen: true });
+    }
 
     return (
       <>
@@ -100,15 +163,13 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps> {
             icon={<LeftOutlined />}
             onClick={on_back_click}
           >
-            {" "}
-            Back{" "}
+            Back
           </Button>
-          <Button shape="default" icon={<PlusCircleFilled />} disabled>
+          <Button shape="default" icon={<PlusCircleFilled />} onClick={on_add_click}>
             Add new
           </Button>
           <Button shape="default" icon={<ClearOutlined />} danger disabled>
-            {" "}
-            Clear All{" "}
+            Clear All
           </Button>
         </Flex>
       </>
