@@ -32,17 +32,14 @@ export default defineConfig({
         name: "BudgetBud - Track your budget seamlessly",
         short_name: "BudgetBud",
         start_url: "/",
-        display: "standalone",
+        display: "minimal-ui",
+        display_override: ["window-controls-overlay"],
         icons: [
-          {
-            src: "logo.png",
-            sizes: "192x192",
-            type: "image/png",
-          },
           {
             src: "logo.png",
             sizes: "512x512",
             type: "image/png",
+            purpose: "any maskable",
           },
         ],
         theme_color: "#ffffff",
@@ -51,6 +48,7 @@ export default defineConfig({
           "Budgeting and Expense Tracker with ability to share budgets " +
           "with friends and family",
         categories: ["finance", "productivity"],
+        
       },
       workbox: {
         globIgnores:["*"],
