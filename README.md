@@ -1,8 +1,21 @@
 # BudgetBud
 
-Budget and expense tracking application.
+A simple, free, no-nonsense and collaborative budgeting tool to manage expenses efficiently.
+
+## Features ✨
+- **Create & Manage Budgets** – Set up budgets with different categories like rent, groceries, entertainment, and more.
+
+- **Track Expenses** – Add and remove expenses to see remaining funds and spending patterns.
+
+- **Collaborate with Other**s – Share your budget with family members or roommates for seamless financial planning.
 
 ## Development
+
+The development principles for this project
+- **Cost-Efficient Hosting** – Design to run seamlessly on free-tier cloud providers, ensuring minimal operational costs.
+- **Focused & Minimalist** – No unnecessary visualizations or feature bloat—built solely to support disciplined financial planning.
+- **Web first** - Leverage PWA and build a great web client to avoid app market fees
+- **Privacy first** - Don't store any data which isn't required for the core function.
 
 ### Client/ WebUI
 
@@ -20,6 +33,9 @@ npm install
 ```
 
 There are some controls available to modify/ tweak the dev flow in `.env.development` file -
+
+> .env.development: This is a file to store runtime configurations which will be available to the app. The development one will be used for the
+>  local development builds, while .env.production will be used when building the production version of the app.
 
 ```
 VITE_CREATE_DUMMY_DATA=true # Populate the app with some dummy data to test out UI features
@@ -43,8 +59,11 @@ Then use the following command to run the dev server -
 dotnet run
 ```
 
-You will need to confiure the dev envirement by creating a `appsettings.Development.json` based on the `appsettings.json` file.
+You will need to configure the dev environment by creating a `appsettings.Development.json` based on the `appsettings.json` file.
 Populate the connection string to be able to test out the server.
+
+> appsettings file: Just like th .env files, these are configurations available to the webb server during runtime.
+>  Comes in develoment and production flavours.
 
 Relevant settings -
 
@@ -63,6 +82,13 @@ your changes work as expected.
 Everything available in `appsettings.json` can be overriden by creating envirement variables witht the same name or
 with `CosmosDb:ConnectionString` like pattern for nested keys.
 
+### Deployment and infrastructure
+
+This application is currently designed to be hosted on Microsoft Azure, leveraging:
+
+- Cosmos DB (free tier) for scalable, cloud-native data storage.
+
+- Azure App Service (most basic tier) and it's inbuilt authentication for social oauth.
 
 # Screenshots
 
