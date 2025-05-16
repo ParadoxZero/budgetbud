@@ -62,3 +62,16 @@ your changes work as expected.
 
 Everything available in `appsettings.json` can be overriden by creating envirement variables witht the same name or
 with `CosmosDb:ConnectionString` like pattern for nested keys.
+
+
+# Screenshots
+
+## Desktop View
+![image](https://github.com/user-attachments/assets/ef90b944-6ab7-4a3d-83bf-83ee62c61be6)
+
+## Mobile View
+![image](https://github.com/user-attachments/assets/9cb1b2bf-8be1-4a0e-8455-f321a35de6ea)
+
+## Expenses for a specific category view
+![image](https://github.com/user-attachments/assets/4be4c8d9-6422-48d9-8e74-aefea76610c8)
+
