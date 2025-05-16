@@ -141,3 +141,21 @@ export function TicksToDate(ticks: number): Date {
   // Create a new JavaScript Date object
   return new Date(millisecondsSinceEpoch);
 }
+
+export function NumberToMonth(num: number): string {
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  return monthNames[num - 1];
+}

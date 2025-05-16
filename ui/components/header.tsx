@@ -47,7 +47,7 @@ import {
 import React from "react";
 import { connect } from "react-redux";
 import { budgetSlice, headerSlice, navigate, store, View } from "../store";
-import { GetScreenSize, ScreenSize } from "../utils";
+import { GetScreenSize, NumberToMonth, ScreenSize } from "../utils";
 import { ShareBudgetModal } from "./share_budget_modal";
 import { LinkBudgetModal } from "./link_budget_modal";
 import { RolloverModal } from "./rollover_modal";
@@ -122,7 +122,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
 
   render_budget_selector() {
     const items = this.props.budget_list.map((budget, index) => ({
-      name: budget.name,
+      name: budget.name + " (" + NumberToMonth(budget.period.month) + " " + budget.period.year + ")",
       value: index,
     }));
     if (items.length == 0) {
