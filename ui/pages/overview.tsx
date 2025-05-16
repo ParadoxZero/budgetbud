@@ -180,10 +180,11 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
 
   header() {
     return (
-      <Flex vertical={GetScreenSize() == ScreenSize.desktop}
-        style={{ marginBottom: 10 }}
+      <Flex
+        style={{ marginBottom: 10, width: "100%" }}
         align="center"
-        justify="space-evenly">
+        justify="center"
+        gap={20}>
         {this.render_available_budget()}
         {this.render_add_expense_button()}
       </Flex>
@@ -325,7 +326,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
         categories={categories}
         defaultCategoryId={context.category_id}
         defaultAmount={context.amount}
-        isLoading= {
+        isLoading={
           context.processing
         }
         onClose={() => {
@@ -340,34 +341,36 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
   }
 
   render_categories() {
-    const minWidth = GetScreenSize() != ScreenSize.mobile ? 500 : 0;
-
+    const minWidth = GetScreenSize() != ScreenSize.mobile ? "400px" : "100%";
     if (this.props.selected_budget_index != null) {
       const budget = this.props.budget_list[this.props.selected_budget_index];
+      const categories = budget?.categoryList || [];
       return (
         <div
           style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 24,
+            alignItems: "center",
+            justifyContent: "center",
             margin: 0,
             marginTop: 0,
-            marginBottom: 10,
+            marginBottom: 0,
             padding: 0,
-            minWidth: minWidth,
           }}
         >
-          <Flex align="stretch" justify="space-around" vertical>
-            <Divider style={{ margin: 0, padding: 0 }} />
-            {budget?.categoryList.map((category) => (
-              <div key={category.id}>
-                {this.render_catogory_list_row(
-                  category.id,
-                  category.name,
-                  this.state.filled_allocations[category.id],
-                  category.allocation,
-                )}
-                <Divider style={{ margin: 0, padding: 0 }} />
-              </div>
-            ))}
-          </Flex>
+          <Divider style={{ margin: 0, padding: 0 }} />
+          {categories.map((category) => (
+            <div key={category.id} style={{ minWidth: minWidth }}>
+              {this.render_catogory_list_row(
+                category.id,
+                category.name,
+                this.state.filled_allocations[category.id],
+                category.allocation,
+              )}
+              <Divider style={{ margin: 0, padding: 0 }} />
+            </div>
+          ))}
         </div>
       );
     }
@@ -387,15 +390,20 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
   }
 
   render_page() {
+    const sideMargin = GetScreenSize() == ScreenSize.desktop ? 20 : 0;
     return (
       <Flex
-        vertical={GetScreenSize() != ScreenSize.desktop}
+        vertical
         justify={
-          GetScreenSize() != ScreenSize.desktop ? "stretch" : "center"
+          GetScreenSize() != ScreenSize.desktop ? "stretch" : "space-around"
         }
         align={
           GetScreenSize() != ScreenSize.desktop ? "stretch" : "flex-start"
         }
+        style={{
+          marginRight: sideMargin,
+          marginLeft: sideMargin,
+        }}
       >
         {this.header()}
         {this.render_categories()}
@@ -485,7 +493,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
         prevProps.selected_budget_index != this.props.selected_budget_index ||
         (prevProps.selected_budget_index != null &&
           prevProps.budget_list[prevProps.selected_budget_index].last_updated !=
-            current_budget.last_updated)
+          current_budget.last_updated)
       ) {
         {
           this.update_calculations();
