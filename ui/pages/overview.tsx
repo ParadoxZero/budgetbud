@@ -341,37 +341,44 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
   }
 
   render_categories() {
-    const minWidth = GetScreenSize() != ScreenSize.mobile ? "400px" : "100%";
+    const minWidth = GetScreenSize() != ScreenSize.mobile ? 400 : window.innerWidth;
     if (this.props.selected_budget_index != null) {
       const budget = this.props.budget_list[this.props.selected_budget_index];
       const categories = budget?.categoryList || [];
+      const columns = Math.max(1, Math.floor(window.innerWidth / minWidth));
+
       return (
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 24,
-            alignItems: "center",
-            justifyContent: "center",
-            margin: 0,
-            marginTop: 0,
-            marginBottom: 0,
-            padding: 0,
-          }}
-        >
+        <>
           <Divider style={{ margin: 0, padding: 0 }} />
-          {categories.map((category) => (
-            <div key={category.id} style={{ minWidth: minWidth }}>
-              {this.render_catogory_list_row(
-                category.id,
-                category.name,
-                this.state.filled_allocations[category.id],
-                category.allocation,
-              )}
-              <Divider style={{ margin: 0, padding: 0 }} />
-            </div>
-          ))}
-        </div>
+
+          <div
+            id="category-list"
+            style={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${columns}, 1fr)`,
+              gap: 0,
+              alignItems: "center",
+              justifyItems: "center",
+              margin: 0,
+              marginTop: 0,
+              marginBottom: 0,
+              padding: 0,
+            }}
+          >
+            {categories.map((category) => (
+              <div key={category.id} style={{ width: minWidth }}>
+                {this.render_catogory_list_row(
+                  category.id,
+                  category.name,
+                  this.state.filled_allocations[category.id],
+                  category.allocation,
+                )}
+                <Divider style={{ margin: 0, padding: 0 }} />
+              </div>
+            ))}
+          </div>
+        </>
+
       );
     }
     return (
@@ -398,7 +405,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
           GetScreenSize() != ScreenSize.desktop ? "stretch" : "space-around"
         }
         align={
-          GetScreenSize() != ScreenSize.desktop ? "stretch" : "flex-start"
+          GetScreenSize() != ScreenSize.desktop ? "stretch" : "center"
         }
         style={{
           marginRight: sideMargin,
