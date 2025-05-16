@@ -24,13 +24,15 @@ import CreateNewBudgetPage from "./pages/create_new_budget_page";
 import { ReactNode } from "react";
 import React from "react";
 import { connect } from "react-redux";
-import { ConfigProvider, Layout } from "antd";
+import { ConfigProvider, Flex, Layout, Typography } from "antd";
 import Header from "./components/header";
 import Overview from "./pages/overview";
 import EditCategoriesPage from "./pages/edit_categories_page";
 import { Budget } from "./datamodel/datamodel";
 import CategoryDetails from "./pages/view_expense_page";
 import { View } from "./store";
+import { GithubOutlined } from "@ant-design/icons";
+import AppFooter from "./components/app_footer";
 
 interface PreRun {
   condition: boolean;
@@ -98,7 +100,6 @@ class App extends React.Component<AppProps> {
   }
 
   render(): ReactNode {
-
     return (
       <ConfigProvider
         theme={{
@@ -106,6 +107,7 @@ class App extends React.Component<AppProps> {
             Layout: {
               headerBg: "white",
               bodyBg: "white",
+              footerBg: "white",
             },
             Timeline: {},
           },
@@ -119,6 +121,9 @@ class App extends React.Component<AppProps> {
             <Header />
           </Layout.Header>
           <Layout.Content>{this.render_view()}</Layout.Content>
+          <Layout.Footer>
+            <AppFooter />
+          </Layout.Footer>
         </Layout>
       </ConfigProvider>
     );
@@ -145,6 +150,7 @@ class App extends React.Component<AppProps> {
     }
   }
 }
+
 function mapStateToProps(state: any): AppProps {
   let budget = null;
   if (
