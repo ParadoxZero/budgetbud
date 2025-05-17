@@ -149,7 +149,9 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
   }
 
   render_add_expense_button() {
+    if (this.props.selected_budget_index == null) return null;
     const budget = this.props.budget_list[this.props.selected_budget_index!];
+    if (budget.categoryList.length === 0) return null;
     const first_category_id = budget.categoryList[0].id;
 
     return (
@@ -342,58 +344,58 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
 
   render_categories() {
     const minWidth = GetScreenSize() != ScreenSize.mobile ? 400 : window.innerWidth;
-    if (this.props.selected_budget_index != null) {
-      const budget = this.props.budget_list[this.props.selected_budget_index];
-      const categories = budget?.categoryList || [];
-      const projected_columns = Math.max(Math.floor(window.innerWidth / minWidth), 1);
-      const columns = Math.min(3, projected_columns, categories.length);
-
+    if (this.props.selected_budget_index == null) {
       return (
-        <>
-          <Divider style={{ margin: 0, padding: 0 }} />
-
-          <div
-            id="category-list"
-            style={{
-              display: "grid",
-              gridTemplateColumns: `repeat(${columns}, 1fr)`,
-              gap: 0,
-              alignItems: "center",
-              justifyItems: "center",
-              margin: 0,
-              marginTop: 0,
-              marginBottom: 0,
-              padding: 0,
-            }}
-          >
-            {categories.map((category) => (
-              <div key={category.id} style={{ width: minWidth }}>
-                {this.render_catogory_list_row(
-                  category.id,
-                  category.name,
-                  this.state.filled_allocations[category.id],
-                  category.allocation,
-                )}
-                <Divider style={{ margin: 0, padding: 0 }} />
-              </div>
-            ))}
-          </div>
-        </>
-
+        <Card
+          bordered={false}
+          style={{ margin: 0, marginTop: 0, marginBottom: 10, padding: 0 }}
+        >
+          <Flex align="center" justify="center" style={{ height: 200 }}>
+            <Empty
+              description="No budget details"
+              imageStyle={{ height: "auto", fontSize: 48 }}
+            />
+          </Flex>
+        </Card>
       );
     }
+    const budget = this.props.budget_list[this.props.selected_budget_index];
+    const categories = budget?.categoryList || [];
+    const projected_columns = Math.max(Math.floor(window.innerWidth / minWidth), 1);
+    const columns = Math.min(3, projected_columns, categories.length);
+
     return (
-      <Card
-        bordered={false}
-        style={{ margin: 0, marginTop: 0, marginBottom: 10, padding: 0 }}
-      >
-        <Flex align="center" justify="center" style={{ height: 200 }}>
-          <Empty
-            description="No budget details"
-            imageStyle={{ height: "auto", fontSize: 48 }}
-          />
-        </Flex>
-      </Card>
+      <>
+        <Divider style={{ margin: 0, padding: 0 }} />
+
+        <div
+          id="category-list"
+          style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${columns}, 1fr)`,
+            gap: 0,
+            alignItems: "center",
+            justifyItems: "center",
+            margin: 0,
+            marginTop: 0,
+            marginBottom: 0,
+            padding: 0,
+          }}
+        >
+          {categories.map((category) => (
+            <div key={category.id} style={{ width: minWidth }}>
+              {this.render_catogory_list_row(
+                category.id,
+                category.name,
+                this.state.filled_allocations[category.id],
+                category.allocation,
+              )}
+              <Divider style={{ margin: 0, padding: 0 }} />
+            </div>
+          ))}
+        </div>
+      </>
+
     );
   }
 
