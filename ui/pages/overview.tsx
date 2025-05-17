@@ -346,7 +346,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
       const budget = this.props.budget_list[this.props.selected_budget_index];
       const categories = budget?.categoryList || [];
       const projected_columns = Math.max(Math.floor(window.innerWidth / minWidth), 1);
-      const columns = Math.min(3, projected_columns);
+      const columns = Math.min(3, projected_columns, categories.length);
 
       return (
         <>
