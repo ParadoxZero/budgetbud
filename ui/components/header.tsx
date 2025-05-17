@@ -122,7 +122,13 @@ class Header extends React.Component<HeaderProps, HeaderState> {
 
   render_budget_selector() {
     const items = this.props.budget_list.map((budget, index) => ({
-      name: budget.name + " (" + NumberToMonth(budget.period.month) + " " + budget.period.year + ")",
+      name:
+        budget.name +
+        " (" +
+        NumberToMonth(budget.period.month) +
+        " " +
+        budget.period.year +
+        ")",
       value: index,
     }));
     if (items.length == 0) {

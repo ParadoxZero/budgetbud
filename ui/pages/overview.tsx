@@ -43,7 +43,12 @@ import {
   Status,
 } from "../utils";
 import { DataService, getDataService } from "../services/data_service";
-import { DataModelFactory, Recurring, Budget, Expense } from "../datamodel/datamodel";
+import {
+  DataModelFactory,
+  Recurring,
+  Budget,
+  Expense,
+} from "../datamodel/datamodel";
 import { Typography } from "antd";
 import { RecurringCalculatorService } from "../services/recurring_date_service";
 import { BaseType } from "antd/es/typography/Base";
@@ -119,7 +124,6 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
           valueStyle={{ color: status_color }}
         />
       </div>
-
     );
   }
 
@@ -174,11 +178,9 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
         >
           Add Expense
         </Button>
-
       </div>
     );
   }
-
 
   header() {
     return (
@@ -186,7 +188,8 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
         style={{ marginBottom: 10, width: "100%" }}
         align="center"
         justify="center"
-        gap={20}>
+        gap={20}
+      >
         {this.render_available_budget()}
         {this.render_add_expense_button()}
       </Flex>
@@ -209,7 +212,6 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
         this.setState({ add_expense_mode_context: null });
       })
       .catch(() => this.setState({ add_expense_mode_context: null }));
-
   }
 
   render_add_single_category_expense() {
@@ -260,7 +262,8 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     value: number,
     total: number,
   ) {
-    const percent = total + value === 0 ? 100 : Math.floor((value / total) * 100);
+    const percent =
+      total + value === 0 ? 100 : Math.floor((value / total) * 100);
     const status = GetStatusFromPercent(percent);
 
     const on_click = () => {
@@ -306,7 +309,10 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     total: number,
   ) {
     const add_expense_mode_context = this.state.add_expense_mode_context;
-    if (add_expense_mode_context && add_expense_mode_context.category_id === id) {
+    if (
+      add_expense_mode_context &&
+      add_expense_mode_context.category_id === id
+    ) {
       return this.render_add_single_category_expense();
     }
     return this.render_view_single_category(id, title, value, total);
@@ -328,9 +334,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
         categories={categories}
         defaultCategoryId={context.category_id}
         defaultAmount={context.amount}
-        isLoading={
-          context.processing
-        }
+        isLoading={context.processing}
         onClose={() => {
           this.setState({ add_expense_mode_context: null });
         }}
@@ -343,7 +347,8 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
   }
 
   render_categories() {
-    const minWidth = GetScreenSize() != ScreenSize.mobile ? 400 : window.innerWidth;
+    const minWidth =
+      GetScreenSize() != ScreenSize.mobile ? 400 : window.innerWidth;
     if (this.props.selected_budget_index == null) {
       return (
         <Card
@@ -361,7 +366,10 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     }
     const budget = this.props.budget_list[this.props.selected_budget_index];
     const categories = budget?.categoryList || [];
-    const projected_columns = Math.max(Math.floor(window.innerWidth / minWidth), 1);
+    const projected_columns = Math.max(
+      Math.floor(window.innerWidth / minWidth),
+      1,
+    );
     const columns = Math.min(3, projected_columns, categories.length);
 
     return (
@@ -395,7 +403,6 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
           ))}
         </div>
       </>
-
     );
   }
 
@@ -407,9 +414,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
         justify={
           GetScreenSize() != ScreenSize.desktop ? "stretch" : "space-around"
         }
-        align={
-          GetScreenSize() != ScreenSize.desktop ? "stretch" : "center"
-        }
+        align={GetScreenSize() != ScreenSize.desktop ? "stretch" : "center"}
         style={{
           marginRight: sideMargin,
           marginLeft: sideMargin,
@@ -503,7 +508,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
         prevProps.selected_budget_index != this.props.selected_budget_index ||
         (prevProps.selected_budget_index != null &&
           prevProps.budget_list[prevProps.selected_budget_index].last_updated !=
-          current_budget.last_updated)
+            current_budget.last_updated)
       ) {
         {
           this.update_calculations();
@@ -543,6 +548,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
       });
     }
   }
+
   private update_calculations() {
     if (
       this.props.selected_budget_index == null ||

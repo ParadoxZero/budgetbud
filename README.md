@@ -3,6 +3,7 @@
 A simple, free, no-nonsense and collaborative budgeting tool to manage expenses efficiently.
 
 ## Features ✨
+
 - **Create & Manage Budgets** – Set up budgets with different categories like rent, groceries, entertainment, and more.
 
 - **Track Expenses** – Add and remove expenses to see remaining funds and spending patterns.
@@ -16,14 +17,14 @@ A simple, free, no-nonsense and collaborative budgeting tool to manage expenses 
 
 <img src="https://github.com/user-attachments/assets/6c7c178c-d44d-49f7-82e7-3da24d8b6a9d" height="500px"/>
 
-
 <img src="https://github.com/user-attachments/assets/6b37505f-e3da-456d-8a01-f9ce177a527d" height="500px"/>
 
 </flex>
 
 # Developer Details
 
-The core principles for this project are - 
+The core principles for this project are -
+
 - **Cost-Efficient Hosting** – Design to run seamlessly on free-tier cloud providers, ensuring minimal operational costs.
 - **Focused & Minimalist** – No unnecessary visualizations or feature bloat—built solely to support disciplined financial planning.
 - **Web first** - Leverage PWA and build a great web client to avoid app market fees
@@ -47,7 +48,7 @@ npm install
 There are some controls available to modify/ tweak the dev flow in `.env.development` file -
 
 > .env.development: This is a file to store runtime configurations which will be available to the app. The development one will be used for the
->  local development builds, while .env.production will be used when building the production version of the app.
+> local development builds, while .env.production will be used when building the production version of the app.
 
 ```
 VITE_CREATE_DUMMY_DATA=true # Populate the app with some dummy data to test out UI features
@@ -75,7 +76,7 @@ You will need to configure the dev environment by creating a `appsettings.Develo
 Populate the connection string to be able to test out the server.
 
 > appsettings file: Just like th .env files, these are configurations available to the webb server during runtime.
->  Comes in develoment and production flavours.
+> Comes in development and production flavours.
 
 Relevant settings -
 
@@ -103,5 +104,6 @@ This application is currently designed to be hosted on Microsoft Azure, leveragi
 - Azure App Service (most basic tier) and it's inbuilt authentication for social oauth.
 
 # Contributing
-The project is currently at it's minimim requirement complete stage. All contributions are most welcome as long as the basic principles are followed. 
+
+The project is currently at it's minimum requirement complete stage. All contributions are most welcome as long as the basic principles are followed.
 Only request is to file an issue first to have a discussion around the contribution :)

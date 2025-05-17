@@ -20,7 +20,12 @@
 
 import React from "react";
 import { Button, Input, Flex } from "antd";
-import { CloseOutlined, LoadingOutlined, PlusOutlined, RightOutlined } from "@ant-design/icons";
+import {
+  CloseOutlined,
+  LoadingOutlined,
+  PlusOutlined,
+  RightOutlined,
+} from "@ant-design/icons";
 
 export enum EditCategoryState {
   Unfilled,

@@ -68,7 +68,11 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
         </Button>,
       ]}
     >
-      <Form form={form} layout="vertical" initialValues={{ categoryId: defaultCategoryId, amount: defaultAmount }}>
+      <Form
+        form={form}
+        layout="vertical"
+        initialValues={{ categoryId: defaultCategoryId, amount: defaultAmount }}
+      >
         <Form.Item
           label="Category"
           name="categoryId"
@@ -86,7 +90,12 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
         <Form.Item
           label="Title"
           name="title"
-          rules={[{ required: false, message: "Please enter a title for the expense" }]}
+          rules={[
+            {
+              required: false,
+              message: "Please enter a title for the expense",
+            },
+          ]}
         >
           <Input placeholder="Expense Title" />
         </Form.Item>
@@ -97,7 +106,6 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
         >
           <Input type="number" placeholder="Expense Amount" />
         </Form.Item>
-
       </Form>
     </Modal>
   );

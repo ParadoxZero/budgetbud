@@ -106,10 +106,6 @@ export interface UserAction {
   payload: Category | Expense | Recurring | Unplanned | null;
 }
 
-// TODO: Design Question -
-// It will be impossible to delete a non-empty category. User will have to wait till next month when
-// the category is reset. Otherwise explicitly delete the expenses in the category. Or should we allow
-// deletion of non-empty categories with a warning?
 export interface Budget {
   id: string;
   name: string;

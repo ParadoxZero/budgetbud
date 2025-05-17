@@ -24,7 +24,13 @@ import { GithubOutlined } from "@ant-design/icons";
 
 const AppFooter: React.FC = () => {
   return (
-    <Flex vertical align="center" justify="space-evenly" style={{ padding: 10 }} gap={10}>
+    <Flex
+      vertical
+      align="center"
+      justify="space-evenly"
+      style={{ padding: 10 }}
+      gap={10}
+    >
       <br />
       <Typography.Text style={{ userSelect: "text" }}>
         Copyright © 2025 Sidhin S Thomas. All rights reserved.

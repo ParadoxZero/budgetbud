@@ -44,14 +44,13 @@ export default defineConfig({
         ],
         theme_color: "#ffffff",
         background_color: "#ffffff",
-        description: 
+        description:
           "Budgeting and Expense Tracker with ability to share budgets " +
           "with friends and family",
         categories: ["finance", "productivity"],
-        
       },
       workbox: {
-        globIgnores:["*"],
+        globIgnores: ["*"],
       },
     }),
   ],

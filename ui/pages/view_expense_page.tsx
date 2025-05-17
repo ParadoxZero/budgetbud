@@ -60,7 +60,10 @@ interface ViewExpensePageState {
   isLoading: boolean;
 }
 
-class ViewExpensePage extends React.Component<ViewExpensePageProps, ViewExpensePageState> {
+class ViewExpensePage extends React.Component<
+  ViewExpensePageProps,
+  ViewExpensePageState
+> {
   _data_service: DataService;
 
   constructor(props: ViewExpensePageProps) {
@@ -82,12 +85,14 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps, ViewExpenseP
   }
   render() {
     if (this.state.isLoading) {
-      return <Flex vertical align="center" justify="center">
-        <Spin
-          size="large"
-          indicator={<LoadingOutlined style={{ fontSize: 48 }} />}
-        />
-      </Flex>;
+      return (
+        <Flex vertical align="center" justify="center">
+          <Spin
+            size="large"
+            indicator={<LoadingOutlined style={{ fontSize: 48 }} />}
+          />
+        </Flex>
+      );
     }
     return (
       <Flex
@@ -108,13 +113,12 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps, ViewExpenseP
   }
 
   render_add_expense_modal() {
-
     const budget = this.props.budget;
     const categories = budget.categoryList.map((category) => ({
       id: category.id,
       name: category.name,
     }));
-   
+
     return (
       <AddExpenseModal
         isOpen={this.state.isAddExpenseModalOpen}
@@ -130,13 +134,14 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps, ViewExpenseP
             0,
             categoryId,
             amount,
-            title
+            title,
           );
           this._data_service
             .updateExpense(this.props.budget.id, expense)
             .then((budget) => {
               store.dispatch(budgetSlice.actions.updateCurrent(budget));
-            }).finally(() => {
+            })
+            .finally(() => {
               this.setState({ isLoading: false });
             });
           this.setState({ isAddExpenseModalOpen: false, isLoading: true });
@@ -152,7 +157,7 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps, ViewExpenseP
 
     const on_add_click = () => {
       this.setState({ isAddExpenseModalOpen: true });
-    }
+    };
 
     return (
       <>
@@ -165,7 +170,11 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps, ViewExpenseP
           >
             Back
           </Button>
-          <Button shape="default" icon={<PlusCircleFilled />} onClick={on_add_click}>
+          <Button
+            shape="default"
+            icon={<PlusCircleFilled />}
+            onClick={on_add_click}
+          >
             Add new
           </Button>
           <Button shape="default" icon={<ClearOutlined />} danger disabled>
@@ -206,10 +215,7 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps, ViewExpenseP
             style={{ minWidth: 100 }}
           >
             <Flex vertical gap={15} justify="space-evenly" align="stretch">
-              <Statistic
-                title={date_string}
-                value={expense.amount}
-              />
+              <Statistic title={date_string} value={expense.amount} />
               <Popconfirm
                 title="Are you sure?"
                 okText="Yes"
@@ -220,9 +226,11 @@ class ViewExpensePage extends React.Component<ViewExpensePageProps, ViewExpenseP
                   size="middle"
                   icon={<DeleteFilled />}
                   shape="default"
-
                   danger
-                > Delete </Button>
+                >
+                  {" "}
+                  Delete{" "}
+                </Button>
               </Popconfirm>
             </Flex>
           </Flex>
