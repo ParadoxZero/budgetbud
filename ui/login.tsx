@@ -55,10 +55,8 @@ class App extends React.Component<{}, AppState> {
             } else {
               console.log(response);
             }
-          })
-          .finally(() => {
             this.setState({ is_loading: false });
-          });
+          })
       }
     });
   }
