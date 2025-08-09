@@ -52,42 +52,15 @@ class App extends React.Component<{}, AppState> {
           .then((response) => {
             if (response.ok) {
               window.location.href = "/index.html";
+            } else {
+              console.log(response);
             }
-            console.log(response);
           })
           .finally(() => {
             this.setState({ is_loading: false });
           });
       }
     });
-  }
-
-  componentDidUpdate(
-    prevProps: Readonly<{}>,
-    prevState: Readonly<AppState>,
-    snapshot?: any,
-  ): void {
-    if (
-      !this.state.is_loading &&
-      prevState.is_loading !== this.state.is_loading
-    ) {
-      const last_login_provider = localStorage.getItem("auth_provider");
-      localStorage.clear();
-      switch (last_login_provider) {
-        case "google":
-          window.location.href =
-            ".auth/login/google?post_login_redirect_uri=/index.html&access_type=offline";
-          break;
-        case "github":
-          window.location.href =
-            ".auth/login/github?post_login_redirect_uri=/index.html";
-          break;
-        default:
-          console.log("No last login provider");
-          break;
-      }
-      this.setState({ show_buttons: true, is_loading: false });
-    }
   }
 
   renderCallToAction() {
