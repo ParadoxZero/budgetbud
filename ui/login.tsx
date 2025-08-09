@@ -32,14 +32,12 @@ import {
 
 interface AppState {
   is_loading: boolean;
-  show_buttons: boolean;
 }
 class App extends React.Component<{}, AppState> {
   constructor(props: {}) {
     super(props);
     this.state = {
       is_loading: true,
-      show_buttons: false,
     };
   }
 
@@ -62,7 +60,7 @@ class App extends React.Component<{}, AppState> {
   }
 
   renderCallToAction() {
-    if (!this.state.show_buttons) {
+    if (this.state.is_loading) {
       return <Spin size="large" indicator={<LoadingOutlined />} />;
     } else {
       return (
