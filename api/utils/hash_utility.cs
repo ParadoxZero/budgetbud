@@ -18,32 +18,19 @@
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
 
-using budgetbud.Utils;
+using System.Security.Cryptography;
+using System.Text;
 
-namespace budgetbud.Services;
+namespace budgetbud.Utils;
 
-public class FakeIdentityService : IIdentityService
+public static class HashUtility
 {
-    private readonly IWebHostEnvironment _environment;
-
-    public FakeIdentityService(IWebHostEnvironment environment)
+    public static string HashUserId(string originalUserId)
     {
-        _environment = environment;
-    }
-
-    public string GetAuthProvider()
-    {
-        return "fake";
-    }
-
-    public string GetUserIdentity()
-    {
-        if (_environment.IsProduction())
+        using (SHA256 sha256Hash = SHA256.Create())
         {
-            throw new Exception("FakeIdentityService should not be used in production");
+            byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(originalUserId));
+            return Convert.ToHexString(bytes).ToLower();
         }
-        string originalId = "fake_user:123";
-        return HashUtility.HashUserId(originalId);
     }
-
 }

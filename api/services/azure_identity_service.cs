@@ -19,6 +19,7 @@
  */
 
 using budgetbud.Exceptions;
+using budgetbud.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -73,7 +74,8 @@ public class AzureIdentityService : IIdentityService
         {
             if (claim.typ == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")
             {
-                return "github:" + claim.val;
+                string originalId = "github:" + claim.val;
+                return HashUtility.HashUserId(originalId);
             }
         }
         throw new AuthException("Name claim not found");
@@ -86,7 +88,8 @@ public class AzureIdentityService : IIdentityService
         {
             if (claim.typ == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")
             {
-                return "google:" + claim.val;
+                string originalId = "google:" + claim.val;
+                return HashUtility.HashUserId(originalId);
             }
         }
         throw new AuthException("Name claim not found");
