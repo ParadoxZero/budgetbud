@@ -77,7 +77,6 @@ class App extends React.Component<AppProps> {
       condition: import.meta.env.PROD,
       action: () => {
         GetAuthDetails().then((response: any) => {
-          console.log(response);
           localStorage.setItem("auth_provider", response.provider);
         });
       },
