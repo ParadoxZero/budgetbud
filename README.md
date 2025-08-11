@@ -138,11 +138,9 @@ The CLI will prompt for migration selection and execute registered migrations. S
 
 ---
 
-## Cosmos Clone Script
+### Cosmos Clone Script
 
 The `clone_cosmos_container.py` script is a Python utility to clone all items from one Cosmos DB container to another. Useful for backups, migrations, or duplicating environments.
-
-### Features
 
 - Copies all items from a source container to a destination container
 - Interactive confirmation to prevent accidental overwrites
