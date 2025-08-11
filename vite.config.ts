@@ -60,6 +60,7 @@ export default defineConfig({
       input: {
         main: "app.html",
         home: "index.html",
+        demo: "demo.html",
         privacy: "privacy.html",
       },
     },

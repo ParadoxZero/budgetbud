@@ -88,7 +88,7 @@ class App extends React.Component<{}, AppState> {
           <Button
             type="primary"
             style={{ backgroundColor: "#1677ff" }}
-            href="/app.html?demo=true"
+            href="/demo.html"
             size="large"
             block
           >

@@ -1,0 +1,50 @@
+<!-- 
+BudgetBug - Budgeting and Expense Tracker with WebUI and API server
+Copyright (C) 2024  Sidhin S Thomas <sidhin.thomas@gmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+The source is available at: https://github.com/ParadoxZero/budgetbud
+-->
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="viewport"
+      content="initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="msapplication-TileColor" content="#ffffff" />
+    <meta name="format-detection" content="telephone=no,email=no" />
+    <meta name="apple-mobile-web-app-title" content="BudgetBud" />
+    <link rel="apple-touch-icon" href="/logo.png" />
+
+    <title>Budgetbud | Demo</title>
+  </head>
+
+  <body>
+    <script>
+      // Signal demo mode to the app without relying on query params
+      window.__DEMO__ = true;
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/ui/main.tsx"></script>
+  </body>
+  
+</html>

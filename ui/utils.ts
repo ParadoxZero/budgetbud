@@ -22,9 +22,12 @@ import { DataModelFactory, RecurringType } from "./datamodel/datamodel";
 
 export function isDemoMode(): boolean {
   const urlParams = new URLSearchParams(window.location.search);
-  const isDemo = urlParams.get('demo') === 'true';
+  const isDemoQuery = urlParams.get('demo') === 'true';
+  // Also support demo via dedicated entry (demo.html) or a global flag set by that page
+  const isDemoPath = window.location.pathname.endsWith('/demo.html');
+  const isDemoGlobal = (window as any).__DEMO__ === true;
   const useLocalData = import.meta.env.VITE_USE_LOCAL_DATA_SERVICE === 'true';
-  return isDemo || useLocalData;
+  return isDemoQuery || isDemoPath || isDemoGlobal || useLocalData;
 }
 
 export enum ScreenSize {
