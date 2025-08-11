@@ -59,7 +59,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: "app.html",
-        login: "login.html",
+        home: "index.html",
         privacy: "privacy.html",
       },
     },

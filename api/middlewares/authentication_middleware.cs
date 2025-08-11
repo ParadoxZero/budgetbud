@@ -58,7 +58,7 @@ public class RedirectToLoginMiddleware
                 path => context.Request.Path.Value.StartsWith(path))
             )
             {
-                context.Response.Redirect("/login.html");
+                context.Response.Redirect("/index.html");
                 return;
             }
 
