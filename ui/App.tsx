@@ -18,7 +18,7 @@
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
 
-import { CreateDummyData } from "./utils";
+import { CreateDummyData, isDemoMode } from "./utils";
 import { GetAuthDetails, PingRemote } from "./services/ping_service";
 import CreateNewBudgetPage from "./pages/create_new_budget_page";
 import { ReactNode } from "react";
@@ -67,7 +67,7 @@ class App extends React.Component<AppProps> {
       },
     },
     {
-      condition: import.meta.env.VITE_CREATE_DUMMY_DATA === "true",
+      condition: import.meta.env.VITE_CREATE_DUMMY_DATA === "true" || isDemoMode(),
       action: () => {
         localStorage.clear();
         localStorage.setItem("userData", JSON.stringify(CreateDummyData()));

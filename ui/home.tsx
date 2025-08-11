@@ -85,6 +85,15 @@ class App extends React.Component<{}, AppState> {
           >
             Login With Github
           </Button>
+          <Button
+            type="primary"
+            style={{ backgroundColor: "#1677ff" }}
+            href="/app.html?demo=true"
+            size="large"
+            block
+          >
+            Demo
+          </Button>
         </>
       );
     }

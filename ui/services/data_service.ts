@@ -30,6 +30,7 @@ import {
   UserActionType,
 } from "../datamodel/datamodel";
 import { fetchData } from "./network_service";
+import { isDemoMode } from "../utils";
 
 export interface DataService {
   getBudget(): Promise<Budget[]>;
@@ -54,7 +55,7 @@ export interface DataService {
 }
 
 export function getDataService(): DataService {
-  if (import.meta.env.VITE_USE_LOCAL_DATA_SERVICE === "true") {
+  if (isDemoMode()) {
     // Return the local data service implementation
     return new LocalDataService();
   } else {
@@ -64,7 +65,7 @@ export function getDataService(): DataService {
 }
 
 export async function RolloverBudget(budget_id: string): Promise<Budget> {
-  if (import.meta.env.VITE_USE_LOCAL_DATA_SERVICE === "true") {
+  if (isDemoMode()) {
     await new Promise((resolve, _reject) => setTimeout(resolve, 3000));
     return getDataService().createBudget("Rollover Budget");
   }

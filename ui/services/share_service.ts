@@ -19,6 +19,7 @@
  */
 
 import { fetchData } from "./network_service";
+import { isDemoMode } from "../utils";
 
 export interface ShareKeyResponse {
   shareKey: string;
@@ -27,7 +28,7 @@ export interface ShareKeyResponse {
 export async function GetShareKey(
   budget_id: string,
 ): Promise<ShareKeyResponse> {
-  if (import.meta.env.VITE_USE_LOCAL_DATA_SERVICE === "true") {
+  if (isDemoMode()) {
     await new Promise((resolve, _reject) => setTimeout(resolve, 3000));
     return { shareKey: "2U0T0Y05" };
   }
@@ -38,7 +39,7 @@ export async function GetShareKey(
 }
 
 export async function LinkBudget(share_key: string): Promise<void> {
-  if (import.meta.env.VITE_USE_LOCAL_DATA_SERVICE === "true") {
+  if (isDemoMode()) {
     await new Promise((resolve, _reject) => setTimeout(resolve, 3000));
     return;
   }

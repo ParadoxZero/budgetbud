@@ -20,6 +20,13 @@
 
 import { DataModelFactory, RecurringType } from "./datamodel/datamodel";
 
+export function isDemoMode(): boolean {
+  const urlParams = new URLSearchParams(window.location.search);
+  const isDemo = urlParams.get('demo') === 'true';
+  const useLocalData = import.meta.env.VITE_USE_LOCAL_DATA_SERVICE === 'true';
+  return isDemo || useLocalData;
+}
+
 export enum ScreenSize {
   mobile = 0,
   tablet = 1,
@@ -56,7 +63,7 @@ export function GetStatusFromPercent(percent: number): Status {
 }
 export function CreateDummyData() {
   // Error if not development
-  if (import.meta.env.VITE_CREATE_DUMMY_DATA !== "true") {
+  if (import.meta.env.VITE_CREATE_DUMMY_DATA !== "true" && !isDemoMode()) {
     throw new Error(
       "PopulateDummpyContent function is only available if dummy mode is enabled.",
     );
