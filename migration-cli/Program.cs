@@ -1,5 +1,5 @@
 /* 
- * BudgetBug - Budgeting and Expense Tracker Migration CLI
+ * BudgetBud - Budgeting and Expense Tracker Migration CLI
  * Copyright (C) 2025  Sidhin S Thomas <sidhin.thomas@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify
