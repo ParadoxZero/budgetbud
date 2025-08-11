@@ -136,8 +136,6 @@ The `migration-cli` is a .NET Core command-line tool for managing database migra
 
 The CLI will prompt for migration selection and execute registered migrations. See `Program.cs` for migration registration and implementation details.
 
----
-
 ### Cosmos Clone Script
 
 The `clone_cosmos_container.py` script is a Python utility to clone all items from one Cosmos DB container to another. Useful for backups, migrations, or duplicating environments.
