@@ -72,7 +72,6 @@ export function ShareBudgetModal(props: {
         mask
         width={300}
         maskClosable
-        onClose={props.onDone}
         onOk={props.onDone}
         onCancel={props.onDone}
         footer={
