@@ -13,13 +13,7 @@
   animation: gradientAnimation 1s ease forwards;
 }
 
-.touchahble:active {
-  /* cursor: pointer;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-    border: 1px solid #ccc;
-    background: linear-gradient(to bottom, #fff, #f2f2f2);
-    transition: box-shadow 0.3s, border 0.3s, background 0.3s; */
-}
+/* .touchahble:active intentionally removed to avoid empty ruleset */
 
 @keyframes gradientAnimation {
   0% {
@@ -52,4 +46,98 @@ body {
 
 #root {
   height: 100vh;
+}
+
+/* Landing styles */
+.landing-root {
+  /* background: #fafafa; */
+  color: #1f1f1f;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.landing-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.signin-area {
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+}
+
+.signin-inner {
+  width: 100%;
+  display: flex;
+}
+
+/* Web: top-left, Mobile: top-center */
+@media (min-width: 768px) {
+  .signin-inner {
+    justify-content: flex-start; /* left on desktop */
+  }
+}
+
+@media (max-width: 767px) {
+  .signin-inner {
+    justify-content: center; /* center on mobile */
+  }
+}
+
+.hero {
+  padding: 48px 0 8px;
+}
+
+.demo-section {
+  padding: 8px 0 24px;
+}
+
+.demo-card {
+  border-radius: 10px;
+}
+
+.features {
+  padding: 16px 0 24px;
+}
+
+.screenshots {
+  padding: 16px 0 24px;
+}
+
+.screenshot-card {
+  height: 260px;
+}
+
+.screenshot-placeholder {
+  height: 220px;
+  border-radius: 8px;
+  border: 1px dashed #d9d9d9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8c8c8c;
+  background: repeating-linear-gradient(
+    45deg,
+    #fafafa,
+    #fafafa 10px,
+    #f5f5f5 10px,
+    #f5f5f5 20px
+  );
+}
+
+.about {
+  padding: 16px 0 48px;
+}
+
+.footer {
+  padding: 16px 0 32px;
 }
