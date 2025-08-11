@@ -58,7 +58,7 @@ export default defineConfig({
     outDir: "wwwroot",
     rollupOptions: {
       input: {
-        main: "index.html",
+        main: "app.html",
         login: "login.html",
         privacy: "privacy.html",
       },

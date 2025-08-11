@@ -44,12 +44,12 @@ class App extends React.Component<{}, AppState> {
   componentDidMount(): void {
     fetch("/.auth/me").then((response) => {
       if (response.ok) {
-        window.location.href = "/index.html";
+        window.location.href = "/app.html";
       } else {
         fetch("/.auth/refresh")
           .then((response) => {
             if (response.ok) {
-              window.location.href = "/index.html";
+              window.location.href = "/app.html";
             } else {
               console.log(response);
             }
@@ -68,7 +68,7 @@ class App extends React.Component<{}, AppState> {
           <Button
             type="primary"
             style={{ backgroundColor: "#f5222d" }}
-            href=".auth/login/google?post_login_redirect_uri=/index.html&access_type=offline"
+            href=".auth/login/google?post_login_redirect_uri=/app.html&access_type=offline"
             size="large"
             block
             icon={<GoogleOutlined />}
@@ -78,7 +78,7 @@ class App extends React.Component<{}, AppState> {
           <Button
             type="primary"
             style={{ backgroundColor: "#262626" }}
-            href=".auth/login/github?post_login_redirect_uri=/index.html"
+            href=".auth/login/github?post_login_redirect_uri=/app.html"
             size="large"
             block
             icon={<GithubOutlined />}

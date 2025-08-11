@@ -28,7 +28,7 @@ public class RedirectToLoginMiddleware
     private readonly RequestDelegate _next;
 
     private readonly string[] _authenticatedPaths = [
-        "/index.html",
+        "/app.html",
     ];
 
     private readonly string[] _apiPaths = [
