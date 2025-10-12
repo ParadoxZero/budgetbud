@@ -24,5 +24,6 @@ namespace budgetbud.Models;
 public class UserData
 {
     public required string id { get; set; }
+    public string NickName { get; set; } = "Anonymous User";
     public required List<string> BudgetIds { get; set; }
 }
