@@ -71,12 +71,12 @@ function App() {
       try {
         const me = await fetch("/.auth/me");
         if (me.ok) {
-          // window.location.href = "/app.html";
+          window.location.href = "/app.html";
           return;
         }
         const refreshed = await fetch("/.auth/refresh");
         if (refreshed.ok) {
-          // window.location.href = "/app.html";
+          window.location.href = "/app.html";
           return;
         }
       } catch (e) {
