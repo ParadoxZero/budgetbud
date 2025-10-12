@@ -239,6 +239,9 @@ class ViewExpensePage extends React.Component<
       const label_ui = (
         <Flex vertical gap={5} style={{ minWidth: 10 }}>
           <Typography.Title level={5}>{expense.title}</Typography.Title>
+          <Typography.Text type="secondary">
+            Added by: {expense.addedBy || "Unknown"}
+          </Typography.Text>
         </Flex>
       );
       return {

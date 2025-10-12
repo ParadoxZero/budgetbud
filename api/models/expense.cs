@@ -27,4 +27,5 @@ public class Expense
     public decimal Amount { get; set; }
     public int CategoryId { get; set; }
     public long Timestamp { get; set; }
+    public string AddedBy { get; set; }
 }

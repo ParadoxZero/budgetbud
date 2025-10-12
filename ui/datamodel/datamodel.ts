@@ -29,6 +29,7 @@ export interface User {
 
 export interface Expense {
   id: number;
+  addedBy: string;
   title: string;
   amount: number;
   categoryId: number;
@@ -135,6 +136,7 @@ export class DataModelFactory {
     return {
       id,
       title,
+      addedBy: "",
       amount: amount,
       categoryId,
       timestamp: Date.now(),
