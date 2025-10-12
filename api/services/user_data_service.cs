@@ -22,6 +22,7 @@ using budgetbud.Exceptions;
 using budgetbud.Models;
 
 namespace budgetbud.Services;
+
 public class UserDataService
 {
     private readonly DbService _dbService;
@@ -41,7 +42,7 @@ public class UserDataService
         List<Budget> budgetList = new List<Budget>();
         foreach (string budgetId in budgets)
         {
-            budgetList.Add(await _dbService.GetBudgetAsync(budgetId));
+            budgetList.Add(await _dbService.UpdateUserNickName(await _dbService.GetBudgetAsync(budgetId)));
         }
         return budgetList;
     }
@@ -103,5 +104,19 @@ public class UserDataService
         budget.period = budget.period.Increment();
         await _dbService.UpdateBudgetAsync(budget);
         return budget;
+    }
+
+    public async Task UpdateUserNickName(string name)
+    {
+        string user_id = _identityService.GetUserIdentity();
+        UserData user_data = await _dbService.GetUserData(user_id);
+        user_data.NickName = name;
+        await _dbService.UpdateUserData(user_data);
+    }
+
+    public async Task<string> GetUserNickName()
+    {
+        string user_id = _identityService.GetUserIdentity();
+        return (await _dbService.GetUserData(user_id)).NickName;
     }
 }
