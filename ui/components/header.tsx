@@ -276,7 +276,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
         key: "5",
         icon: <LogoutOutlined />,
         onClick: () => {
-          window.location.href = "/.auth/logout";
+          window.location.href = "/logout";
         },
       },
     ];

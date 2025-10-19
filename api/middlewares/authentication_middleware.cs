@@ -42,11 +42,14 @@ public class RedirectToLoginMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        if (!context.Request.Headers.ContainsKey("X-MS-CLIENT-PRINCIPAL"))
+        var urlPath = context.Request.Path.Value ?? string.Empty;
+        bool isAuthenticated = context.User?.Identity?.IsAuthenticated ?? false;
+
+        if (!isAuthenticated)
         {
             if (context.Request.Path.HasValue &&
                 _apiPaths.Any(
-                    path => context.Request.Path.Value.StartsWith(path)
+                    path => urlPath.StartsWith(path)
             ))
             {
                 context.Response.StatusCode = 401;
@@ -55,7 +58,7 @@ public class RedirectToLoginMiddleware
             }
 
             if (context.Request.Path.HasValue && _authenticatedPaths.Any(
-                path => context.Request.Path.Value.StartsWith(path))
+                path => urlPath.StartsWith(path))
             )
             {
                 context.Response.Redirect("/index.html");
@@ -63,7 +66,14 @@ public class RedirectToLoginMiddleware
             }
 
         }
-
+        else
+        {
+            if (urlPath == "/" || urlPath.Equals("/index.html", StringComparison.OrdinalIgnoreCase))
+            {
+                context.Response.Redirect("/app.html");
+                return;
+            }
+        }
         await _next(context);
     }
 }

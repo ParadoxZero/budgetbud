@@ -22,12 +22,14 @@ using System;
 using budgetbud.Exceptions;
 using budgetbud.Models;
 using budgetbud.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace budgetbud.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class SocialController : ControllerBase
