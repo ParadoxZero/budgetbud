@@ -45,7 +45,7 @@ public class BuiltInIdentityService : IIdentityService
         if (string.IsNullOrEmpty(id))
             throw new UnauthorizedAccessException("No identity claim found");
 
-        var provider = GetAuthProvider();
+        var provider = GetAuthProvider().ToLower();
         return HashUtility.HashUserId($"{provider}:{id}");
     }
 

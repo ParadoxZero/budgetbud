@@ -23,6 +23,7 @@ using budgetbud.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
@@ -36,6 +37,12 @@ if (use_swagger)
 }
 
 builder.Services.AddSingleton<IIdentityService, BuiltInIdentityService>();
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+});
+
 
 builder.Services.AddAuthentication(options =>
 {
@@ -67,6 +74,8 @@ builder.Services.AddSingleton<DbService>();
 builder.Services.AddSingleton<UserDataService>();
 
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 app.UseMiddleware<RedirectToLoginMiddleware>();
 
 app.UseDefaultFiles();
