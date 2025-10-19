@@ -1,0 +1,35 @@
+# Ignore Git stuff
+.git
+.gitignore
+
+# Node / frontend build
+node_modules
+npm-debug.log
+wwwroot
+
+# .NET build artifacts
+bin/
+obj/
+*.user
+*.suo
+
+# Logs and temp files
+*.log
+*.tmp
+*.DS_Store
+
+# Local environment and secrets
+.env.*
+appsettings.Development.json
+
+# Docker-related
+Dockerfile*
+docker-compose.yml
+
+# OS-specific junk
+Thumbs.db
+
+# Repo specific
+.vscode
+.vs
+.github
