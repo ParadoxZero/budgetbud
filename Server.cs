@@ -75,6 +75,16 @@ builder.Services.AddSingleton<UserDataService>();
 
 var app = builder.Build();
 
+var forwardedHeadersOptions = new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+};
+// Since we're behind docker network, trust all proxies
+forwardedHeadersOptions.KnownNetworks.Clear();
+forwardedHeadersOptions.KnownProxies.Clear();
+
+app.UseForwardedHeaders(forwardedHeadersOptions);
+
 app.UseForwardedHeaders();
 app.UseMiddleware<RedirectToLoginMiddleware>();
 
