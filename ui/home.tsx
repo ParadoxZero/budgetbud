@@ -42,20 +42,11 @@ function SignInButtons({ compact = false }: { compact?: boolean }) {
         <Button
           type="primary"
           style={{ backgroundColor: "#f5222d" }}
-          href=".auth/login/google?post_login_redirect_uri=/app.html&access_type=offline"
+          href="/login"
           size={compact ? "middle" : "large"}
           icon={<GoogleOutlined />}
         >
           Google
-        </Button>
-        <Button
-          type="primary"
-          style={{ backgroundColor: "#262626" }}
-          href=".auth/login/github?post_login_redirect_uri=/app.html"
-          size={compact ? "middle" : "large"}
-          icon={<GithubOutlined />}
-        >
-          GitHub
         </Button>
       </Flex>
     </Flex>
@@ -63,33 +54,6 @@ function SignInButtons({ compact = false }: { compact?: boolean }) {
 }
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    const checkAuth = async () => {
-      try {
-        const me = await fetch("/.auth/me");
-        if (me.ok) {
-          window.location.href = "/app.html";
-          return;
-        }
-        const refreshed = await fetch("/.auth/refresh");
-        if (refreshed.ok) {
-          window.location.href = "/app.html";
-          return;
-        }
-      } catch (e) {
-        // no-op
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    };
-    checkAuth();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   const { Header, Content, Footer } = Layout;
   const [current, setCurrent] = React.useState(0);
@@ -98,14 +62,7 @@ function App() {
       {/* Ant Design Header */}
       <Header className="landing-header" style={{ width: "100%" }}>
         <Flex className="container signin-area" align="center" justify="end">
-          {/* Logo */}
-          {isLoading ? (
-            <Button type="text" icon={<LoadingOutlined />} disabled>
-              Checking sign-in...
-            </Button>
-          ) : (
-              <SignInButtons compact />
-          )}
+          <SignInButtons compact />
         </Flex>
       </Header>
 
