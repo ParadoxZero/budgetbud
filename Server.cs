@@ -78,7 +78,7 @@ var app = builder.Build();
 
 var forwardedHeadersOptions = new ForwardedHeadersOptions
 {
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+    ForwardedHeaders = ForwardedHeaders.All
 };
 
 forwardedHeadersOptions.KnownNetworks.Add(new Microsoft.AspNetCore.HttpOverrides.IPNetwork(IPAddress.Parse("172.0.0.0"), 8));
