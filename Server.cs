@@ -88,7 +88,6 @@ forwardedHeadersOptions.KnownNetworks.Add(new Microsoft.AspNetCore.HttpOverrides
 
 app.UseForwardedHeaders(forwardedHeadersOptions);
 
-app.UseForwardedHeaders();
 app.UseMiddleware<RedirectToLoginMiddleware>();
 
 app.UseDefaultFiles();
