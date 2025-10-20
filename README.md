@@ -4,8 +4,8 @@ A simple, free, no-nonsense and collaborative budgeting tool to manage expenses 
 
 | Env | Link |
 | --- | ---- |
-| Prod | https://tinyurl.com/budgetbudapp |
-| Test | https://tinyurl.com/budgetbudtest |
+| Prod | https://budgetbud.app |
+| Test | TBD |
 
 ## Features ✨
 
