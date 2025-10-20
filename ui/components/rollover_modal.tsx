@@ -1,6 +1,6 @@
 /*
  * BudgetBud - Budgeting and Expense Tracker with WebUI and API server
- * Copyright (C) 2024  Sidhin S Thomas <sidhin.thomas@gmail.com>
+ * Copyright (C) 2025  Sidhin S Thomas <sidhin.thomas@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -57,11 +57,10 @@ export function RolloverModal(props: {
         okText="Rollover"
         cancelText="Cancel"
         centered
-        closable={true}
-        destroyOnClose
+        closable={false}
+        destroyOnHidden
         keyboard
-        mask
-        maskClosable
+        maskClosable={!is_processing}
         open={props.isOpen}
       >
         <Typography.Paragraph>

@@ -1,6 +1,6 @@
 /*
  * BudgetBud - Budgeting and Expense Tracker with WebUI and API server
- * Copyright (C) 2024  Sidhin S Thomas <sidhin.thomas@gmail.com>
+ * Copyright (C) 2025  Sidhin S Thomas <sidhin.thomas@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -28,8 +28,7 @@ import {
   MoreOutlined,
   PlusOutlined,
   SettingOutlined,
-  UpOutlined,
-  UpSquareFilled,
+  UserOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -38,7 +37,6 @@ import {
   Dropdown,
   Flex,
   Input,
-  InputRef,
   MenuProps,
   Select,
   Space,
@@ -47,10 +45,11 @@ import {
 import React from "react";
 import { connect } from "react-redux";
 import { budgetSlice, headerSlice, navigate, store, View } from "../store";
-import { GetScreenSize, NumberToMonth, ScreenSize } from "../utils";
+import { NumberToMonth } from "../utils";
 import { ShareBudgetModal } from "./share_budget_modal";
 import { LinkBudgetModal } from "./link_budget_modal";
 import { RolloverModal } from "./rollover_modal";
+import { NicknameModal } from "./nickname_modal";
 
 export interface HeaderBudgetDetails {
   name: string;
@@ -71,9 +70,7 @@ export interface HeaderProps {
 
 interface HeaderState {
   is_budget_selector_visible: boolean;
-  open_share_modal: boolean;
-  open_link_modal: boolean;
-  open_rollover_modal: boolean;
+  open_model: 'share' | 'rollover' | 'link' | 'edit_nickname' | 'none';
 }
 
 class Header extends React.Component<HeaderProps, HeaderState> {
@@ -114,9 +111,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
     super(props);
     this.state = {
       is_budget_selector_visible: false,
-      open_share_modal: false,
-      open_link_modal: false,
-      open_rollover_modal: false,
+      open_model: 'none',
     };
   }
 
@@ -154,7 +149,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
     const linkBudget = (
       e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>,
     ) => {
-      this.setState({ open_link_modal: true });
+      this.setState({ open_model: 'link' });
       e.preventDefault();
     };
     const onSelectionChanged = (value: number) => {
@@ -214,12 +209,12 @@ class Header extends React.Component<HeaderProps, HeaderState> {
           variant="outlined"
         />
         <LinkBudgetModal
-          isOpen={this.state.open_link_modal}
+          isOpen={this.state.open_model === 'link'}
           onDone={() => {
             store.dispatch(navigate(View.Overview));
           }}
           onClose={() => {
-            this.setState({ open_link_modal: false });
+            this.setState({ open_model: 'none' });
           }}
         />
       </>
@@ -245,7 +240,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
         key: "1",
         disabled: !enable_proceed_next_month,
         onClick: () => {
-          this.setState({ open_rollover_modal: true });
+          this.setState({ open_model: 'rollover' });
         },
       },
       {
@@ -253,27 +248,36 @@ class Header extends React.Component<HeaderProps, HeaderState> {
         key: "2",
         icon: <LinkOutlined />,
         onClick: () => {
-          this.setState({ open_share_modal: true });
+          this.setState({ open_model: 'share' });
+        },
+        disabled: false,
+      },
+      {
+        label: "Edit Nickname",
+        key: "3",
+        icon: <UserOutlined />,
+        onClick: () => {
+          this.setState({ open_model: 'edit_nickname' });
         },
         disabled: false,
       },
       {
         label: "History",
-        key: "3",
+        key: "4",
         icon: <CalendarOutlined />,
         onClick: () => {},
         disabled: true,
       },
       {
         label: "Trends",
-        key: "4",
+        key: "5",
         icon: <LineChartOutlined />,
         onClick: () => {},
         disabled: true,
       },
       {
         label: "Sign Out",
-        key: "5",
+        key: "6",
         icon: <LogoutOutlined />,
         onClick: () => {
           window.location.href = "/logout";
@@ -288,20 +292,26 @@ class Header extends React.Component<HeaderProps, HeaderState> {
           <Button type="text" icon={<MoreOutlined />} size="large"></Button>
         </Dropdown>
         <ShareBudgetModal
-          isOpen={this.state.open_share_modal}
+          isOpen={this.state.open_model === 'share'}
           budget_id={selected_budget?.id}
           onDone={() => {
-            this.setState({ open_share_modal: false });
+            this.setState({ open_model: 'none' });
           }}
         />
         <RolloverModal
-          isOpen={this.state.open_rollover_modal}
+          isOpen={this.state.open_model === 'rollover'}
           budget_id={selected_budget?.id}
           onDone={() => {
-            this.setState({ open_rollover_modal: false });
+            this.setState({ open_model: 'none' });
           }}
           onClose={() => {
-            this.setState({ open_rollover_modal: false });
+            this.setState({ open_model: 'none' });
+          }}
+        />
+        <NicknameModal
+          isOpen={this.state.open_model === 'edit_nickname'}
+          onDone={() => {
+            this.setState({ open_model: 'none' });
           }}
         />
       </>
