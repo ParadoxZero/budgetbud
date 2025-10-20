@@ -1,0 +1,85 @@
+version: "3.8"
+
+services:
+  app:
+    image: paradoxzero/budgetbud-alpine:latest
+    container_name: budgetbud
+    restart: always
+    environment:
+      # Update if forked for your domain
+      - VIRTUAL_HOST=budgetbud.app, www.budgetbud.app
+      - LETSENCRYPT_HOST=budgetbud.app,www.budgetbud.app
+      - LETSENCRYPT_EMAIL=admin@budgetbud.app
+      - ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
+      # set via .env file for security
+      - CosmosDb__ConnectionString=${COSMOS_CONN}
+      - CosmosDb__Database=${COSMOS_DB}
+      - CosmosDb__Container=${COSMOS_CONTAINER}
+      - Auth__GoogleClientId=${GOOGLE_CLIENT_ID}
+      - Auth__GoogleClientSecret=${GOOGLE_CLIENT_SECRET}
+    expose:
+      - "8080"
+    networks:
+      - webnet
+
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy:alpine
+    container_name: nginx-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - certs:/etc/nginx/certs:ro
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - webnet
+
+  acme-companion:
+    image: nginxproxy/acme-companion
+    container_name: nginx-proxy-acme
+    restart: always
+    environment:
+      # change if forked
+      - DEFAULT_EMAIL=admin@budgetbud.app  
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - certs:/etc/nginx/certs
+      - acme:/etc/acme.sh
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - nginx-proxy
+    networks:
+      - webnet
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      # Check for updates every 5 minutes
+      - WATCHTOWER_POLL_INTERVAL=3600
+      # Automatically clean up old images after updating
+      - WATCHTOWER_CLEANUP=true
+      # Optionally notify on update (Slack, Discord, etc.)
+      # - WATCHTOWER_NOTIFICATIONS=slack
+      # - WATCHTOWER_NOTIFICATION_SLACK_HOOK_URL=https://hooks.slack.com/services/...
+    command: budgetbud
+    networks:
+      - webnet
+
+networks:
+  webnet:
+
+volumes:
+  certs:
+  vhost:
+  html:
+  acme:
