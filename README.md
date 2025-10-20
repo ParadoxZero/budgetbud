@@ -91,13 +91,17 @@ Relevant settings -
     "Database": "",
     "Container": ""
   },
+  "Auth": {
+    "GoogleClientId":"",
+    "GoogleClientSecret":""
+  },
   "EnableSwagger": false
 ```
 
 If enabled, swagger will be available at `http://<origin>/swagger` URL. You can use the Swagger UI to test out APIs to ensure
 your changes work as expected.
 
-Everything available in `appsettings.json` can be overriden by creating envirement variables witht the same name or
+Everything available in `appsettings.json` can be overridden by creating environment variables with the same name or
 with `CosmosDb:ConnectionString` like pattern for nested keys.
 
 ## Deployment and infrastructure
@@ -106,7 +110,28 @@ This application is currently designed to be hosted on Microsoft Azure, leveragi
 
 - Cosmos DB (free tier) for scalable, cloud-native data storage.
 
-- Azure App Service (most basic tier) and it's inbuilt authentication for social oauth.
+- Any cheap VPS, Azure App Service or a container host
+
+If using docker you can set up BudgetBud by a single command - 
+
+```bash
+  docker run -d -p 8080:8080 \
+    -e ASPNETCORE_ENVIRONMENT=Production \
+    -e CosmosDb__ConnectionString="<FILL Correct info>" \
+    -e CosmosDb__Database="<FILL Correct info>" \
+    -e CosmosDb__Container="<FILL Correct info>" \
+    -e Auth__GoogleClientId="<FILL Correct info>" \
+    -e Auth__GoogleClientSecret="<FILL Correct info>" \
+    --name budgetbud paradoxzero/budgetbud-alpine:latest
+```
+
+Otherwise you can use the `docker-compose.yaml` to bring up the infra quickly with SSL and auto 
+update configured.
+
+```bash
+cd budgetbud
+docker compose up -d
+```
 
 ## Tools and Scripts
 
@@ -162,5 +187,4 @@ You will be prompted to confirm before cloning begins.
 
 ## Contributing
 
-The project is currently at it's minimum requirement complete stage. All contributions are most welcome as long as the basic principles are followed.
-Only request is to file an issue first to have a discussion around the contribution :)
+The project is currently at it's minimum requirement complete stage. All contributions are most welcome as long as the basic principles are followed. Please file an issue first to have a discussion around the contribution if it's non-trivial.
