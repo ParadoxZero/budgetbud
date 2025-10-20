@@ -21,6 +21,7 @@
 using budgetbud.Models;
 using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -35,12 +36,15 @@ public class DbService
     private readonly Container _container;
     private readonly IIdentityService _identityService;
 
-    public DbService(IConfiguration configuration, IIdentityService identityService)
+    private readonly IMemoryCache _cache;
+
+    public DbService(IConfiguration configuration, IIdentityService identityService, IMemoryCache cache)
     {
         _cosmosClient = new CosmosClient(configuration["CosmosDb:ConnectionString"]);
         _database = _cosmosClient.GetDatabase(configuration["CosmosDb:Database"]);
         _container = _database.GetContainer(configuration["CosmosDb:Container"]);
         _identityService = identityService;
+        _cache = cache;
     }
 
     public async Task<UserData> GetUserData(string user_id)
@@ -134,7 +138,7 @@ public class DbService
         cat.ExpenseList.Add(expense);
         cat.LastUpdated = DateTime.UtcNow.Ticks;
         await UpdateBudgetAsync(budget);
-        return budget;
+        return await UpdateUserNickName(budget);
     }
 
     public async Task UpdateExpenseAsync(string budget_id, Expense expense)
@@ -210,7 +214,7 @@ public class DbService
         Budget budget = await GetBudgetAsync(budget_id);
         budget.categoryList.RemoveAll(c => c.Id == category_id);
         await UpdateBudgetAsync(budget);
-        return budget;
+        return await UpdateUserNickName(budget);
     }
 
     internal async Task<Budget> DeleteExpenseAsync(string budget_id, int category_id, int expense_id)
@@ -220,7 +224,7 @@ public class DbService
         category.ExpenseList.RemoveAll(e => e.Id == expense_id);
         category.LastUpdated = DateTime.UtcNow.Ticks;
         await UpdateBudgetAsync(budget);
-        return budget;
+        return await UpdateUserNickName(budget);
     }
 
     internal async Task<Budget> UpdateUserNickName(Budget budget)
@@ -232,12 +236,16 @@ public class DbService
             {
                 if (!string.IsNullOrEmpty(expense.AddedBy))
                 {
-                    if (!userNames.ContainsKey(expense.AddedBy))
+                    if (!_cache.TryGetValue(expense.AddedBy, out string nickName))
                     {
                         var userData = await GetUserData(expense.AddedBy);
-                        userNames[expense.AddedBy] = userData.NickName;
+                        nickName = userData.NickName;
+                        _cache.Set(expense.AddedBy, nickName, new MemoryCacheEntryOptions
+                        {
+                            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
+                        });
                     }
-                    expense.AddedBy = userNames[expense.AddedBy];
+                    expense.AddedBy = nickName;
                 }
             }
         }

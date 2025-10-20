@@ -41,8 +41,8 @@ public class UserController : ControllerBase
   }
 
   public record GetUserDetailsResponse(string nickName, string id);
-  [HttpGet("user")]
-  public async Task<IActionResult> GetUserNickName()
+  [HttpGet("details")]
+  public async Task<IActionResult> GetUserDetails()
   {
     var userDetails = new GetUserDetailsResponse(
         nickName: await _userDataService.GetUserNickName(),
@@ -51,18 +51,18 @@ public class UserController : ControllerBase
     return Ok(userDetails);
   }
 
-  public record UpdateNickNameInput(string name);
+  public record UpdateNickNameInput(string nickName);
   [HttpPost("nickname")]
   public async Task<IActionResult> UpdateUserNickName([FromBody] UpdateNickNameInput input)
   {
       // Validate the new nickname (e.g., check length, forbidden characters, etc.)
-      if (string.IsNullOrWhiteSpace(input.name))
+      if (string.IsNullOrWhiteSpace(input.nickName))
       {
           return BadRequest("Invalid nickname.");
       }
 
       // Update the nickname in the user data service
-      await _userDataService.UpdateUserNickName(input.name);
+      await _userDataService.UpdateUserNickName(input.nickName);
       return NoContent();
   }
 }
