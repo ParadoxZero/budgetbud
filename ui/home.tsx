@@ -18,7 +18,7 @@
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import ReactDOM from "react-dom/client";
 
 import "./main.css";
@@ -27,7 +27,6 @@ import {
   GithubOutlined,
   GoogleOutlined,
   LeftOutlined,
-  LoadingOutlined,
   PlayCircleOutlined,
   RightOutlined,
 } from "@ant-design/icons";
@@ -36,7 +35,7 @@ import { GetScreenSize, ScreenSize } from "./utils";
 
 function SignInButtons({ compact = false }: { compact?: boolean }) {
   return (
-    <Flex align="center" wrap  gap={10}>
+    <Flex align="center" wrap gap={10}>
       <Typography.Title level={4} style={{ margin: 10 }}>Sign in with</Typography.Title>
       <Flex gap={10} >
         <Button
@@ -75,7 +74,7 @@ function App() {
               <img src="/logo.png" alt="BudgetBud logo" width={80} height={80} />
               <Typography.Title level={1} style={{ margin: 0 }}>BudgetBud</Typography.Title>
               <Typography.Paragraph style={{ fontSize: 18, maxWidth: 800 }}>
-                A simple, free, no-nonsense and collaborative budgeting tool to manage expenses efficiently.
+                A simple, free, open source, no-nonsense, collaborative budgeting tool to manage expenses efficiently.
               </Typography.Paragraph>
             </Flex>
           </div>
@@ -83,51 +82,47 @@ function App() {
 
         {/* Demo CTA */}
         <div className="demo-section">
-          <div className="container">
-            <Card className="demo-card" bordered>
-              <Flex gap={16} align="center" justify="space-evenly" wrap vertical>
-                <Typography.Text style={{ fontSize: 16 }}>
-                  Check out a demo of budgetbud without signing in.
-                </Typography.Text>
-                <Button
-                  type="primary"
-                  size="large"
-                  href="/demo.html"
-                  icon={<PlayCircleOutlined />}
-                >
-                  Try it out!
-                </Button>
-              </Flex>
-            </Card>
-          </div>
+          <Flex className="container" justify="center" align="center">
+            <Button
+              type="primary"
+              size="large"
+              href="/demo.html"
+              icon={<PlayCircleOutlined />}
+            >
+              Try it out!
+            </Button>
+          </Flex>
         </div>
 
         {/* Features */}
         <div className="features">
           <div className="container">
-            <Typography.Title level={3} style={{ textAlign: "center" }}>Features</Typography.Title>
+            <Typography.Title level={2} style={{ textAlign: "center" }}>Features</Typography.Title>
             <Row gutter={[16, 16]}>
               <Col xs={24} md={8}>
-                <Card hoverable>
-                  <Typography.Title level={4} style={{ marginTop: 0 }}>Create & Manage Multiple Budgets</Typography.Title>
+                <Card hoverable style={{ height: '100%' }}>
+                  <Typography.Title level={3} >Create & Manage Multiple Budgets</Typography.Title>
                   <Typography.Paragraph>
                     Set up budgets with categories like rent, groceries, entertainment, and more.
+                  </Typography.Paragraph>
+                  <Typography.Paragraph>
+                    Add as many budgets as you need for different purpose - hosehold, travel, maintainance.
                   </Typography.Paragraph>
                 </Card>
               </Col>
               <Col xs={24} md={8}>
-                <Card hoverable>
-                  <Typography.Title level={4} style={{ marginTop: 0 }}>Track Expenses</Typography.Title>
+                <Card hoverable style={{ height: '100%' }}>
+                  <Typography.Title level={3}>Track Expenses</Typography.Title>
                   <Typography.Paragraph>
                     Add and remove expenses to see remaining funds and spending patterns.
                   </Typography.Paragraph>
                 </Card>
               </Col>
               <Col xs={24} md={8}>
-                <Card hoverable>
-                  <Typography.Title level={4} style={{ marginTop: 0 }}>Collaborate with Others</Typography.Title>
+                <Card hoverable style={{ height: '100%' }}>
+                  <Typography.Title level={3}>Collaborate with Others</Typography.Title>
                   <Typography.Paragraph>
-                    Share your budget with family or roommates for seamless planning.
+                    Share your budget with family or roommates for seamless tracking.
                   </Typography.Paragraph>
                 </Card>
               </Col>
@@ -140,42 +135,45 @@ function App() {
           <div className="container">
             <Typography.Title level={3} style={{ textAlign: "center" }}>Screenshots</Typography.Title>
             <Image.PreviewGroup
-             preview={{
-        toolbarRender: (
-          _,
-          {
-            actions: {
-              onActive,
-            },
-          },
-        ) => (
-          <Space size={12} className="toolbar-wrapper">
-            <LeftOutlined disabled={current === 0} onClick={() => onActive?.(-1)} />
-            <RightOutlined disabled={current === 3} onClick={() => onActive?.(1)} />
-          </Space>
-        ),
-        onChange: (index) => {
-          setCurrent(index);
-        },
-      }}>
+              preview={{
+                toolbarRender: (
+                  _,
+                  {
+                    actions: {
+                      onActive,
+                    },
+                  },
+                ) => (
+                  <Space size={12} className="toolbar-wrapper">
+                    <LeftOutlined disabled={current === 0} onClick={() => onActive?.(-1)} />
+                    <RightOutlined disabled={current === 3} onClick={() => onActive?.(1)} />
+                  </Space>
+                ),
+                onChange: (index) => {
+                  setCurrent(index);
+                },
+              }}>
               <Flex gap={16} justify="center" align="center" wrap>
                 <Image
                   key={0}
                   src="/mobile1.png"
                   alt="BudgetBud mobile screenshot 1"
                   height={300}
+                  className="screenshot-image"
                 />
                 <Image
                   key={1}
                   src="/mobile2.png"
                   alt="BudgetBud mobile screenshot 2"
                   height={300}
+                  className="screenshot-image"
                 />
                 <Image
                   key={2}
                   src="/desktop1.png"
                   alt="BudgetBud desktop screenshot"
                   height={300}
+                  className="screenshot-image"
                 />
               </Flex>
             </Image.PreviewGroup>
@@ -186,27 +184,39 @@ function App() {
         <div className="about">
           <div className="container">
             <Divider />
-            <Row gutter={[16, 16]}>
-              <Col xs={24} md={12}>
-                  <Typography.Title level={4} style={{ marginTop: 0 }}>Built on simple principles</Typography.Title>
-                  <ul>
-                    <li>Cost-efficient self-hosting on free tiers</li>
-                    <li>Focused and minimalist—no bloat</li>
-                    <li>Web-first PWA experience</li>
-                    <li>Privacy-first—no Personally Identifiable Information (PII) stored</li>
-                  </ul>
-              </Col>
-              <Col xs={24} md={12}>
-                  <Typography.Title level={4} style={{ marginTop: 0 }}>Forever free and open source</Typography.Title>
-                  <Typography.Paragraph>
-                    The source is available on GitHub. Contributions are welcome.
-                  </Typography.Paragraph>
-                  <Space>
-                    <Button type="primary" style={{ backgroundColor: "#262626" }}
-                      href="https://github.com/ParadoxZero/budgetbud" target="_blank" icon={<GithubOutlined />}>View on GitHub</Button>
-                  </Space>
-              </Col>
-            </Row>
+            <Flex wrap justify="space-evenly" style={{ marginTop: "2rem" }}>
+              <Flex vertical>
+                <Typography.Title level={4} style={{ marginTop: 0 }}>
+                  Built on simple principles
+                </Typography.Title>
+                <ul>
+                  <li>Cost-efficient self-hosting on free tiers</li>
+                  <li>Focused and minimalist—no bloat</li>
+                  <li>Web-first PWA experience</li>
+                  <li>Privacy-first—no Personally Identifiable Information (PII) stored</li>
+                </ul>
+              </Flex>
+
+              <Flex vertical >
+                <Typography.Title level={4} style={{ marginTop: 0 }}>
+                  Forever free and open source
+                </Typography.Title>
+                <Typography.Paragraph>
+                  The source is available on GitHub. Contributions are welcome.
+                </Typography.Paragraph>
+                <Space>
+                  <Button
+                    type="primary"
+                    style={{ backgroundColor: "#262626" }}
+                    href="https://github.com/ParadoxZero/budgetbud"
+                    target="_blank"
+                    icon={<GithubOutlined />}
+                  >
+                    View on GitHub
+                  </Button>
+                </Space>
+              </Flex>
+            </Flex>
           </div>
         </div>
       </Content>

@@ -55,7 +55,8 @@ body {
 }
 
 .container {
-  max-width: 1100px;
+  width: 90%;
+  height: 100%;
   margin: 0 auto;
   padding: 0 16px;
 }
@@ -66,13 +67,15 @@ body {
   z-index: 10;
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(6px);
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 2px solid #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  height: 5em;
 }
 
 .signin-area {
-  display: flex;
-  align-items: center;
-  min-height: 56px;
+  /* display: flex; */
+  /* align-items: center; */
+  /* min-height: 56px; */
 }
 
 .signin-inner {
@@ -132,6 +135,11 @@ body {
     #f5f5f5 10px,
     #f5f5f5 20px
   );
+}
+
+.screenshot-image {
+  border-radius: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .about {
