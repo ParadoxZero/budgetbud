@@ -6,7 +6,7 @@
     <title>Privacy Policy</title>
     <style>
       body {
-        font-family: Arial, sans-serif;
+        font-family: 'Inter', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
         line-height: 1.6;
         margin: 0;
         padding: 0;
@@ -23,15 +23,22 @@
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
       h1 {
-        font-size: 24px;
         margin-bottom: 10px;
       }
       p {
         margin-bottom: 15px;
       }
+      .hero {
+        text-align: center;
+        margin-bottom: 20px;
+      }
     </style>
   </head>
   <body>
+    <div class="hero">
+      <img src="/logo.png" alt="BudgetBud logo" style="width: 80px; height: 80px;"/>
+      <h1 ><a href="/">BudgetBud</a></h1>
+    </div>
     <div class="container">
       <h1>Privacy Policy</h1>
       <p>
@@ -42,7 +49,13 @@
       <p>
         We do not collect any personal data except for your user ID associated
         with Google or GitHub. This ID is used solely for authentication
-        purposes.
+        purposes. 
+      </p>
+      <p>
+        We don't store any personal information. The unique google user ID we
+        collect is stored as a cryptographic hash to identify users within
+        budgetbud. As such, there is no way to reverse engineer the user ID
+        from the stored data.
       </p>
       <h2>Cookies</h2>
       <p>
@@ -57,8 +70,11 @@
       <h2>Contact</h2>
       <p>
         If you have any questions about this privacy policy, please contact us
-        at contact@inxcm.com
+        at <a href="mailto:contact@budgetbud.app">contact@budgetbud.app</a>
       </p>
     </div>
+    <footer style="text-align: center; margin: 20px 0;">
+        Copyright &copy; 2025 Budgetbud &bull; By Sidhin S Thomas
+    </footer>
   </body>
 </html>

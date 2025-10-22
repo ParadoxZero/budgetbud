@@ -32,17 +32,22 @@ const AppFooter: React.FC = () => {
       gap={10}
     >
       <br />
-      <Typography.Text style={{ userSelect: "text" }}>
-        Copyright © 2025 Sidhin S Thomas. All rights reserved.
+      <Typography.Text style={{ userSelect: "text", display: "inline-flex", alignItems: "center", gap: 8 }}>
+        Copyright &copy; 2025 Budgetbud &bull; By Sidhin S Thomas
       </Typography.Text>
-      <a
-        href="https://github.com/ParadoxZero/budgetbud"
-        target="_blank"
+      <Typography.Text
         style={{ display: "inline-flex", alignItems: "center", gap: 8 }}
       >
-        <GithubOutlined style={{ fontSize: 18 }} />
-        <span>View on GitHub</span>
-      </a>
+        <a
+          href="https://github.com/ParadoxZero/budgetbud"
+          target="_blank"
+          style={{ display: "inline-flex", alignItems: "center", gap: 8 }}
+        >
+          <GithubOutlined style={{ fontSize: 18 }} />
+          <span>GitHub</span>
+        </a> |
+        <a href="/privacy">Privacy</a>
+      </Typography.Text>
     </Flex>
   );
 };

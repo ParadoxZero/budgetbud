@@ -32,6 +32,7 @@ import {
 } from "@ant-design/icons";
 
 import { GetScreenSize, ScreenSize } from "./utils";
+import AppFooter from "./components/app_footer";
 
 function SignInButtons({ compact = false }: { compact?: boolean }) {
   return (
@@ -223,12 +224,7 @@ function App() {
 
       {/* Ant Design Footer */}
       <Footer className="footer">
-        <div className="container">
-          <Divider />
-          <Flex align="center" justify="center" wrap>
-            <Typography.Text type="secondary">BudgetBud © Sidhin S Thomas. All rights reserved</Typography.Text>
-          </Flex>
-        </div>
+        <AppFooter />
       </Footer>
     </Layout>
   );
