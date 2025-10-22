@@ -20,15 +20,13 @@
 
 import React from "react";
 import {
-  Button,
   Card,
   Divider,
   Dropdown,
   Empty,
   Flex,
-  Input,
   MenuProps,
-  Progress,
+  message,
   Spin,
   Statistic,
 } from "antd";
@@ -36,14 +34,11 @@ import {
   ArrowUpOutlined,
   CalendarOutlined,
   CheckCircleOutlined,
-  DownCircleOutlined,
   DownOutlined,
   EditOutlined,
   LineChartOutlined,
   LinkOutlined,
   LoadingOutlined,
-  LogoutOutlined,
-  PlusCircleFilled,
   PlusOutlined,
   WalletOutlined,
 } from "@ant-design/icons";
@@ -58,11 +53,9 @@ import {
   DataModelFactory,
   Recurring,
   Budget,
-  Expense,
 } from "../datamodel/datamodel";
 import { Typography } from "antd";
 import { RecurringCalculatorService } from "../services/recurring_date_service";
-import { BaseType } from "antd/es/typography/Base";
 import {
   navigate,
   View,
@@ -169,8 +162,10 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
   render_action_button() {
     if (this.props.selected_budget_index == null) return null;
     const budget = this.props.budget_list[this.props.selected_budget_index!];
-    if (budget.categoryList.length === 0) return null;
-    const first_category_id = budget.categoryList[0].id;
+    let first_category_id = null;
+    if (budget.categoryList.length > 0) {
+      first_category_id = budget.categoryList[0].id;
+    }
 
     let enable_proceed_next_month = false;
     const now = new Date(Date.now());
@@ -227,8 +222,12 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
           type="default"
           size="large"
           icon={<DownOutlined />}
-          menu={{items: items}}
+          menu={{ items: items }}
           onClick={() => {
+            if (first_category_id == null) {
+              message.warning("No categories available to add expense.");
+              return;
+            }
             this.setState({
               add_expense_mode_context: {
                 category_id: first_category_id,
