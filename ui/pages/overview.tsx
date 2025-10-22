@@ -23,17 +23,28 @@ import {
   Button,
   Card,
   Divider,
+  Dropdown,
   Empty,
   Flex,
   Input,
+  MenuProps,
   Progress,
   Spin,
   Statistic,
 } from "antd";
 import {
+  ArrowUpOutlined,
+  CalendarOutlined,
   CheckCircleOutlined,
+  DownCircleOutlined,
+  DownOutlined,
+  EditOutlined,
+  LineChartOutlined,
+  LinkOutlined,
   LoadingOutlined,
+  LogoutOutlined,
   PlusCircleFilled,
+  PlusOutlined,
   WalletOutlined,
 } from "@ant-design/icons";
 import {
@@ -66,6 +77,8 @@ import { connect } from "react-redux";
 import { AddExpenseModal } from "../components/add_expense_modal";
 import SingleCategory from "../components/single_category";
 import EditCategory, { EditCategoryState } from "../components/edit_category";
+import { ShareBudgetModal } from "../components/share_budget_modal";
+import { RolloverModal } from "../components/rollover_modal";
 
 const { Text } = Typography;
 
@@ -88,6 +101,7 @@ interface IState {
   upcoming_expense: { name: string; amount: number } | null;
   add_expense_mode_context: AddExpenseContext | null;
   previous_budget_index: number | null;
+  open_model: 'share' | 'rollover' | 'link' | 'edit_nickname' | 'none';
 }
 
 class OverviewPage extends React.Component<OverviewProps, IState> {
@@ -152,18 +166,68 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     );
   }
 
-  render_add_expense_button() {
+  render_action_button() {
     if (this.props.selected_budget_index == null) return null;
     const budget = this.props.budget_list[this.props.selected_budget_index!];
     if (budget.categoryList.length === 0) return null;
     const first_category_id = budget.categoryList[0].id;
 
+    let enable_proceed_next_month = false;
+    const now = new Date(Date.now());
+    enable_proceed_next_month = budget.period.month != now.getMonth() + 1;
+    enable_proceed_next_month =  enable_proceed_next_month ||
+      budget.period.year != now.getFullYear();
+
+    const items: MenuProps["items"] = [
+      {
+        label: "Proceed Next Month",
+        icon: <ArrowUpOutlined />,
+        key: "1",
+        disabled: !enable_proceed_next_month,
+        onClick: () => {
+          this.setState({ open_model: 'rollover' });
+        },
+      },
+      {
+        label: "Edit Categories",
+        key: "3",
+        icon: <EditOutlined />,
+        onClick: () => {
+          store.dispatch(navigate(View.CategoryEdit));
+        }
+      },
+      {
+        label: "History",
+        key: "4",
+        icon: <CalendarOutlined />,
+        onClick: () => {},
+        disabled: true,
+      },
+      {
+        label: "Trends",
+        key: "5",
+        icon: <LineChartOutlined />,
+        onClick: () => {},
+        disabled: true,
+      },
+      {
+        label: "Share Budget",
+        key: "2",
+        icon: <LinkOutlined />,
+        onClick: () => {
+          this.setState({ open_model: 'share' });
+        },
+        disabled: false,
+      },
+    ];
+
     return (
       <div style={{ margin: 10 }}>
-        <Button
+        <Dropdown.Button
           type="default"
-          icon={<PlusCircleFilled />}
           size="large"
+          icon={<DownOutlined />}
+          menu={{items: items}}
           onClick={() => {
             this.setState({
               add_expense_mode_context: {
@@ -175,9 +239,28 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
               },
             });
           }}
-        >
+        ><PlusOutlined />
           Add Expense
-        </Button>
+        </Dropdown.Button>
+         <ShareBudgetModal
+                  isOpen={this.state.open_model === 'share'}
+                  budget_id={budget.id}
+                  onDone={() => {
+                    this.setState({ open_model: 'none' });
+                  }}
+                />
+        <RolloverModal
+          isOpen={this.state.open_model === 'rollover'}
+          budget_id={budget.id}
+          onDone={() => {
+            this.setState({ open_model: 'none' });
+          }}
+          onClose={() => {
+            this.setState({ open_model: 'none' });
+          }}
+        />
+        {this.render_add_expense_modal()}
+        
       </div>
     );
   }
@@ -191,7 +274,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
         gap={20}
       >
         {this.render_available_budget()}
-        {this.render_add_expense_button()}
+        {this.render_action_button()}
       </Flex>
     );
   }
@@ -422,7 +505,6 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
       >
         {this.header()}
         {this.render_categories()}
-        {this.render_add_expense_modal()}
       </Flex>
     );
   }
@@ -456,6 +538,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
       upcoming_expense: null,
       add_expense_mode_context: null,
       previous_budget_index: null,
+      open_model: 'none',
     };
   }
 

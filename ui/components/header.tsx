@@ -19,15 +19,11 @@
  */
 
 import {
-  ArrowUpOutlined,
-  CalendarOutlined,
   FileOutlined,
-  LineChartOutlined,
   LinkOutlined,
   LogoutOutlined,
-  MoreOutlined,
   PlusOutlined,
-  SettingOutlined,
+  SmileOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import {
@@ -46,9 +42,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { budgetSlice, headerSlice, navigate, store, View } from "../store";
 import { NumberToMonth } from "../utils";
-import { ShareBudgetModal } from "./share_budget_modal";
 import { LinkBudgetModal } from "./link_budget_modal";
-import { RolloverModal } from "./rollover_modal";
 import { NicknameModal } from "./nickname_modal";
 
 export interface HeaderBudgetDetails {
@@ -94,14 +88,6 @@ class Header extends React.Component<HeaderProps, HeaderState> {
         gap="small"
       >
         {this.render_budget_selector()}
-        <Button
-          type="text"
-          icon={<SettingOutlined />}
-          size="large"
-          onClick={() => {
-            store.dispatch(navigate(View.CategoryEdit));
-          }}
-        ></Button>
         {this.render_more_menu()}
       </Flex>
     );
@@ -172,11 +158,11 @@ class Header extends React.Component<HeaderProps, HeaderState> {
           }))}
           defaultValue={defaultValue}
           onChange={onSelectionChanged}
-          onDropdownVisibleChange={(visible) => {
+          onOpenChange={(visible) => {
             this.setState({ is_budget_selector_visible: visible });
           }}
           open={this.state.is_budget_selector_visible}
-          dropdownRender={(menu) => (
+          popupRender={(menu) => (
             <>
               {menu}
               <Divider style={{ margin: "8px 0" }} />
@@ -222,92 +208,29 @@ class Header extends React.Component<HeaderProps, HeaderState> {
   }
 
   render_more_menu() {
-    const current_budget =
-      this.props.budget_list[this.props.selected_budget_index ?? 0];
-    let enable_proceed_next_month = false;
-    if (current_budget) {
-      const now = new Date(Date.now());
-      enable_proceed_next_month =
-        current_budget.period.month != now.getMonth() + 1;
-      enable_proceed_next_month =
-        enable_proceed_next_month ||
-        current_budget.period.year != now.getFullYear();
-    }
+   
     const items: MenuProps["items"] = [
-      {
-        label: "Proceed Next Month",
-        icon: <ArrowUpOutlined />,
-        key: "1",
-        disabled: !enable_proceed_next_month,
-        onClick: () => {
-          this.setState({ open_model: 'rollover' });
-        },
-      },
-      {
-        label: "Share Budget",
-        key: "2",
-        icon: <LinkOutlined />,
-        onClick: () => {
-          this.setState({ open_model: 'share' });
-        },
-        disabled: false,
-      },
       {
         label: "Edit Nickname",
         key: "3",
-        icon: <UserOutlined />,
         onClick: () => {
           this.setState({ open_model: 'edit_nickname' });
         },
         disabled: false,
       },
       {
-        label: "History",
-        key: "4",
-        icon: <CalendarOutlined />,
-        onClick: () => {},
-        disabled: true,
-      },
-      {
-        label: "Trends",
-        key: "5",
-        icon: <LineChartOutlined />,
-        onClick: () => {},
-        disabled: true,
-      },
-      {
         label: "Sign Out",
         key: "6",
-        icon: <LogoutOutlined />,
         onClick: () => {
           window.location.href = "/logout";
         },
       },
     ];
-    let defaultValue: number = this.props.selected_budget_index ?? 0;
-    let selected_budget = this.props.budget_list[defaultValue];
     return (
       <>
-        <Dropdown menu={{ items }} arrow>
-          <Button type="text" icon={<MoreOutlined />} size="large"></Button>
+        <Dropdown menu={{ items }} >
+          <Button type="default" icon={<UserOutlined />} shape="circle" size="large"></Button>
         </Dropdown>
-        <ShareBudgetModal
-          isOpen={this.state.open_model === 'share'}
-          budget_id={selected_budget?.id}
-          onDone={() => {
-            this.setState({ open_model: 'none' });
-          }}
-        />
-        <RolloverModal
-          isOpen={this.state.open_model === 'rollover'}
-          budget_id={selected_budget?.id}
-          onDone={() => {
-            this.setState({ open_model: 'none' });
-          }}
-          onClose={() => {
-            this.setState({ open_model: 'none' });
-          }}
-        />
         <NicknameModal
           isOpen={this.state.open_model === 'edit_nickname'}
           onDone={() => {
