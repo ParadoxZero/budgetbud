@@ -46,7 +46,7 @@ const AppFooter: React.FC = () => {
           <GithubOutlined style={{ fontSize: 18 }} />
           <span>GitHub</span>
         </a> |
-        <a href="/privacy">Privacy</a>
+        <a href="/privacy.html">Privacy</a>
       </Typography.Text>
     </Flex>
   );
