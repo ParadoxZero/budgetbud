@@ -76,13 +76,13 @@ public class SocialController : ControllerBase
     }
 
     [HttpPost("link/{key}")]
-    public async Task<IActionResult> GetSharedBudget(string key)
+    public async Task<IActionResult> LinkBudget(string key)
     {
         if (_cache.TryGetValue(key, out string? budget_id))
         {
             try
             {
-                var budget = await _dbService.GetBudgetAsync(budget_id ?? "");
+                var budget = await _dbService.GetBudgetUnauthorizedAsync(budget_id ?? "");
                 string user_id = _identityService.GetUserIdentity();
                 UserData user_data = await _dbService.GetUserData(user_id);
                 budget.authorized_users.Add(user_id);

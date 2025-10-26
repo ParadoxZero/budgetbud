@@ -18,6 +18,8 @@
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
 
+using budgetbud.api.exceptions;
+using budgetbud.Exceptions;
 using budgetbud.Models;
 using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.Azure.Cosmos;
@@ -70,15 +72,30 @@ public class DbService
         await _container.UpsertItemAsync(userData, new PartitionKey(userData.id));
     }
 
+    public async Task<Budget> GetBudgetUnauthorizedAsync(string budget_id)
+    {
+        var budget = await _container.ReadItemAsync<Budget>(budget_id, new PartitionKey(budget_id));
+        if (budget.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            throw new CodedException(StatusCodes.Status404NotFound, "Budget not found");
+        }
+        return budget;
+    }
+
     public async Task<Budget> GetBudgetAsync(string budget_id)
     {
-        return await _container.ReadItemAsync<Budget>(budget_id, new PartitionKey(budget_id));
+        var budget = await GetBudgetUnauthorizedAsync(budget_id);
+        if (budget.authorized_users.Contains(_identityService.GetUserIdentity())) {
+            return budget;
+        }
+        throw new AuthException();
     }
 
     public async Task<BudgetHistory> GetHistoryAsync(string history_id)
     {
         return await _container.ReadItemAsync<BudgetHistory>(history_id, new PartitionKey(history_id));
     }
+
     public async Task<Budget> CreateNewBudgetAsync(string name)
     {
         BudgetHistory history = new BudgetHistory
@@ -201,10 +218,13 @@ public class DbService
 
     public async Task DeleteBudgetAsync(string budget_id)
     {
-        var user_data = await GetUserData(_identityService.GetUserIdentity());
         var budget = await GetBudgetAsync(budget_id);
-        user_data.BudgetIds.Remove(budget_id);
-        await UpdateUserData(user_data);
+        foreach (var user_id in budget.authorized_users)
+        {
+            var user_data = await GetUserData(user_id);
+            user_data.BudgetIds.Remove(budget_id);
+            await UpdateUserData(user_data);
+        }
         await _container.DeleteItemAsync<Budget>(budget_id, new PartitionKey(budget_id));
         await _container.DeleteItemAsync<BudgetHistory>(budget.history_id, new PartitionKey(budget.history_id));
     }

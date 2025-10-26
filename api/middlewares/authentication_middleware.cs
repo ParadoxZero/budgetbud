@@ -1,6 +1,6 @@
 /* 
  * BudgetBud - Budgeting and Expense Tracker with WebUI and API server
- * Copyright (C) 2024  Sidhin S Thomas <sidhin.thomas@gmail.com>
+ * Copyright (C) 2025  Sidhin S Thomas <sidhin.thomas@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,6 +18,7 @@
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
 
+using budgetbud.api.exceptions;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 
@@ -74,6 +75,15 @@ public class RedirectToLoginMiddleware
                 return;
             }
         }
-        await _next(context);
+        try
+        {
+            await _next(context);
+
+        }
+        catch (CodedException ex)
+        {
+            context.Response.StatusCode = ex.StatusCode;
+            await context.Response.WriteAsJsonAsync(ex);
+        }
     }
 }

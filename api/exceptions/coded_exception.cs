@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * BudgetBud - Budgeting and Expense Tracker with WebUI and API server
  * Copyright (C) 2025  Sidhin S Thomas <sidhin.thomas@gmail.com>
  * 
@@ -18,15 +18,10 @@
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
 
-using budgetbud.api.exceptions;
-using System;
+namespace budgetbud.api.exceptions;
 
-namespace budgetbud.Exceptions;
-
-public class AuthException : CodedException
+public class CodedException(int code, string text) : Exception
 {
-    public AuthException(): base(StatusCodes.Status401Unauthorized, "Not Authorized") { }
-
-    public AuthException(string text) : base(StatusCodes.Status401Unauthorized, text) { }
-
+    public int StatusCode { get; } = code;
+    public string Text { get; } = text;
 }

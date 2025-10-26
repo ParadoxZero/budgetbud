@@ -1,7 +1,7 @@
 
 /* 
  * BudgetBud - Budgeting and Expense Tracker with WebUI and API server
- * Copyright (C) 2024  Sidhin S Thomas <sidhin.thomas@gmail.com>
+ * Copyright (C) 2025  Sidhin S Thomas <sidhin.thomas@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -20,16 +20,14 @@
  */
 
 
+using budgetbud.api.exceptions;
+
 namespace budgetbud.Exceptions
 {
-    public class InvalidInputException : Exception
+    public class InvalidInputException : CodedException
     {
-        public InvalidInputException(string message) : base(message)
-        {
-        }
+        public InvalidInputException(): base(StatusCodes.Status400BadRequest, "Invalid request") { }
+        public InvalidInputException(string text) : base(StatusCodes.Status400BadRequest, text) { }
 
-        public InvalidInputException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
     }
 }
