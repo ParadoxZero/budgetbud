@@ -29,7 +29,7 @@ public class TimeUnit
         TimeUnit next = new TimeUnit();
         if (this.Month == 12)
         {
-            next.Month = 0;
+            next.Month = 1;
             next.Year = this.Year + 1;
         }
         else
