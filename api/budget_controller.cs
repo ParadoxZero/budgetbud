@@ -44,6 +44,12 @@ public class BudgetController : ControllerBase
         return Ok(await _userDataService.FetchAssociatedBudgets());
     }
 
+    [HttpPost("reorder")]
+    public async Task<IActionResult> ReorderBudgets(List<string> newOrder) {
+      await _userDataService.ReorderBudgets(newOrder) ;
+      return Ok();
+    }
+
     public record CreateBudgetInput(string name);
     [HttpPost]
     public async Task<IActionResult> CreateBudget([FromBody] CreateBudgetInput input)
@@ -68,6 +74,12 @@ public class BudgetController : ControllerBase
     public async Task<IActionResult> UpdateCategoryInput(string budget_id, Category category)
     {
         return Ok(await _userDataService.UpdateCategory(budget_id, category));
+    }
+
+    [HttpPost("{budget_id}/reorder_categories")]
+    public async Task<IActionResult> ReorderCategories(string budget_id, List<int> new_order) {
+        await _userDataService.ReorderChategoriesAsync(budget_id, new_order);
+        return Ok(); 
     }
 
     [HttpDelete("{budget_id}/category/{category_id}")]

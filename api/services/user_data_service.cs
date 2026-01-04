@@ -47,6 +47,17 @@ public class UserDataService
         return budgetList;
     }
 
+    public async Task ReorderBudgets(List<string> newOrder) {
+      string user_id = _identityService.GetUserIdentity();
+      var userData = await _dbService.GetUserData(user_id);
+      List<string> budgetList = userData.BudgetIds;
+      if (budgetList.Count != newOrder.Count || !new HashSet<string>(budgetList).SetEquals(newOrder)) {
+        throw new BadHttpRequestException("Invalid list of budget ids");
+      }
+      userData.BudgetIds = newOrder;
+      await _dbService.UpdateUserData(userData);
+    }
+
     public async Task<Budget> CreateBudget(string name)
     {
         var budget = await _dbService.CreateNewBudgetAsync(name);
@@ -81,6 +92,24 @@ public class UserDataService
     public async Task<Budget> DeleteCategory(string budget_id, int category_id)
     {
         return await _dbService.DeleteCategoryAsync(budget_id, category_id);
+    }
+
+    public async Task ReorderChategoriesAsync(string budget_id, List<int> new_order) {
+        Budget budget = await _dbService.GetBudgetAsync(budget_id);
+        List<Category> category_list = budget.categoryList;
+        var categoriesById = category_list.ToDictionary(c => c.Id);
+        List<Category> reordered = new List<Category>(category_list.Count);
+        foreach(var id in new_order) {
+          if (!categoriesById.ContainsKey(id)) {
+            throw new BadHttpRequestException("Invalid key in input list");
+          }
+          reordered.Add(categoriesById[id]);
+        }
+        if (reordered.Count() != category_list.Count()) {
+          throw new BadHttpRequestException("Order doesn't contain all categories"); 
+        }
+        budget.categoryList = reordered;
+        await _dbService.UpdateBudgetAsync(budget);
     }
 
     public async Task<Budget> DeleteExpense(string budget_id, int category_id, int expense_id)
