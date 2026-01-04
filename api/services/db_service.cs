@@ -180,8 +180,9 @@ public class DbService
     public async Task AddCategoryAsync(string budget_id, List<Category> categoryList)
     {
         Budget budget = await GetBudgetAsync(budget_id);
-        int last_id = (budget.categoryList.LastOrDefault()?.Id ?? 0) + 1;
-        categoryList.ForEach(c => { c.Id = last_id++; c.LastUpdated = DateTime.UtcNow.Ticks; });
+        int last_id = 0; 
+        budget.categoryList.ForEach(c=>{last_id = Math.Max(c.Id, last_id);});
+        categoryList.ForEach(c => { c.Id = ++last_id; c.LastUpdated = DateTime.UtcNow.Ticks; });
         budget.categoryList.AddRange(categoryList);
         await UpdateBudgetAsync(budget);
     }
@@ -208,6 +209,7 @@ public class DbService
         budget.categoryList.RemoveAll(c => c.Id == category.Id);
         await UpdateBudgetAsync(budget);
     }
+
 
     public async Task AddRecurringAsync(string budget_id, Recurring recurring)
     {
