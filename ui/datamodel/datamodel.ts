@@ -125,6 +125,13 @@ export interface BudgetHistory {
   history: Budget[];
 }
 
+export interface GroupCategoryEditRow {
+  row_key: number,
+  id: number | null;
+  title: string;
+  amount: number;
+}
+
 export class DataModelFactory {
   static createExpense(
     lastUsedId: number,

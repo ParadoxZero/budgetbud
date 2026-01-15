@@ -28,6 +28,7 @@ import {
   UserAction,
   DataModelFactory,
   UserActionType,
+  GroupCategoryEditRow,
 } from "../datamodel/datamodel";
 import { fetchData } from "./network_service";
 import { isDemoMode } from "../utils";
@@ -39,6 +40,10 @@ export interface DataService {
   getHistory(): Promise<BudgetHistory>;
   createCategories(budget_id: string, categories: Category[]): Promise<Budget>;
   updateCategory(budget_id: string, category: Category): Promise<Budget>;
+  bulkUpdateCategories(
+    budget_id: string,
+    categories: GroupCategoryEditRow[],
+  ): Promise<Budget>;
   deleteCategory(budget_id: string, categoryId: number): Promise<Budget>;
   updateExpense(budget_id: string, expense: Expense): Promise<Budget>;
   deleteExpense(
@@ -80,6 +85,19 @@ class RemoteDataService implements DataService {
 
   constructor() {
     this.BASE_URL = "";
+  }
+  bulkUpdateCategories(
+    budget_id: string,
+    categories: GroupCategoryEditRow[],
+  ): Promise<Budget> {
+    const endpoint: string = `${this.BASE_URL}/api/Budget/${budget_id}/bulk_edit_categories`;
+    return fetchData(endpoint, {
+      method: "POST",
+      body: JSON.stringify(categories),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((response) => response.json() as Promise<Budget>);
   }
 
   deleteBudget(budget_id: string): Promise<void> {
@@ -185,6 +203,13 @@ class RemoteDataService implements DataService {
 }
 
 class LocalDataService implements DataService {
+  bulkUpdateCategories(
+    budget_id: string,
+    categories: GroupCategoryEditRow[],
+  ): Promise<Budget> {
+    throw new Error("Bulk update categories not implemented for local data service.");
+  }
+
   deleteBudget(budget_id: string): Promise<void> {
     return new Promise((resolve, _reject) => {
       // Implement the logic to delete a budget from local storage

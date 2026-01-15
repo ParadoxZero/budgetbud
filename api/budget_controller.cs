@@ -76,7 +76,7 @@ public class BudgetController : ControllerBase
         return Ok(await _userDataService.UpdateCategory(budget_id, category));
     }
 
-    [HttpPost("{budget_id}/categotries")]
+    [HttpPost("{budget_id}/bulk_edit_categories")]
     public async Task<IActionResult> GroupEditCategories(string budget_id, List<UserDataService.GroupCategoryEditRow> categories) 
     {
       return Ok(await _userDataService.GroupEditCategories(budget_id, categories));

@@ -67,7 +67,8 @@ class App extends React.Component<AppProps> {
       },
     },
     {
-      condition: import.meta.env.VITE_CREATE_DUMMY_DATA === "true" || isDemoMode(),
+      condition:
+        import.meta.env.VITE_CREATE_DUMMY_DATA === "true" || isDemoMode(),
       action: () => {
         localStorage.clear();
         localStorage.setItem("userData", JSON.stringify(CreateDummyData()));

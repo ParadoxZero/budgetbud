@@ -109,7 +109,10 @@ public class UserDataService
           {
             throw new BadHttpRequestException("Invalid category id");
           }
-          updatedCategoryList.Add(categoriesById[category.id.Value]);
+          var existing_category = categoriesById[category.id.Value];
+          existing_category.Allocation = category.amount;
+          existing_category.Name = category.title;
+          updatedCategoryList.Add(existing_category);
         }
         else {
           Category new_category = new Category {
