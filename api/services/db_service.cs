@@ -180,11 +180,17 @@ public class DbService
     public async Task AddCategoryAsync(string budget_id, List<Category> categoryList)
     {
         Budget budget = await GetBudgetAsync(budget_id);
-        int last_id = 0; 
-        budget.categoryList.ForEach(c=>{last_id = Math.Max(c.Id, last_id);});
-        categoryList.ForEach(c => { c.Id = ++last_id; c.LastUpdated = DateTime.UtcNow.Ticks; });
+        int last_id = GetNextCategoryId(budget);
+        categoryList.ForEach(c => { c.Id = last_id++; c.LastUpdated = DateTime.UtcNow.Ticks; });
         budget.categoryList.AddRange(categoryList);
         await UpdateBudgetAsync(budget);
+    }
+
+    public int GetNextCategoryId(Budget budget)
+    {
+        int last_id = 0;
+        budget.categoryList.ForEach(c => { last_id = Math.Max(c.Id, last_id); });
+        return last_id + 1;
     }
 
     public async Task UpdateCategoryAsync(string budget_id, Category category)
