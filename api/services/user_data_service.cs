@@ -28,6 +28,8 @@ public class UserDataService
     private readonly DbService _dbService;
     private readonly IIdentityService _identityService;
 
+    public record GroupCategoryEditRow(int? id, string title, int amount);
+
     public UserDataService(DbService dbService, IIdentityService identityService)
     {
         _dbService = dbService;
@@ -94,6 +96,43 @@ public class UserDataService
         return await _dbService.DeleteCategoryAsync(budget_id, category_id);
     }
 
+    public async Task<Budget> GroupEditCategories(string budget_id, List<GroupCategoryEditRow> categories)
+    {
+      Budget budget = await _dbService.GetBudgetAsync(budget_id);
+      int next_category_id = _dbService.GetNextCategoryId(budget);
+      var categoriesById = budget.categoryList.ToDictionary(c => c.Id);
+      var updatedCategoryList = new List<Category>();
+      foreach(var category in categories) 
+      {
+        if (category.id.HasValue ) {
+          if (!categoriesById.ContainsKey(category.id.Value))
+          {
+            throw new BadHttpRequestException("Invalid category id");
+          }
+          var existing_category = categoriesById[category.id.Value];
+          existing_category.Allocation = category.amount;
+          existing_category.Name = category.title;
+          updatedCategoryList.Add(existing_category);
+        }
+        else {
+          Category new_category = new Category {
+            Id = next_category_id++,
+            Name = category.title,
+            Description = "",
+            Allocation = category.amount,
+            IsActive = true,
+            Currency = "INR",
+            LastUpdated = DateTime.UtcNow.Ticks,
+            ExpenseList = new List<Expense>()
+          };
+          updatedCategoryList.Add(new_category);
+        }
+      }
+      budget.categoryList = updatedCategoryList;
+      await _dbService.UpdateBudgetAsync(budget);
+      return budget; 
+    }
+
     public async Task ReorderChategoriesAsync(string budget_id, List<int> new_order) {
         Budget budget = await _dbService.GetBudgetAsync(budget_id);
         List<Category> category_list = budget.categoryList;
@@ -148,4 +187,5 @@ public class UserDataService
         string user_id = _identityService.GetUserIdentity();
         return (await _dbService.GetUserData(user_id)).NickName;
     }
+
 }

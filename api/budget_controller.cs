@@ -76,6 +76,12 @@ public class BudgetController : ControllerBase
         return Ok(await _userDataService.UpdateCategory(budget_id, category));
     }
 
+    [HttpPost("{budget_id}/bulk_edit_categories")]
+    public async Task<IActionResult> GroupEditCategories(string budget_id, List<UserDataService.GroupCategoryEditRow> categories) 
+    {
+      return Ok(await _userDataService.GroupEditCategories(budget_id, categories));
+    }
+
     [HttpPost("{budget_id}/reorder_categories")]
     public async Task<IActionResult> ReorderCategories(string budget_id, List<int> new_order) {
         await _userDataService.ReorderChategoriesAsync(budget_id, new_order);

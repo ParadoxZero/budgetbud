@@ -1,6 +1,6 @@
 /*
  * BudgetBud - Budgeting and Expense Tracker with WebUI and API server
- * Copyright (C) 2024  Sidhin S Thomas <sidhin.thomas@gmail.com>
+ * Copyright (C) 2026  Sidhin S Thomas <sidhin.thomas@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,256 +18,255 @@
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
 
-import React from "react";
-import { connect } from "react-redux";
-import { Budget, DataModelFactory } from "../datamodel/datamodel";
-import { budgetSlice, navigate, store, View } from "../store";
+import React, { useState, useEffect } from "react";
 import {
-  Button,
-  Card,
-  Divider,
-  Flex,
+  Table,
   Input,
+  InputNumber,
   Popconfirm,
-  Typography,
+  Button,
+  Flex,
+  message,
 } from "antd";
 import {
-  BackwardFilled,
-  CheckOutlined,
-  CloseOutlined,
-  DeleteFilled,
   LeftOutlined,
+  CheckOutlined,
+  DeleteOutlined,
   PlusOutlined,
-  SendOutlined,
-  UpOutlined,
 } from "@ant-design/icons";
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import type { DragEndEvent } from "@dnd-kit/core";
 import { DataService, getDataService } from "../services/data_service";
-import { AddCategoriesForm } from "../components/add_categories_form";
+import { Budget, GroupCategoryEditRow } from "../datamodel/datamodel";
+import { useDispatch } from "react-redux";
+import { budgetSlice, navigate, View } from "../store";
 
-export interface EditCategoriesPageProps {
+interface DraggableTableBodyRowProps
+  extends React.HTMLAttributes<HTMLTableRowElement> {
+  "data-row-key": string;
+}
+
+const DraggableTableBodyRow: React.FC<DraggableTableBodyRowProps> = (props) => {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({
+      id: props["data-row-key"],
+    });
+
+  const style: React.CSSProperties = {
+    ...props.style,
+    transform: CSS.Transform.toString(transform && { ...transform, scaleY: 1 }),
+    transition,
+    cursor: "move",
+  };
+
+  return (
+    <tr
+      {...props}
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+    />
+  );
+};
+
+interface EditCategoriesPageProps {
   budget: Budget;
 }
 
-interface EditCategoriesPageState {
-  is_loading: boolean;
-  add_category_mode: boolean;
-}
+const EditCategoriesPage: React.FC<EditCategoriesPageProps> = ({
+  budget,
+}) => {
+  const [dataSource, setDataSource] = useState<GroupCategoryEditRow[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const dispatch = useDispatch();
+  const _data_service: DataService = getDataService();
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 1,
+      },
+    }),
+  );
 
-class EditCategoriesPage extends React.Component<
-  EditCategoriesPageProps,
-  EditCategoriesPageState
-> {
-  _data_service: DataService;
-
-  constructor(props: EditCategoriesPageProps) {
-    super(props);
-    this._data_service = getDataService();
-    this.state = {
-      is_loading: false,
-      add_category_mode: false,
-    };
-  }
-
-  render() {
-    return (
-      <Flex vertical align="center" justify="center">
-        <Divider />
-        {this.render_control_buttons()}
-        <Divider />
-        {this.render_body()}
-      </Flex>
+  useEffect(() => {
+    const initialData: GroupCategoryEditRow[] = budget.categoryList.map(
+      (cat, index) => ({
+        row_key: index,
+        id: cat.id,
+        title: cat.name,
+        amount: cat.allocation,
+      }),
     );
-  }
+    setDataSource(initialData);
+  }, [budget]);
 
-  render_body() {
-    if (this.state.add_category_mode) {
-      return this.render_add_category();
-    } else {
-      return this.render_categories();
+  const handleRowChange = (
+    id: number | null,
+    field: keyof GroupCategoryEditRow,
+    value: any,
+  ) => {
+    const newData = [...dataSource];
+    const index = newData.findIndex((item) => item.row_key === id);
+    if (index > -1) {
+      const item = newData[index];
+      newData.splice(index, 1, { ...item, [field]: value });
+      setDataSource(newData);
     }
-  }
+  };
 
-  render_add_category() {
-    return (
-      <AddCategoriesForm
-        budget_id={this.props.budget.id}
-        onCategoriesAdded={() => {
-          store.dispatch(navigate(View.Overview));
-        }}
-        onCancel={() => {
-          this.setState({ add_category_mode: false });
-        }}
-      />
-    );
-  }
+  const handleAddRow = () => {
+    const newRow: GroupCategoryEditRow = {
+      row_key: dataSource.length + 1,
+      id: null,
+      title: "",
+      amount: 0,
+    };
+    setDataSource([...dataSource, newRow]);
+  };
 
-  render_categories() {
-    return (
-      <Card bordered={false} style={{ maxWidth: 600 }}>
-        <Flex justify="space-between" vertical>
-          {this.props.budget.categoryList.map((category) => (
-            <div key={category.id}>
-              {this.render_catogory_list_row(
-                category.id,
-                category.name,
-                category.allocation,
-              )}
-            </div>
-          ))}
-        </Flex>
-      </Card>
-    );
-  }
+  const handleDeleteRow = (id: number | null) => {
+    const newData = dataSource.filter((item) => item.row_key !== id);
+    setDataSource(newData);
+  };
 
-  render_control_buttons() {
-    const on_back_click = () => {
-      if (this.state.add_category_mode) {
-        this.setState({ add_category_mode: false });
-        return;
-      }
-      store.dispatch(navigate(View.Overview));
-    };
-    const on_add_category_click = () => {
-      this.setState({ add_category_mode: true });
-    };
-    return (
-      <>
-        <Flex align="center" justify="center" gap={10} wrap>
-          <Button
-            shape="default"
-            type="primary"
-            icon={<LeftOutlined />}
-            onClick={on_back_click}
-            disabled={this.state.is_loading}
-          >
-            {" "}
-            Back{" "}
-          </Button>
-          <Button
-            shape="default"
-            type="default"
-            icon={<PlusOutlined />}
-            onClick={on_add_category_click}
-          >
-            Add Categories
-          </Button>
-          <Popconfirm
-            title="Delete Budget"
-            description="Are you sure? All data will be lost."
-            okText="Yes"
-            cancelText="No"
-            onConfirm={() => {
-              this.setState({ is_loading: true });
-              this._data_service
-                .deleteBudget(this.props.budget.id)
-                .then(() => store.dispatch(navigate(View.Overview)))
-                .finally(() => {
-                  this.setState({ is_loading: false });
-                });
-            }}
-          >
-            <Button
-              danger
-              shape="default"
-              icon={<DeleteFilled />}
-              disabled={this.state.is_loading}
-            >
-              {" "}
-              Delete Budget{" "}
-            </Button>
-          </Popconfirm>
-        </Flex>
-      </>
-    );
-  }
+  const handleBulkSave = async () => {
+    setLoading(true);
+    try {
+      const updatedBudget = await _data_service.bulkUpdateCategories(
+        budget.id,
+        dataSource, 
+      );
+      dispatch(budgetSlice.actions.updateCurrent(updatedBudget));
+      message.success("Categories updated successfully!");
+    } catch (error) {
+      message.error("Failed to update categories.");
+      console.error("Bulk save error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  render_catogory_list_row(id: number, title: string, allocation: number) {
-    const delete_title = "Delete '" + title + "' category";
-    const delete_question = "Are you sure? All data will be lost.";
+  const handleDragEnd = ({ active, over }: DragEndEvent) => {
+    if (active.id !== over?.id) {
+      setDataSource((previous) => {
+        const activeIndex = previous.findIndex((item) => item.row_key === active.id);
+        const overIndex = previous.findIndex((item) => item.row_key === over?.id);
+        return arrayMove(previous, activeIndex, overIndex);
+      });
+    }
+  };
 
-    let updated_title = title;
-    let updated_allocation = allocation;
+  const columns = [
+    {
+      title: "Title",
+      dataIndex: "title",
+      width: "50%",
+      render: (_: any, record: GroupCategoryEditRow) => (
+        <Input
+          value={record.title}
+          onChange={(e) => handleRowChange(record.row_key, "title", e.target.value)}
+        />
+      ),
+    },
+    {
+      title: "Amount",
+      dataIndex: "amount",
+      width: "30%",
+      render: (_: any, record: GroupCategoryEditRow) => (
+        <InputNumber
+          value={record.amount}
+          onChange={(value) => handleRowChange(record.row_key, "amount", value)}
+        />
+      ),
+    },
+    {
+      title: "Operation",
+      dataIndex: "operation",
+      render: (_: any, record: GroupCategoryEditRow) => (
+        <Popconfirm
+          title="Sure to delete?"
+          onConfirm={() => handleDeleteRow(record.row_key)}
+        >
+          <Button icon={<DeleteOutlined />} danger />
+        </Popconfirm>
+      ),
+    },
+  ];
 
-    const on_delete_click = () => {
-      this._data_service
-        .deleteCategory(this.props.budget.id, id)
-        .then((budget: Budget) =>
-          store.dispatch(budgetSlice.actions.updateCurrent(budget)),
-        )
-        .finally(() => {
-          this.setState({ is_loading: false });
-        });
-    };
-    const on_title_change = (e: React.ChangeEvent<HTMLInputElement>) => {
-      updated_title = e.target.value;
-    };
-    const on_allocation_change = (e: React.ChangeEvent<HTMLInputElement>) => {
-      updated_allocation = parseInt(e.target.value);
-    };
-    const on_edit_click = () => {
-      let category = DataModelFactory.createCategory(0);
-      category.name = updated_title;
-      category.allocation = updated_allocation;
-      category.id = id;
-      this.setState({ is_loading: true });
-      this._data_service
-        .updateCategory(this.props.budget.id, category)
-        .then((budget: Budget) =>
-          store.dispatch(budgetSlice.actions.updateCurrent(budget)),
-        )
-        .finally(() => this.setState({ is_loading: false }));
-    };
-    return (
-      <div
-        style={{
-          margin: 0,
-          marginTop: 10,
-          marginBottom: 10,
-          paddingRight: 20,
-          paddingLeft: 20,
-          minWidth: 300,
-        }}
+  const on_back_click = () => {
+    dispatch(navigate(View.Overview));
+  };
+
+  return (
+    <Flex vertical align="center" justify="center">
+      <Flex align="center" justify="center" gap={10} wrap style={{ margin: 20 }}>
+        <Button
+          shape="default"
+          type="primary"
+          icon={<LeftOutlined />}
+          onClick={on_back_click}
+          disabled={loading}
+        >
+          Back
+        </Button>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={handleAddRow}
+          disabled={loading}
+        >
+          Add Row
+        </Button>
+        <Button
+          type="primary"
+          icon={<CheckOutlined />}
+          onClick={handleBulkSave}
+          loading={loading}
+        >
+          Save All Changes
+        </Button>
+      </Flex>
+      <DndContext
+        sensors={sensors}
+        modifiers={[restrictToVerticalAxis]}
+        onDragEnd={handleDragEnd}
       >
-        <Flex align="center" justify="center" gap={10}>
-          <Input
-            size="middle"
-            defaultValue={title}
-            style={{ minWidth: 150, maxWidth: 350 }}
-            onChange={on_title_change}
-          ></Input>
-          <Input
-            size="middle"
-            defaultValue={allocation}
-            style={{ minWidth: 50, maxWidth: 100 }}
-            onChange={on_allocation_change}
-          ></Input>
-          <Button
-            shape="circle"
-            type="primary"
-            icon={<CheckOutlined />}
-            onClick={on_edit_click}
-            disabled={this.state.is_loading}
-          ></Button>
-
-          <Popconfirm
-            title={delete_title}
-            description={delete_question}
-            onConfirm={on_delete_click}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button
-              danger
-              shape="circle"
-              type="primary"
-              icon={<DeleteFilled />}
-              disabled={this.state.is_loading}
-            ></Button>
-          </Popconfirm>
-        </Flex>
-      </div>
-    );
-  }
-}
+        <SortableContext
+          items={dataSource.map((item) => item.row_key)}
+          strategy={verticalListSortingStrategy}
+        >
+          <Table
+            components={{
+              body: {
+                row: DraggableTableBodyRow,
+              },
+            }}
+            bordered
+            dataSource={dataSource}
+            columns={columns}
+            rowClassName="editable-row"
+            pagination={false}
+            rowKey={(record) => record.row_key}
+          />
+        </SortableContext>
+      </DndContext>
+    </Flex>
+  );
+};
 
 export default EditCategoriesPage;
+
