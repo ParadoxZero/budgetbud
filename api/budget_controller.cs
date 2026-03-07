@@ -107,6 +107,24 @@ public class BudgetController : ControllerBase
         return Ok(await _userDataService.DeleteExpense(budget_id, category_id, expense_id));
     }
 
+    [HttpPost("{budget_id}/recurring")]
+    public async Task<IActionResult> AddRecurring(string budget_id, Recurring recurring)
+    {
+        return Ok(await _userDataService.AddRecurring(budget_id, recurring));
+    }
+
+    [HttpPut("{budget_id}/recurring")]
+    public async Task<IActionResult> UpdateRecurring(string budget_id, Recurring recurring)
+    {
+        return Ok(await _userDataService.UpdateRecurring(budget_id, recurring));
+    }
+
+    [HttpDelete("{budget_id}/recurring/{recurring_id}")]
+    public async Task<IActionResult> DeleteRecurring(string budget_id, int recurring_id)
+    {
+        return Ok(await _userDataService.DeleteRecurring(budget_id, recurring_id));
+    }
+
     [HttpPost("{budget_id}/rollover")]
     public async Task<IActionResult> Rollover(string budget_id)
     {

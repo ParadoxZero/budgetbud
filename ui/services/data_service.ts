@@ -181,12 +181,21 @@ class RemoteDataService implements DataService {
     );
   }
 
-  updateRecurring(_budget_id: string, _recurring: Recurring): Promise<Budget> {
-    throw new Error("Not implemented");
+  updateRecurring(_budget_id: string, recurring: Recurring): Promise<Budget> {
+    const isNew = recurring.id === 0;
+    const endpoint = `${this.BASE_URL}/api/Budget/${_budget_id}/recurring`;
+    return fetchData(endpoint, {
+      method: isNew ? "POST" : "PUT",
+      body: JSON.stringify(recurring),
+      headers: { "Content-Type": "application/json" },
+    }).then((response) => response.json() as Promise<Budget>);
   }
 
-  deleteRecurring(_budget_id: string, _recurringId: number): Promise<Budget> {
-    throw new Error("Not implemented");
+  deleteRecurring(_budget_id: string, recurringId: number): Promise<Budget> {
+    const endpoint = `${this.BASE_URL}/api/Budget/${_budget_id}/recurring/${recurringId}`;
+    return fetchData(endpoint, { method: "DELETE" }).then(
+      (response) => response.json() as Promise<Budget>,
+    );
   }
 
   updateUnplanned(_budget_id: string, _unplanned: Unplanned): Promise<Budget> {

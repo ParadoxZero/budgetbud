@@ -217,11 +217,35 @@ public class DbService
     }
 
 
-    public async Task AddRecurringAsync(string budget_id, Recurring recurring)
+    public async Task<Budget> AddRecurringAsync(string budget_id, Recurring recurring)
     {
         Budget budget = await GetBudgetAsync(budget_id);
+        int last_id = 0;
+        budget.recurringList.ForEach(r => { last_id = Math.Max(r.Id, last_id); });
+        recurring.Id = last_id + 1;
+        recurring.LastUpdated = DateTime.UtcNow.Ticks;
         budget.recurringList.Add(recurring);
         await UpdateBudgetAsync(budget);
+        return budget;
+    }
+
+    public async Task<Budget> UpdateRecurringAsync(string budget_id, Recurring recurring)
+    {
+        Budget budget = await GetBudgetAsync(budget_id);
+        int index = budget.recurringList.FindIndex(r => r.Id == recurring.Id);
+        if (index == -1) throw new Exception("Recurring item not found");
+        recurring.LastUpdated = DateTime.UtcNow.Ticks;
+        budget.recurringList[index] = recurring;
+        await UpdateBudgetAsync(budget);
+        return budget;
+    }
+
+    public async Task<Budget> DeleteRecurringAsync(string budget_id, int recurring_id)
+    {
+        Budget budget = await GetBudgetAsync(budget_id);
+        budget.recurringList.RemoveAll(r => r.Id == recurring_id);
+        await UpdateBudgetAsync(budget);
+        return budget;
     }
 
     public async Task DeleteBudgetAsync(string budget_id)

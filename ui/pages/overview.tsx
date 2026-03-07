@@ -72,6 +72,7 @@ import SingleCategory from "../components/single_category";
 import EditCategory, { EditCategoryState } from "../components/edit_category";
 import { ShareBudgetModal } from "../components/share_budget_modal";
 import { RolloverModal } from "../components/rollover_modal";
+import SubscriptionsSection from "../components/subscriptions_section";
 
 const { Text } = Typography;
 
@@ -488,6 +489,18 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     );
   }
 
+  render_subscriptions() {
+    if (this.props.selected_budget_index == null) return null;
+    const budget = this.props.budget_list[this.props.selected_budget_index];
+    return (
+      <SubscriptionsSection
+        budget_id={budget.id}
+        recurringList={budget.recurringList}
+        dataService={this._data_service}
+      />
+    );
+  }
+
   render_page() {
     const sideMargin = GetScreenSize() == ScreenSize.desktop ? 20 : 0;
     return (
@@ -503,6 +516,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
         }}
       >
         {this.header()}
+        {this.render_subscriptions()}
         {this.render_categories()}
       </Flex>
     );

@@ -156,6 +156,21 @@ public class UserDataService
         return await _dbService.DeleteExpenseAsync(budget_id, category_id, expense_id);
     }
 
+    public async Task<Budget> AddRecurring(string budget_id, Recurring recurring)
+    {
+        return await _dbService.AddRecurringAsync(budget_id, recurring);
+    }
+
+    public async Task<Budget> UpdateRecurring(string budget_id, Recurring recurring)
+    {
+        return await _dbService.UpdateRecurringAsync(budget_id, recurring);
+    }
+
+    public async Task<Budget> DeleteRecurring(string budget_id, int recurring_id)
+    {
+        return await _dbService.DeleteRecurringAsync(budget_id, recurring_id);
+    }
+
     public async Task<Budget> RolloverBudget(string budget_id)
     {
         Budget budget = await _dbService.GetBudgetAsync(budget_id);
