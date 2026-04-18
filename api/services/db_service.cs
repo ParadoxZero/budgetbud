@@ -31,7 +31,7 @@ using System.Threading.Tasks;
 
 namespace budgetbud.Services;
 
-public class DbService
+public class DbService : IDbService
 {
     private readonly CosmosClient _cosmosClient;
     private readonly Database _database;
@@ -152,20 +152,34 @@ public class DbService
         } while (cat.ExpenseList.Exists(e => e.Id == expense.Id));
         expense.AddedBy = _identityService.GetUserIdentity();
         expense.Timestamp = DateTime.UtcNow.Ticks;
+        expense.LastModified = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         cat.ExpenseList.Add(expense);
         cat.LastUpdated = DateTime.UtcNow.Ticks;
         await UpdateBudgetAsync(budget);
         return await UpdateUserNickName(budget);
     }
 
-    public async Task UpdateExpenseAsync(string budget_id, Expense expense)
+    // Updates an existing expense, rejecting edits whose client timestamp is not newer than the stored one.
+    public async Task<Budget> UpdateExpenseAsync(string budget_id, Expense expense)
     {
         Budget budget = await GetBudgetAsync(budget_id);
-        expense.Timestamp = DateTime.UtcNow.Ticks;
         Category category = budget.categoryList?.Find(c => c.Id == expense.CategoryId) ?? throw new Exception("Category not found");
-        category.ExpenseList[category.ExpenseList.FindIndex(e => e.Id == expense.Id)] = expense;
+        int idx = category.ExpenseList.FindIndex(e => e.Id == expense.Id);
+        if (idx == -1) throw new Exception("Expense not found");
+
+        Expense existing = category.ExpenseList[idx];
+
+        // Reject stale edits: only apply if the client's edit timestamp is strictly newer.
+        if (expense.LastModified > 0 && expense.LastModified <= existing.LastModified)
+        {
+            return await UpdateUserNickName(budget);
+        }
+
+        expense.LastModified = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        category.ExpenseList[idx] = expense;
         category.LastUpdated = DateTime.UtcNow.Ticks;
         await UpdateBudgetAsync(budget);
+        return await UpdateUserNickName(budget);
     }
 
     public async Task DeleteExpense(string budget_id, Expense expense)
@@ -245,7 +259,7 @@ public class DbService
         return await UpdateUserNickName(budget);
     }
 
-    internal async Task<Budget> DeleteExpenseAsync(string budget_id, int category_id, int expense_id)
+    public async Task<Budget> DeleteExpenseAsync(string budget_id, int category_id, int expense_id)
     {
         Budget budget = await GetBudgetAsync(budget_id);
         Category category = budget.categoryList.Find(c => c.Id == category_id) ?? throw new Exception("Category not found");
@@ -255,7 +269,7 @@ public class DbService
         return await UpdateUserNickName(budget);
     }
 
-    internal async Task<Budget> UpdateUserNickName(Budget budget)
+    public async Task<Budget> UpdateUserNickName(Budget budget)
     {
         Dictionary<string, string> userNames = new Dictionary<string, string>();
         foreach (Category category in budget.categoryList)

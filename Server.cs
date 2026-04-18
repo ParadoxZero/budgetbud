@@ -71,7 +71,7 @@ builder.Services.AddAuthentication(options =>
     options.ClientSecret = builder.Configuration.GetValue<string>("Auth:GoogleClientSecret");
 });
 
-builder.Services.AddSingleton<DbService>();
+builder.Services.AddSingleton<IDbService, DbService>();
 builder.Services.AddSingleton<UserDataService>();
 
 var app = builder.Build();
@@ -121,3 +121,5 @@ if (use_swagger)
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }
