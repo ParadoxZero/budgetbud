@@ -237,6 +237,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ConfigProvider
       theme={{
+        token: {
+          fontFamily: "'Miranda Sans', sans-serif",
+          fontWeightStrong: 600,
+        },
         components: {
           Layout: {
             headerBg: "white",
