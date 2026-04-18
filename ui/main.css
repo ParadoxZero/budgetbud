@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Miranda Sans';
+  src: url('/fonts/MirandaSans-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 .touchahble {
   cursor: pointer;
   transition:
@@ -30,6 +38,8 @@
 }
 
 body {
+  font-family: 'Miranda Sans', sans-serif;
+  font-weight: 600;
   -webkit-touch-callout: none;
   /* Safari */
   -webkit-user-select: none;

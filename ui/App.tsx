@@ -103,6 +103,10 @@ class App extends React.Component<AppProps> {
     return (
       <ConfigProvider
         theme={{
+          token: {
+            fontFamily: "'Miranda Sans', sans-serif",
+            fontWeightStrong: 600,
+          },
           components: {
             Layout: {
               headerBg: "white",
