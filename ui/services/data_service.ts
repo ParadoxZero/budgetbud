@@ -32,6 +32,12 @@ import {
 } from "../datamodel/datamodel";
 import { fetchData } from "./network_service";
 import { isDemoMode } from "../utils";
+import {
+  enqueueOperation,
+  getQueueSize,
+} from "./sync_queue";
+import { backgroundSyncService } from "./background_sync_service";
+import { store, syncSlice } from "../store";
 
 export interface DataService {
   getBudget(): Promise<Budget[]>;
@@ -61,11 +67,9 @@ export interface DataService {
 
 export function getDataService(): DataService {
   if (isDemoMode()) {
-    // Return the local data service implementation
     return new LocalDataService();
   } else {
-    // Return the URL service implementation
-    return new RemoteDataService();
+    return new QueuedDataService();
   }
 }
 
@@ -80,7 +84,7 @@ export async function RolloverBudget(budget_id: string): Promise<Budget> {
   return await response.json();
 }
 
-class RemoteDataService implements DataService {
+export class RemoteDataService implements DataService {
   BASE_URL: string;
 
   constructor() {
@@ -199,6 +203,100 @@ class RemoteDataService implements DataService {
 
   getUserActions(_budget_id: string): Promise<UserAction[]> {
     throw new Error("Not implemented");
+  }
+}
+
+function applyExpenseToLocalBudget(budget: Budget, expense: Expense): Budget {
+  const updated = JSON.parse(JSON.stringify(budget)) as Budget;
+  const category = updated.categoryList.find((c) => c.id === expense.categoryId);
+  if (!category) return updated;
+  const idx = category.expenseList.findIndex((e) => e.id === expense.id);
+  if (idx !== -1) {
+    category.expenseList[idx] = expense;
+  } else {
+    category.expenseList.push(expense);
+  }
+  updated.last_updated = Date.now();
+  return updated;
+}
+
+function deleteExpenseFromLocalBudget(
+  budget: Budget,
+  category_id: number,
+  expense_id: number,
+): Budget {
+  const updated = JSON.parse(JSON.stringify(budget)) as Budget;
+  const category = updated.categoryList.find((c) => c.id === category_id);
+  if (category) {
+    category.expenseList = category.expenseList.filter((e) => e.id !== expense_id);
+  }
+  updated.last_updated = Date.now();
+  return updated;
+}
+
+function getCurrentBudget(budget_id: string): Budget | null {
+  const state = store.getState() as any;
+  const budget_list: Budget[] = state.budget.budget_list;
+  return budget_list.find((b) => b.id === budget_id) ?? null;
+}
+
+export class QueuedDataService implements DataService {
+  private remote: RemoteDataService;
+
+  constructor() {
+    this.remote = new RemoteDataService();
+  }
+
+  updateExpense(budget_id: string, expense: Expense): Promise<Budget> {
+    const current = getCurrentBudget(budget_id);
+    if (!current) return this.remote.updateExpense(budget_id, expense);
+    const optimistic = applyExpenseToLocalBudget(current, expense);
+    enqueueOperation({ type: "ADD_EXPENSE", budget_id, payload: { expense } });
+    store.dispatch(syncSlice.actions.setPending(getQueueSize()));
+    backgroundSyncService.triggerSync();
+    return Promise.resolve(optimistic);
+  }
+
+  deleteExpense(budget_id: string, category_id: number, expense_id: number): Promise<Budget> {
+    const current = getCurrentBudget(budget_id);
+    if (!current) return this.remote.deleteExpense(budget_id, category_id, expense_id);
+    const optimistic = deleteExpenseFromLocalBudget(current, category_id, expense_id);
+    enqueueOperation({ type: "DELETE_EXPENSE", budget_id, payload: { category_id, expense_id } });
+    store.dispatch(syncSlice.actions.setPending(getQueueSize()));
+    backgroundSyncService.triggerSync();
+    return Promise.resolve(optimistic);
+  }
+
+  getBudget(): Promise<Budget[]> { return this.remote.getBudget(); }
+  createBudget(name: string): Promise<Budget> { return this.remote.createBudget(name); }
+  deleteBudget(budget_id: string): Promise<void> { return this.remote.deleteBudget(budget_id); }
+  getHistory(budget_id?: string): Promise<BudgetHistory> { return this.remote.getHistory(); }
+  createCategories(budget_id: string, categories: Category[]): Promise<Budget> {
+    return this.remote.createCategories(budget_id, categories);
+  }
+  updateCategory(budget_id: string, category: Category): Promise<Budget> {
+    return this.remote.updateCategory(budget_id, category);
+  }
+  bulkUpdateCategories(budget_id: string, categories: GroupCategoryEditRow[]): Promise<Budget> {
+    return this.remote.bulkUpdateCategories(budget_id, categories);
+  }
+  deleteCategory(budget_id: string, categoryId: number): Promise<Budget> {
+    return this.remote.deleteCategory(budget_id, categoryId);
+  }
+  updateRecurring(budget_id: string, recurring: Recurring): Promise<Budget> {
+    return this.remote.updateRecurring(budget_id, recurring);
+  }
+  deleteRecurring(budget_id: string, recurringId: number): Promise<Budget> {
+    return this.remote.deleteRecurring(budget_id, recurringId);
+  }
+  updateUnplanned(budget_id: string, unplanned: Unplanned): Promise<Budget> {
+    return this.remote.updateUnplanned(budget_id, unplanned);
+  }
+  deleteUnplanned(budget_id: string, unplannedId: number): Promise<Budget> {
+    return this.remote.deleteUnplanned(budget_id, unplannedId);
+  }
+  getUserActions(budget_id: string): Promise<UserAction[]> {
+    return this.remote.getUserActions(budget_id);
   }
 }
 
