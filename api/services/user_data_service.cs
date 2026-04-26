@@ -18,6 +18,7 @@
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
 
+using budgetbud.Dto;
 using budgetbud.Exceptions;
 using budgetbud.Models;
 
@@ -27,8 +28,6 @@ public class UserDataService
 {
     private readonly DbService _dbService;
     private readonly IIdentityService _identityService;
-
-    public record GroupCategoryEditRow(int? id, string title, int amount);
 
     public UserDataService(DbService dbService, IIdentityService identityService)
     {
