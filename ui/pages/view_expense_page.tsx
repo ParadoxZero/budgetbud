@@ -49,57 +49,7 @@ import { DataService, getDataService } from "../services/data_service";
 import header from "../components/header";
 import { TicksToDate } from "../utils";
 import { ExpenseDetailsModal } from "../components/expense_details_modal";
-
-interface EditExpenseModalProps {
-  editingExpense: { id: number; title: string; amount: number; categoryId: number } | null;
-  categories: { id: number; name: string }[];
-  budgetId: string;
-  defaultCategoryId: number;
-  onClose: () => void;
-  onLoadingChange: (loading: boolean) => void;
-}
-
-const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
-  editingExpense,
-  categories,
-  budgetId,
-  defaultCategoryId,
-  onClose,
-  onLoadingChange,
-}) => {
-  const dataService = getDataService();
-  return (
-    <ExpenseDetailsModal
-      isOpen={editingExpense !== null}
-      categories={categories}
-      defaultCategoryId={editingExpense?.categoryId ?? defaultCategoryId}
-      defaultAmount={editingExpense?.amount ?? 0}
-      defaultTitle={editingExpense?.title}
-      modalTitle="Edit Expense"
-      submitLabel="Save"
-      onClose={onClose}
-      onSubmit={(title, amount, categoryId) => {
-        if (!editingExpense) return;
-        const expense = DataModelFactory.createExpense(
-          editingExpense.id,
-          categoryId,
-          amount,
-          title,
-        );
-        onLoadingChange(true);
-        dataService
-          .updateExpense(budgetId, expense)
-          .then((budget) => {
-            store.dispatch(budgetSlice.actions.updateCurrent(budget));
-          })
-          .finally(() => {
-            onLoadingChange(false);
-          });
-        onClose();
-      }}
-    />
-  );
-};
+import { EditExpenseModal } from "../components/edit_expense_modal";
 
 export interface ViewExpensePageProps {
   budget: Budget;
