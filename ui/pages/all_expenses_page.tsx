@@ -32,7 +32,7 @@ export interface AllExpensesPageProps {
 }
 
 interface AllExpensesPageState {
-  editingExpense: { id: number; title: string; amount: number; categoryId: number; timestamp: number } | null;
+  editingExpense: { id: number; title: string; amount: number; categoryId: number } | null;
   isLoading: boolean;
 }
 
@@ -159,7 +159,7 @@ class AllExpensesPage extends React.Component<
                 icon={<EditFilled />}
                 size="small"
                 onClick={() => expense && this.setState({
-                  editingExpense: { id: expense.id, title: expense.title, amount: expense.amount, categoryId: expense.categoryId, timestamp: expense.timestamp },
+                  editingExpense: { id: expense.id, title: expense.title, amount: expense.amount, categoryId: expense.categoryId },
                 })}
               >
                 Edit

@@ -59,7 +59,7 @@ export interface ViewExpensePageProps {
 interface ViewExpensePageState {
   isAddExpenseModalOpen: boolean;
   isLoading: boolean;
-  editingExpense: { id: number; title: string; amount: number; categoryId: number; timestamp: number } | null;
+  editingExpense: { id: number; title: string; amount: number; categoryId: number } | null;
 }
 
 class ViewExpensePage extends React.Component<
@@ -223,7 +223,6 @@ class ViewExpensePage extends React.Component<
             title: expense.title,
             amount: expense.amount,
             categoryId: expense.categoryId,
-            timestamp: expense.timestamp,
           },
         });
       };
