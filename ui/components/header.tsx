@@ -203,7 +203,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
               if (data.length) {
                 store.dispatch(budgetSlice.actions.set({
                   budget_list: data,
-                  selected_budget_index: data.length - 1,
+                  selected_budget_index: data.length - 1, // newly added budget is appended last
                 }));
               }
             });
