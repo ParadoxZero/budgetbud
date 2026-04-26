@@ -45,7 +45,7 @@ export function LinkBudgetModal(props: {
     LinkBudget(code)
       .then(() => {
         props.onDone();
-        messageApi.error("Succesfully linked the budget.", 5);
+        messageApi.success("Successfully linked the budget.", 5);
       })
       .catch(() => {
         messageApi.error("Failed to link budget.", 5);
