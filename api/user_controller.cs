@@ -18,6 +18,8 @@
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
 
+using budgetbud.Models.Request;
+using budgetbud.Models.Response;
 using budgetbud.Exceptions;
 using budgetbud.Models;
 using budgetbud.Services;
@@ -40,7 +42,6 @@ public class UserController : ControllerBase
     _identityService = identityService;
   }
 
-  public record GetUserDetailsResponse(string nickName, string id);
   [HttpGet("details")]
   public async Task<IActionResult> GetUserDetails()
   {
@@ -51,7 +52,6 @@ public class UserController : ControllerBase
     return Ok(userDetails);
   }
 
-  public record UpdateNickNameInput(string nickName);
   [HttpPost("nickname")]
   public async Task<IActionResult> UpdateUserNickName([FromBody] UpdateNickNameInput input)
   {
