@@ -122,6 +122,17 @@ export class RemoteDataService implements DataService {
     }).then((response) => response.json() as Promise<Budget>);
   }
 
+  editExpense(_budget_id: string, expense: Expense): Promise<Budget> {
+    const endpoint: string = `${this.BASE_URL}/api/Budget/${_budget_id}/expense`;
+    return fetchData(endpoint, {
+      method: "PUT",
+      body: JSON.stringify(expense),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((response) => response.json() as Promise<Budget>);
+  }
+
   deleteExpense(
     _budget_id: string,
     category_id: number,

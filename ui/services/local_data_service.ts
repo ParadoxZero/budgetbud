@@ -265,6 +265,35 @@ export class LocalDataService implements DataService {
     });
   }
 
+  editExpense(_budget_id: string, expense: Expense): Promise<Budget> {
+    return new Promise((resolve, reject) => {
+      const user_data = localStorage.getItem("userData") ?? "[]";
+      if (user_data) {
+        let budget_list: Budget[] = JSON.parse(user_data);
+        const index = this.find_budget_by_id(_budget_id, budget_list);
+        if (index === -1) {
+          reject();
+          return;
+        }
+        budget_list[index].categoryList = budget_list[index].categoryList.map(
+          (c: Category) => {
+            if (c.id === expense.categoryId) {
+              c.expenseList = c.expenseList.map((e: Expense) =>
+                e.id === expense.id ? expense : e,
+              );
+            }
+            return c;
+          },
+        );
+        budget_list[index].last_updated = Date.now();
+        localStorage.setItem("userData", JSON.stringify(budget_list));
+        resolve(budget_list[index]);
+      } else {
+        reject();
+      }
+    });
+  }
+
   deleteExpense(
     _budget_id: string,
     category_id: number,

@@ -67,7 +67,7 @@ import {
 
 import "../main.css";
 import { connect } from "react-redux";
-import { AddExpenseModal } from "../components/add_expense_modal";
+import { ExpenseDetailsModal } from "../components/expense_details_modal";
 import SingleCategory from "../components/single_category";
 import EditCategory, { EditCategoryState } from "../components/edit_category";
 import { ShareBudgetModal } from "../components/share_budget_modal";
@@ -411,7 +411,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     const context = this.state.add_expense_mode_context;
     if (!context) return null;
     return (
-      <AddExpenseModal
+      <ExpenseDetailsModal
         isOpen={context.isModalOpen || false}
         categories={categories}
         defaultCategoryId={context.category_id}
