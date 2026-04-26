@@ -31,7 +31,7 @@ export default defineConfig({
       manifest: {
         name: "BudgetBud - Track your budget seamlessly",
         short_name: "BudgetBud",
-        start_url: "/",
+        start_url: "/app.html",
         display: "minimal-ui",
         display_override: ["window-controls-overlay"],
         icons: [
@@ -50,7 +50,10 @@ export default defineConfig({
         categories: ["finance", "productivity"],
       },
       workbox: {
-        globIgnores: ["*"],
+        globPatterns: ["**/*.{js,css,html,png,svg,ico,woff,woff2}"],
+        navigateFallback: "/app.html",
+        // Don't intercept API calls, auth routes, or the landing/login page
+        navigateFallbackDenylist: [/^\/api/, /^\/login/, /^\/logout/, /^\/index\.html/, /^\/demo\.html/, /^\/privacy\.html/],
       },
     }),
   ],
