@@ -317,7 +317,7 @@ class ViewExpensePage extends React.Component<
     return (
       <>
         <Timeline
-          mode="alternate"
+          mode="left"
           items={item_list}
           style={{ minWidth: 300 }}
           reverse
