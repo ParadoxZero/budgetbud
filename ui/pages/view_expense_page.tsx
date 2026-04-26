@@ -48,7 +48,58 @@ import { connect } from "react-redux";
 import { DataService, getDataService } from "../services/data_service";
 import header from "../components/header";
 import { TicksToDate } from "../utils";
-import { AddExpenseModal } from "../components/add_expense_modal";
+import { ExpenseDetailsModal } from "../components/expense_details_modal";
+
+interface EditExpenseModalProps {
+  editingExpense: { id: number; title: string; amount: number; categoryId: number } | null;
+  categories: { id: number; name: string }[];
+  budgetId: string;
+  defaultCategoryId: number;
+  onClose: () => void;
+  onLoadingChange: (loading: boolean) => void;
+}
+
+const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
+  editingExpense,
+  categories,
+  budgetId,
+  defaultCategoryId,
+  onClose,
+  onLoadingChange,
+}) => {
+  const dataService = getDataService();
+  return (
+    <ExpenseDetailsModal
+      isOpen={editingExpense !== null}
+      categories={categories}
+      defaultCategoryId={editingExpense?.categoryId ?? defaultCategoryId}
+      defaultAmount={editingExpense?.amount ?? 0}
+      defaultTitle={editingExpense?.title}
+      modalTitle="Edit Expense"
+      submitLabel="Save"
+      onClose={onClose}
+      onSubmit={(title, amount, categoryId) => {
+        if (!editingExpense) return;
+        const expense = DataModelFactory.createExpense(
+          editingExpense.id,
+          categoryId,
+          amount,
+          title,
+        );
+        onLoadingChange(true);
+        dataService
+          .updateExpense(budgetId, expense)
+          .then((budget) => {
+            store.dispatch(budgetSlice.actions.updateCurrent(budget));
+          })
+          .finally(() => {
+            onLoadingChange(false);
+          });
+        onClose();
+      }}
+    />
+  );
+};
 
 export interface ViewExpensePageProps {
   budget: Budget;
@@ -110,7 +161,14 @@ class ViewExpensePage extends React.Component<
         <Divider />
         {this.render_body()}
         {this.render_add_expense_modal()}
-        {this.render_edit_expense_modal()}
+        <EditExpenseModal
+          editingExpense={this.state.editingExpense}
+          categories={this.props.budget.categoryList.map((c) => ({ id: c.id, name: c.name }))}
+          budgetId={this.props.budget.id}
+          defaultCategoryId={this.props.categoryId}
+          onClose={() => this.setState({ editingExpense: null })}
+          onLoadingChange={(loading) => this.setState({ isLoading: loading })}
+        />
       </Flex>
     );
   }
@@ -123,7 +181,7 @@ class ViewExpensePage extends React.Component<
     }));
 
     return (
-      <AddExpenseModal
+      <ExpenseDetailsModal
         isOpen={this.state.isAddExpenseModalOpen}
         categories={categories}
         defaultCategoryId={this.props.categoryId}
@@ -132,7 +190,6 @@ class ViewExpensePage extends React.Component<
           this.setState({ isAddExpenseModalOpen: false });
         }}
         onSubmit={(title, amount, categoryId) => {
-          console.log("Adding expense", title, amount, categoryId);
           const expense = DataModelFactory.createExpense(
             0,
             categoryId,
@@ -148,48 +205,6 @@ class ViewExpensePage extends React.Component<
               this.setState({ isLoading: false });
             });
           this.setState({ isAddExpenseModalOpen: false, isLoading: true });
-        }}
-      />
-    );
-  }
-
-  render_edit_expense_modal() {
-    const { editingExpense } = this.state;
-    const budget = this.props.budget;
-    const categories = budget.categoryList.map((category) => ({
-      id: category.id,
-      name: category.name,
-    }));
-
-    return (
-      <AddExpenseModal
-        isOpen={editingExpense !== null}
-        categories={categories}
-        defaultCategoryId={editingExpense?.categoryId ?? this.props.categoryId}
-        defaultAmount={editingExpense?.amount ?? 0}
-        defaultTitle={editingExpense?.title}
-        modalTitle="Edit Expense"
-        submitLabel="Save"
-        onClose={() => {
-          this.setState({ editingExpense: null });
-        }}
-        onSubmit={(title, amount, categoryId) => {
-          if (!editingExpense) return;
-          const expense = DataModelFactory.createExpense(
-            editingExpense.id,
-            categoryId,
-            amount,
-            title,
-          );
-          this._data_service
-            .updateExpense(this.props.budget.id, expense)
-            .then((budget) => {
-              store.dispatch(budgetSlice.actions.updateCurrent(budget));
-            })
-            .finally(() => {
-              this.setState({ isLoading: false });
-            });
-          this.setState({ editingExpense: null, isLoading: true });
         }}
       />
     );

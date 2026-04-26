@@ -21,7 +21,7 @@
 import React from "react";
 import { Modal, Input, Select, Button, Form } from "antd";
 
-export interface AddExpenseModalProps {
+export interface ExpenseDetailsModalProps {
   isOpen: boolean;
   categories: { id: number; name: string }[];
   defaultCategoryId: number;
@@ -34,7 +34,7 @@ export interface AddExpenseModalProps {
   onSubmit: (title: string, amount: number, categoryId: number) => void;
 }
 
-export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
+export const ExpenseDetailsModal: React.FC<ExpenseDetailsModalProps> = ({
   isOpen,
   categories,
   defaultCategoryId,
