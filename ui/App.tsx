@@ -30,6 +30,7 @@ import Overview from "./pages/overview";
 import EditCategoriesPage from "./pages/edit_categories_page";
 import { Budget } from "./datamodel/datamodel";
 import CategoryDetails from "./pages/view_expense_page";
+import AllExpensesPage from "./pages/all_expenses_page";
 import { View } from "./store";
 import { GithubOutlined } from "@ant-design/icons";
 import AppFooter from "./components/app_footer";
@@ -149,6 +150,8 @@ class App extends React.Component<AppProps> {
         return <EditCategoriesPage budget={this.props.current_budget!} />;
       case View.CategoryDetails:
         return <CategoryDetails budget={this.props.current_budget!} />;
+      case View.AllExpenses:
+        return <AllExpensesPage budget={this.props.current_budget!} />;
       default:
         return <>Not Found</>;
     }
