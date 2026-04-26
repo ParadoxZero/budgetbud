@@ -158,7 +158,7 @@ public class DbService
         return await UpdateUserNickName(budget);
     }
 
-    public async Task UpdateExpenseAsync(string budget_id, Expense expense)
+    public async Task<Budget> UpdateExpenseAsync(string budget_id, Expense expense)
     {
         Budget budget = await GetBudgetAsync(budget_id);
         expense.Timestamp = DateTime.UtcNow.Ticks;
@@ -166,6 +166,7 @@ public class DbService
         category.ExpenseList[category.ExpenseList.FindIndex(e => e.Id == expense.Id)] = expense;
         category.LastUpdated = DateTime.UtcNow.Ticks;
         await UpdateBudgetAsync(budget);
+        return await UpdateUserNickName(budget);
     }
 
     public async Task DeleteExpense(string budget_id, Expense expense)
