@@ -101,11 +101,13 @@ export function CreateDummyData() {
   }
 
   function generateRandomExpense() {
-    return DataModelFactory.createExpense(
+    const expense = DataModelFactory.createExpense(
       Math.floor(Math.random() * 1000),
       last_cat_id,
       getRandomExpense(),
     );
+    expense.addedBy = "Demo User";
+    return expense;
   }
 
   let last_cat_id = 0;
