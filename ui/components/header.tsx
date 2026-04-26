@@ -41,6 +41,7 @@ import {
 import React from "react";
 import { connect } from "react-redux";
 import { budgetSlice, headerSlice, navigate, store, View } from "../store";
+import { getDataService } from "../services/data_service";
 import { NumberToMonth } from "../utils";
 import { LinkBudgetModal } from "./link_budget_modal";
 import { NicknameModal } from "./nickname_modal";
@@ -198,6 +199,14 @@ class Header extends React.Component<HeaderProps, HeaderState> {
           isOpen={this.state.open_model === 'link'}
           onDone={() => {
             store.dispatch(navigate(View.Overview));
+            getDataService().getBudget().then((data) => {
+              if (data.length) {
+                store.dispatch(budgetSlice.actions.set({
+                  budget_list: data,
+                  selected_budget_index: data.length - 1, // newly added budget is appended last
+                }));
+              }
+            });
           }}
           onClose={() => {
             this.setState({ open_model: 'none' });
