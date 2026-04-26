@@ -19,7 +19,7 @@
  */
 
 import React from "react";
-import { Budget, Expense } from "../datamodel/datamodel";
+import { Budget } from "../datamodel/datamodel";
 import { budgetSlice, headerSlice, navigate, store, View } from "../store";
 import { Button, Flex, Popconfirm, Table, Tag, Typography } from "antd";
 import { DeleteFilled, EditFilled, LeftOutlined } from "@ant-design/icons";
@@ -32,7 +32,7 @@ export interface AllExpensesPageProps {
 }
 
 interface AllExpensesPageState {
-  editingExpense: Expense | null;
+  editingExpense: { id: number; title: string; amount: number; categoryId: number } | null;
   isLoading: boolean;
 }
 
@@ -99,25 +99,6 @@ class AllExpensesPage extends React.Component<
       });
   }
 
-  handleEditSubmit(title: string, amount: number, categoryId: number) {
-    if (!this.state.editingExpense) return;
-    const updatedExpense: Expense = {
-      ...this.state.editingExpense,
-      title,
-      amount,
-      categoryId,
-    };
-    this.setState({ isLoading: true, editingExpense: null });
-    this._data_service
-      .updateExpense(this.props.budget.id, updatedExpense)
-      .then((budget) => {
-        store.dispatch(budgetSlice.actions.updateCurrent(budget));
-      })
-      .finally(() => {
-        this.setState({ isLoading: false });
-      });
-  }
-
   render() {
     const categories = this.props.budget.categoryList.map((c) => ({
       id: c.id,
@@ -176,7 +157,9 @@ class AllExpensesPage extends React.Component<
               <Button
                 icon={<EditFilled />}
                 size="small"
-                onClick={() => expense && this.setState({ editingExpense: expense })}
+                onClick={() => expense && this.setState({
+                  editingExpense: { id: expense.id, title: expense.title, amount: expense.amount, categoryId: expense.categoryId },
+                })}
               >
                 Edit
               </Button>
@@ -220,18 +203,14 @@ class AllExpensesPage extends React.Component<
           scroll={{ x: "max-content" }}
           locale={{ emptyText: "No expenses recorded yet." }}
         />
-        {this.state.editingExpense && (
-          <EditExpenseModal
-            isOpen={true}
-            categories={categories}
-            expense={this.state.editingExpense}
-            isLoading={this.state.isLoading}
-            onClose={() => this.setState({ editingExpense: null })}
-            onSubmit={(title, amount, categoryId) =>
-              this.handleEditSubmit(title, amount, categoryId)
-            }
-          />
-        )}
+        <EditExpenseModal
+          editingExpense={this.state.editingExpense}
+          categories={categories}
+          budgetId={this.props.budget.id}
+          defaultCategoryId={this.props.budget.categoryList[0]?.id ?? 0}
+          onClose={() => this.setState({ editingExpense: null })}
+          onLoadingChange={(loading) => this.setState({ isLoading: loading })}
+        />
       </Flex>
     );
   }
