@@ -46,6 +46,7 @@ export interface DataService {
   ): Promise<Budget>;
   deleteCategory(budget_id: string, categoryId: number): Promise<Budget>;
   updateExpense(budget_id: string, expense: Expense): Promise<Budget>;
+  editExpense(budget_id: string, expense: Expense): Promise<Budget>;
   deleteExpense(
     budget_id: string,
     category_id: number,

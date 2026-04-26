@@ -19,7 +19,7 @@
  */
 
 import React from "react";
-import { DataModelFactory } from "../datamodel/datamodel";
+import { Expense } from "../datamodel/datamodel";
 import { budgetSlice, store } from "../store";
 import { getDataService } from "../services/data_service";
 import { ExpenseDetailsModal } from "./expense_details_modal";
@@ -54,15 +54,17 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
       onClose={onClose}
       onSubmit={(title, amount, categoryId) => {
         if (!editingExpense) return;
-        const expense = DataModelFactory.createExpense(
-          editingExpense.id,
+        const expense: Expense = {
+          id: editingExpense.id,
           categoryId,
           amount,
           title,
-        );
+          addedBy: "",
+          timestamp: Date.now(),
+        };
         onLoadingChange(true);
         dataService
-          .updateExpense(budgetId, expense)
+          .editExpense(budgetId, expense)
           .then((budget) => {
             store.dispatch(budgetSlice.actions.updateCurrent(budget));
           })

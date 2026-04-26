@@ -101,6 +101,12 @@ public class BudgetController : ControllerBase
         return Ok(await _userDataService.AddExpenseToBudget(budget_id, expense));
     }
 
+    [HttpPut("{budget_id}/expense")]
+    public async Task<IActionResult> EditExpenseInput(string budget_id, Expense expense)
+    {
+        return Ok(await _userDataService.UpdateExpenseToBudget(budget_id, expense));
+    }
+
     [HttpDelete("{budget_id}/category/{category_id}/expense/{expense_id}")]
     public async Task<IActionResult> DeleteExpense(string budget_id, int category_id, int expense_id)
     {
