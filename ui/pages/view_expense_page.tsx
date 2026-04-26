@@ -58,6 +58,7 @@ export interface ViewExpensePageProps {
 interface ViewExpensePageState {
   isAddExpenseModalOpen: boolean;
   isLoading: boolean;
+  editingExpense: { id: number; title: string; amount: number; categoryId: number } | null;
 }
 
 class ViewExpensePage extends React.Component<
@@ -72,6 +73,7 @@ class ViewExpensePage extends React.Component<
     this.state = {
       isAddExpenseModalOpen: false,
       isLoading: false,
+      editingExpense: null,
     };
   }
 
@@ -108,6 +110,7 @@ class ViewExpensePage extends React.Component<
         <Divider />
         {this.render_body()}
         {this.render_add_expense_modal()}
+        {this.render_edit_expense_modal()}
       </Flex>
     );
   }
@@ -145,6 +148,48 @@ class ViewExpensePage extends React.Component<
               this.setState({ isLoading: false });
             });
           this.setState({ isAddExpenseModalOpen: false, isLoading: true });
+        }}
+      />
+    );
+  }
+
+  render_edit_expense_modal() {
+    const { editingExpense } = this.state;
+    const budget = this.props.budget;
+    const categories = budget.categoryList.map((category) => ({
+      id: category.id,
+      name: category.name,
+    }));
+
+    return (
+      <AddExpenseModal
+        isOpen={editingExpense !== null}
+        categories={categories}
+        defaultCategoryId={editingExpense?.categoryId ?? this.props.categoryId}
+        defaultAmount={editingExpense?.amount ?? 0}
+        defaultTitle={editingExpense?.title}
+        modalTitle="Edit Expense"
+        submitLabel="Save"
+        onClose={() => {
+          this.setState({ editingExpense: null });
+        }}
+        onSubmit={(title, amount, categoryId) => {
+          if (!editingExpense) return;
+          const expense = DataModelFactory.createExpense(
+            editingExpense.id,
+            categoryId,
+            amount,
+            title,
+          );
+          this._data_service
+            .updateExpense(this.props.budget.id, expense)
+            .then((budget) => {
+              store.dispatch(budgetSlice.actions.updateCurrent(budget));
+            })
+            .finally(() => {
+              this.setState({ isLoading: false });
+            });
+          this.setState({ editingExpense: null, isLoading: true });
         }}
       />
     );
@@ -206,6 +251,16 @@ class ViewExpensePage extends React.Component<
             store.dispatch(budgetSlice.actions.updateCurrent(budget));
           });
       };
+      const on_edit_click = () => {
+        this.setState({
+          editingExpense: {
+            id: expense.id,
+            title: expense.title,
+            amount: expense.amount,
+            categoryId: expense.categoryId,
+          },
+        });
+      };
       const ui = (
         <div>
           <Flex
@@ -216,22 +271,31 @@ class ViewExpensePage extends React.Component<
           >
             <Flex vertical gap={15} justify="space-evenly" align="stretch">
               <Statistic title={date_string} value={expense.amount} />
-              <Popconfirm
-                title="Are you sure?"
-                okText="Yes"
-                showArrow
-                onConfirm={on_delete_click}
-              >
+              <Space>
                 <Button
                   size="middle"
-                  icon={<DeleteFilled />}
+                  icon={<EditFilled />}
                   shape="default"
-                  danger
+                  onClick={on_edit_click}
                 >
-                  {" "}
-                  Delete{" "}
+                  Edit
                 </Button>
-              </Popconfirm>
+                <Popconfirm
+                  title="Are you sure?"
+                  okText="Yes"
+                  showArrow
+                  onConfirm={on_delete_click}
+                >
+                  <Button
+                    size="middle"
+                    icon={<DeleteFilled />}
+                    shape="default"
+                    danger
+                  >
+                    Delete
+                  </Button>
+                </Popconfirm>
+              </Space>
             </Flex>
           </Flex>
         </div>

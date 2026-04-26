@@ -26,6 +26,9 @@ export interface AddExpenseModalProps {
   categories: { id: number; name: string }[];
   defaultCategoryId: number;
   defaultAmount: number;
+  defaultTitle?: string;
+  modalTitle?: string;
+  submitLabel?: string;
   isLoading?: boolean;
   onClose: () => void;
   onSubmit: (title: string, amount: number, categoryId: number) => void;
@@ -36,6 +39,9 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
   categories,
   defaultCategoryId,
   defaultAmount,
+  defaultTitle,
+  modalTitle = "Add Expense",
+  submitLabel = "Add",
   onClose,
   onSubmit,
   isLoading,
@@ -55,7 +61,7 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
   };
   return (
     <Modal
-      title="Add Expense"
+      title={modalTitle}
       open={isOpen}
       loading={isLoading}
       onCancel={onClose}
@@ -64,14 +70,14 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
           Cancel
         </Button>,
         <Button key="submit" type="primary" onClick={handleOk}>
-          Add
+          {submitLabel}
         </Button>,
       ]}
     >
       <Form
         form={form}
         layout="vertical"
-        initialValues={{ categoryId: defaultCategoryId, amount: defaultAmount }}
+        initialValues={{ categoryId: defaultCategoryId, amount: defaultAmount, title: defaultTitle }}
       >
         <Form.Item
           label="Category"
