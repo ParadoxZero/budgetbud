@@ -48,6 +48,16 @@ export const ExpenseDetailsModal: React.FC<ExpenseDetailsModalProps> = ({
 }) => {
   const [form] = Form.useForm();
 
+  React.useEffect(() => {
+    if (isOpen) {
+      form.setFieldsValue({
+        categoryId: defaultCategoryId,
+        amount: defaultAmount,
+        title: defaultTitle ?? "",
+      });
+    }
+  }, [isOpen, defaultCategoryId, defaultAmount, defaultTitle, form]);
+
   const handleOk = () => {
     form
       .validateFields()

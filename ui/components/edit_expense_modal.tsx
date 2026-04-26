@@ -25,7 +25,7 @@ import { getDataService } from "../services/data_service";
 import { ExpenseDetailsModal } from "./expense_details_modal";
 
 export interface EditExpenseModalProps {
-  editingExpense: { id: number; title: string; amount: number; categoryId: number } | null;
+  editingExpense: { id: number; title: string; amount: number; categoryId: number; timestamp: number } | null;
   categories: { id: number; name: string }[];
   budgetId: string;
   defaultCategoryId: number;
@@ -60,7 +60,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
           amount,
           title,
           addedBy: "",
-          timestamp: Date.now(),
+          timestamp: editingExpense.timestamp,
         };
         onLoadingChange(true);
         dataService
