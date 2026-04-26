@@ -16,7 +16,7 @@ RUN npm run build
 # ===========================
 # STAGE 2 - Backend Build
 # ===========================
-FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
 WORKDIR /src
 
 COPY *.csproj ./
@@ -32,7 +32,7 @@ RUN dotnet publish -c Release -o /app/publish
 # ===========================
 # STAGE 3 - Runtime
 # ===========================
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS final
 WORKDIR /app
 
 # Copy published output
