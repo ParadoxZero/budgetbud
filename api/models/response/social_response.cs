@@ -18,8 +18,6 @@
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
 
-namespace budgetbud.Dto;
+namespace budgetbud.Models.Response;
 
-public record GetUserDetailsResponse(string nickName, string id);
-
-public record UpdateNickNameInput(string nickName);
+public record CreateShareKey(string shareKey);

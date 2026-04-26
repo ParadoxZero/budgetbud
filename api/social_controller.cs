@@ -19,7 +19,7 @@
  */
 
 using System;
-using budgetbud.Dto;
+using budgetbud.Models.Response;
 using budgetbud.Exceptions;
 using budgetbud.Models;
 using budgetbud.Services;

@@ -18,7 +18,7 @@
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
 
-namespace budgetbud.Dto;
+namespace budgetbud.Models.Request;
 
 public record CreateBudgetInput(string name);
 

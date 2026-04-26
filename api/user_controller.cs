@@ -18,7 +18,8 @@
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
 
-using budgetbud.Dto;
+using budgetbud.Models.Request;
+using budgetbud.Models.Response;
 using budgetbud.Exceptions;
 using budgetbud.Models;
 using budgetbud.Services;
