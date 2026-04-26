@@ -19,6 +19,7 @@
  */
 
 using System;
+using budgetbud.Models.Response;
 using budgetbud.Exceptions;
 using budgetbud.Models;
 using budgetbud.Services;
@@ -39,8 +40,6 @@ public class SocialController : ControllerBase
     private readonly DbService _dbService;
 
     private static readonly Random random = new();
-
-    public record CreateShareKey(string shareKey);
 
     public SocialController(IIdentityService identityService, IMemoryCache cache, DbService dbService)
     {

@@ -18,6 +18,7 @@
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
 
+using budgetbud.Models.Request;
 using budgetbud.Exceptions;
 using budgetbud.Models;
 using budgetbud.Services;
@@ -50,7 +51,6 @@ public class BudgetController : ControllerBase
       return Ok();
     }
 
-    public record CreateBudgetInput(string name);
     [HttpPost]
     public async Task<IActionResult> CreateBudget([FromBody] CreateBudgetInput input)
     {
@@ -77,7 +77,7 @@ public class BudgetController : ControllerBase
     }
 
     [HttpPost("{budget_id}/bulk_edit_categories")]
-    public async Task<IActionResult> GroupEditCategories(string budget_id, List<UserDataService.GroupCategoryEditRow> categories) 
+    public async Task<IActionResult> GroupEditCategories(string budget_id, List<GroupCategoryEditRow> categories)
     {
       return Ok(await _userDataService.GroupEditCategories(budget_id, categories));
     }
@@ -99,6 +99,12 @@ public class BudgetController : ControllerBase
     public async Task<IActionResult> AddExpenseInput(string budget_id, Expense expense)
     {
         return Ok(await _userDataService.AddExpenseToBudget(budget_id, expense));
+    }
+
+    [HttpPut("{budget_id}/expense")]
+    public async Task<IActionResult> EditExpenseInput(string budget_id, Expense expense)
+    {
+        return Ok(await _userDataService.UpdateExpenseToBudget(budget_id, expense));
     }
 
     [HttpDelete("{budget_id}/category/{category_id}/expense/{expense_id}")]

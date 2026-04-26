@@ -48,7 +48,8 @@ import { connect } from "react-redux";
 import { DataService, getDataService } from "../services/data_service";
 import header from "../components/header";
 import { TicksToDate } from "../utils";
-import { AddExpenseModal } from "../components/add_expense_modal";
+import { ExpenseDetailsModal } from "../components/expense_details_modal";
+import { EditExpenseModal } from "../components/edit_expense_modal";
 
 export interface ViewExpensePageProps {
   budget: Budget;
@@ -58,6 +59,7 @@ export interface ViewExpensePageProps {
 interface ViewExpensePageState {
   isAddExpenseModalOpen: boolean;
   isLoading: boolean;
+  editingExpense: { id: number; title: string; amount: number; categoryId: number } | null;
 }
 
 class ViewExpensePage extends React.Component<
@@ -72,6 +74,7 @@ class ViewExpensePage extends React.Component<
     this.state = {
       isAddExpenseModalOpen: false,
       isLoading: false,
+      editingExpense: null,
     };
   }
 
@@ -108,6 +111,14 @@ class ViewExpensePage extends React.Component<
         <Divider />
         {this.render_body()}
         {this.render_add_expense_modal()}
+        <EditExpenseModal
+          editingExpense={this.state.editingExpense}
+          categories={this.props.budget.categoryList.map((c) => ({ id: c.id, name: c.name }))}
+          budgetId={this.props.budget.id}
+          defaultCategoryId={this.props.categoryId}
+          onClose={() => this.setState({ editingExpense: null })}
+          onLoadingChange={(loading) => this.setState({ isLoading: loading })}
+        />
       </Flex>
     );
   }
@@ -120,7 +131,7 @@ class ViewExpensePage extends React.Component<
     }));
 
     return (
-      <AddExpenseModal
+      <ExpenseDetailsModal
         isOpen={this.state.isAddExpenseModalOpen}
         categories={categories}
         defaultCategoryId={this.props.categoryId}
@@ -129,7 +140,6 @@ class ViewExpensePage extends React.Component<
           this.setState({ isAddExpenseModalOpen: false });
         }}
         onSubmit={(title, amount, categoryId) => {
-          console.log("Adding expense", title, amount, categoryId);
           const expense = DataModelFactory.createExpense(
             0,
             categoryId,
@@ -206,6 +216,16 @@ class ViewExpensePage extends React.Component<
             store.dispatch(budgetSlice.actions.updateCurrent(budget));
           });
       };
+      const on_edit_click = () => {
+        this.setState({
+          editingExpense: {
+            id: expense.id,
+            title: expense.title,
+            amount: expense.amount,
+            categoryId: expense.categoryId,
+          },
+        });
+      };
       const ui = (
         <div>
           <Flex
@@ -216,22 +236,31 @@ class ViewExpensePage extends React.Component<
           >
             <Flex vertical gap={15} justify="space-evenly" align="stretch">
               <Statistic title={date_string} value={expense.amount} />
-              <Popconfirm
-                title="Are you sure?"
-                okText="Yes"
-                showArrow
-                onConfirm={on_delete_click}
-              >
+              <Space>
                 <Button
                   size="middle"
-                  icon={<DeleteFilled />}
+                  icon={<EditFilled />}
                   shape="default"
-                  danger
+                  onClick={on_edit_click}
                 >
-                  {" "}
-                  Delete{" "}
+                  Edit
                 </Button>
-              </Popconfirm>
+                <Popconfirm
+                  title="Are you sure?"
+                  okText="Yes"
+                  showArrow
+                  onConfirm={on_delete_click}
+                >
+                  <Button
+                    size="middle"
+                    icon={<DeleteFilled />}
+                    shape="default"
+                    danger
+                  >
+                    Delete
+                  </Button>
+                </Popconfirm>
+              </Space>
             </Flex>
           </Flex>
         </div>
@@ -253,7 +282,7 @@ class ViewExpensePage extends React.Component<
     return (
       <>
         <Timeline
-          mode="alternate"
+          mode="left"
           items={item_list}
           style={{ minWidth: 300 }}
           reverse

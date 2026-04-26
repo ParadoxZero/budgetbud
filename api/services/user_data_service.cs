@@ -18,6 +18,7 @@
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
 
+using budgetbud.Models.Request;
 using budgetbud.Exceptions;
 using budgetbud.Models;
 
@@ -27,8 +28,6 @@ public class UserDataService
 {
     private readonly DbService _dbService;
     private readonly IIdentityService _identityService;
-
-    public record GroupCategoryEditRow(int? id, string title, int amount);
 
     public UserDataService(DbService dbService, IIdentityService identityService)
     {
@@ -72,6 +71,11 @@ public class UserDataService
     public async Task<Budget> AddExpenseToBudget(string budget_id, Expense expense)
     {
         return await _dbService.AddExpenseAsync(budget_id, expense);
+    }
+
+    public async Task<Budget> UpdateExpenseToBudget(string budget_id, Expense expense)
+    {
+        return await _dbService.UpdateExpenseAsync(budget_id, expense);
     }
 
     public async Task<Budget> AddCategoryToBudget(string budget_id, List<Category> categoryList)

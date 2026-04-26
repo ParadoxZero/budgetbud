@@ -1,6 +1,6 @@
 /*
  * BudgetBud - Budgeting and Expense Tracker with WebUI and API server
- * Copyright (C) 2025  Sidhin S Thomas <sidhin.thomas@gmail.com>
+ * Copyright (C) 2024  Sidhin S Thomas <sidhin.thomas@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,91 +18,61 @@
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
 
-import React, { useEffect } from "react";
-import { Modal, Input, Select, Button, Form } from "antd";
+import React from "react";
 import { Expense } from "../datamodel/datamodel";
+import { budgetSlice, store } from "../store";
+import { getDataService } from "../services/data_service";
+import { ExpenseDetailsModal } from "./expense_details_modal";
 
 export interface EditExpenseModalProps {
-  isOpen: boolean;
+  editingExpense: { id: number; title: string; amount: number; categoryId: number } | null;
   categories: { id: number; name: string }[];
-  expense: Expense;
-  isLoading?: boolean;
+  budgetId: string;
+  defaultCategoryId: number;
   onClose: () => void;
-  onSubmit: (title: string, amount: number, categoryId: number) => void;
+  onLoadingChange: (loading: boolean) => void;
 }
 
 export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
-  isOpen,
+  editingExpense,
   categories,
-  expense,
+  budgetId,
+  defaultCategoryId,
   onClose,
-  onSubmit,
-  isLoading,
+  onLoadingChange,
 }) => {
-  const [form] = Form.useForm();
-
-  useEffect(() => {
-    if (isOpen) {
-      form.setFieldsValue({
-        categoryId: expense.categoryId,
-        amount: expense.amount,
-        title: expense.title,
-      });
-    }
-  }, [isOpen, expense, form]);
-
-  const handleOk = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        onSubmit(values.title, parseFloat(values.amount), values.categoryId);
-        form.resetFields();
-      })
-      .catch((info) => {
-        console.error("Validation Failed:", info);
-      });
-  };
-
+  const dataService = getDataService();
   return (
-    <Modal
-      title="Edit Expense"
-      open={isOpen}
-      loading={isLoading}
-      onCancel={onClose}
-      footer={[
-        <Button key="cancel" onClick={onClose}>
-          Cancel
-        </Button>,
-        <Button key="submit" type="primary" onClick={handleOk}>
-          Save
-        </Button>,
-      ]}
-    >
-      <Form form={form} layout="vertical">
-        <Form.Item
-          label="Category"
-          name="categoryId"
-          rules={[{ required: true, message: "Please select a category" }]}
-        >
-          <Select placeholder="Select a category">
-            {categories.map((category) => (
-              <Select.Option key={category.id} value={category.id}>
-                {category.name}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-        <Form.Item label="Title" name="title">
-          <Input placeholder="Expense Title" />
-        </Form.Item>
-        <Form.Item
-          label="Amount"
-          name="amount"
-          rules={[{ required: true, message: "Please enter an amount" }]}
-        >
-          <Input type="number" placeholder="Expense Amount" />
-        </Form.Item>
-      </Form>
-    </Modal>
+    <ExpenseDetailsModal
+      isOpen={editingExpense !== null}
+      categories={categories}
+      defaultCategoryId={editingExpense?.categoryId ?? defaultCategoryId}
+      defaultAmount={editingExpense?.amount ?? 0}
+      defaultTitle={editingExpense?.title}
+      modalTitle="Edit Expense"
+      submitLabel="Save"
+      onClose={onClose}
+      onSubmit={(title, amount, categoryId) => {
+        if (!editingExpense) return;
+        const expense: Expense = {
+          id: editingExpense.id,
+          categoryId,
+          amount,
+          title,
+          addedBy: "",
+          timestamp: Date.now(),
+        };
+        onLoadingChange(true);
+        dataService
+          .editExpense(budgetId, expense)
+          .then((budget) => {
+            store.dispatch(budgetSlice.actions.updateCurrent(budget));
+          })
+          .finally(() => {
+            onLoadingChange(false);
+          });
+        onClose();
+      }}
+    />
   );
 };
