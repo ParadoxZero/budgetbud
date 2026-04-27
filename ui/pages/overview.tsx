@@ -40,6 +40,7 @@ import {
   LinkOutlined,
   LoadingOutlined,
   PlusOutlined,
+  UnorderedListOutlined,
   WalletOutlined,
 } from "@ant-design/icons";
 import {
@@ -190,6 +191,14 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
         onClick: () => {
           store.dispatch(navigate(View.CategoryEdit));
         }
+      },
+      {
+        label: "View All Expenses",
+        key: "6",
+        icon: <UnorderedListOutlined />,
+        onClick: () => {
+          store.dispatch(navigate(View.AllExpenses));
+        },
       },
       {
         label: "History",

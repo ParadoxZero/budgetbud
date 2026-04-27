@@ -27,6 +27,7 @@ export enum View {
   CategoryDetails,
   CategoryEdit,
   ExpenseDetails,
+  AllExpenses,
 }
 
 export const navigationSlice = createSlice({

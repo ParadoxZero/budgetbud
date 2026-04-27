@@ -54,14 +54,13 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
       onClose={onClose}
       onSubmit={(title, amount, categoryId) => {
         if (!editingExpense) return;
-        const expense: Expense = {
+        const expense = {
           id: editingExpense.id,
           categoryId,
           amount,
           title,
           addedBy: "",
-          timestamp: Date.now(),
-        };
+        } as Expense;
         onLoadingChange(true);
         dataService
           .editExpense(budgetId, expense)
