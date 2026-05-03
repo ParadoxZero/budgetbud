@@ -30,5 +30,6 @@ namespace budgetbud.Models
         public long LastUpdated { get; set; }
         public required string Currency { get; set; }
         public required List<Expense> ExpenseList { get; set; }
+        public bool? IsSingleType { get; set; }
     }
 }
