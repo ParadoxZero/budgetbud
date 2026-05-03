@@ -424,7 +424,7 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
     expenseId: number | undefined,
   ) {
     if (isSingleType) {
-      const isChecked = value > 0;
+      const isChecked = expenseId !== undefined;
       return (
         <SingleCategoryCheckbox
           title={title}
