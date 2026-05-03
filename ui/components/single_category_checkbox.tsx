@@ -20,12 +20,12 @@
 
 import React from "react";
 import { Button, Checkbox, Typography, Flex } from "antd";
+import type { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { RightOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
 interface SingleCategoryCheckboxProps {
-  id: number;
   title: string;
   total: number;
   isChecked: boolean;
@@ -42,7 +42,7 @@ const SingleCategoryCheckbox: React.FC<SingleCategoryCheckboxProps> = ({
   onUncheck,
   onRightButtonClick,
 }) => {
-  const handleChange = (e: { target: { checked: boolean } }) => {
+  const handleChange = (e: CheckboxChangeEvent) => {
     if (e.target.checked) {
       onCheck();
     } else {
