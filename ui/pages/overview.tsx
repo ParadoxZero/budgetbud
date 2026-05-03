@@ -433,9 +433,11 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
           onCheck={() =>
             this.handle_single_category_check(category_id, title, total)
           }
-          onUncheck={() =>
-            this.handle_single_category_uncheck(category_id, expenseId!)
-          }
+          onUncheck={() => {
+            if (expenseId !== undefined) {
+              this.handle_single_category_uncheck(category_id, expenseId);
+            }
+          }}
           onRightButtonClick={() => store.dispatch(to_category_view(category_id))}
         />
       );
