@@ -19,9 +19,8 @@
  */
 
 import React from "react";
-import { Button, Checkbox, Typography, Flex } from "antd";
+import { Checkbox, Typography, Flex } from "antd";
 import type { CheckboxChangeEvent } from "antd/lib/checkbox";
-import { RightOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
@@ -31,7 +30,6 @@ interface SingleCategoryCheckboxProps {
   isChecked: boolean;
   onCheck: () => void;
   onUncheck: () => void;
-  onRightButtonClick: () => void;
 }
 
 const SingleCategoryCheckbox: React.FC<SingleCategoryCheckboxProps> = ({
@@ -40,7 +38,6 @@ const SingleCategoryCheckbox: React.FC<SingleCategoryCheckboxProps> = ({
   isChecked,
   onCheck,
   onUncheck,
-  onRightButtonClick,
 }) => {
   const handleChange = (e: CheckboxChangeEvent) => {
     if (e.target.checked) {
@@ -81,18 +78,9 @@ const SingleCategoryCheckbox: React.FC<SingleCategoryCheckboxProps> = ({
             {title}
           </Text>
         </Flex>
-        <Flex align="center" justify="right" gap={8}>
-          <Text type="secondary" style={{ fontSize: 14 }}>
-            {total}
-          </Text>
-          <Button
-            shape="circle"
-            type="default"
-            icon={<RightOutlined />}
-            style={{ padding: 20, marginLeft: 12 }}
-            onClick={onRightButtonClick}
-          />
-        </Flex>
+        <Text type="secondary" style={{ fontSize: 14 }}>
+          {total}
+        </Text>
       </Flex>
     </div>
   );
