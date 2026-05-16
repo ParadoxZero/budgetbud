@@ -23,8 +23,12 @@ using budgetbud.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.IdentityModel.Tokens;
 using System.Net;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
@@ -38,12 +42,18 @@ if (use_swagger)
 }
 
 builder.Services.AddSingleton<IIdentityService, BuiltInIdentityService>();
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
 });
 
+
+var jwtKey = builder.Configuration.GetValue<string>("Auth:JwtKey");
+var jwtKeyBytes = string.IsNullOrEmpty(jwtKey)
+    ? new byte[32] // dummy key when not configured; JWT auth will simply reject all tokens
+    : Encoding.UTF8.GetBytes(jwtKey);
 
 builder.Services.AddAuthentication(options =>
 {
@@ -69,6 +79,30 @@ builder.Services.AddAuthentication(options =>
 {
     options.ClientId = builder.Configuration.GetValue<string>("Auth:GoogleClientId");
     options.ClientSecret = builder.Configuration.GetValue<string>("Auth:GoogleClientSecret");
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = "budgetbud",
+        ValidateAudience = true,
+        ValidAudience = "budgetbud",
+        ValidateLifetime = true,
+        IssuerSigningKey = new SymmetricSecurityKey(jwtKeyBytes),
+        ValidateIssuerSigningKey = true,
+        ClockSkew = TimeSpan.Zero,
+    };
+});
+
+// Accept either cookie or JWT Bearer on all [Authorize] endpoints
+builder.Services.AddAuthorization(options =>
+{
+    options.DefaultPolicy = new AuthorizationPolicyBuilder(
+        CookieAuthenticationDefaults.AuthenticationScheme,
+        JwtBearerDefaults.AuthenticationScheme)
+        .RequireAuthenticatedUser()
+        .Build();
 });
 
 builder.Services.AddSingleton<DbService>();
@@ -88,6 +122,8 @@ forwardedHeadersOptions.KnownNetworks.Add(new Microsoft.AspNetCore.HttpOverrides
 
 app.UseForwardedHeaders(forwardedHeadersOptions);
 
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseMiddleware<RedirectToLoginMiddleware>();
 
 app.UseDefaultFiles();

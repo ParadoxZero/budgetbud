@@ -18,29 +18,27 @@
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
 
-import { clearJwt, getJwt } from "./auth_persistence_service";
+import { CapacitorConfig } from "@capacitor/cli";
 
-export async function fetchData(
-  url: string,
-  options: RequestInit,
-): Promise<Response> {
-  const jwt = await getJwt();
-  if (jwt) {
-    // Attach JWT Bearer token for native platforms where cookie auth may not
-    // persist across sessions (e.g., cookie cleared by OS).
-    const headers = new Headers(options.headers as HeadersInit | undefined);
-    headers.set("Authorization", `Bearer ${jwt}`);
-    options = { ...options, headers };
-  }
+const config: CapacitorConfig = {
+  appId: "com.budgetbud.app",
+  appName: "BudgetBud",
+  // Vite's output directory (same as build.outDir in vite.config.ts)
+  webDir: "wwwroot",
+  server: {
+    // Set this to your production server URL for native builds so the WebView
+    // loads from the server and cookie auth works same-origin.
+    // Example: url: "https://your-budgetbud-server.com"
+    // Leave unset to bundle local assets (requires CORS + JWT auth on the server).
+    androidScheme: "https",
+  },
+  plugins: {
+    // @capacitor/preferences backs to iOS Keychain and Android Keystore,
+    // giving JWT tokens device-level persistence that survives cookie eviction.
+    Preferences: {
+      group: "com.budgetbud.app",
+    },
+  },
+};
 
-  const response = await fetch(url, options);
-  if (response.status === 401) {
-    // JWT may have expired — clear it so next login stores a fresh one.
-    await clearJwt();
-    window.location.href = "/index.html";
-  }
-  if (!response.ok) {
-    throw new Error("API request failed");
-  }
-  return response;
-}
+export default config;

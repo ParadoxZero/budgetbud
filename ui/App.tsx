@@ -20,6 +20,8 @@
 
 import { CreateDummyData, isDemoMode } from "./utils";
 import { GetAuthDetails, PingRemote } from "./services/ping_service";
+import { fetchData } from "./services/network_service";
+import { storeJwt } from "./services/auth_persistence_service";
 import CreateNewBudgetPage from "./pages/create_new_budget_page";
 import { ReactNode } from "react";
 import React from "react";
@@ -81,6 +83,23 @@ class App extends React.Component<AppProps> {
         GetAuthDetails().then((response: any) => {
           localStorage.setItem("auth_provider", response.provider);
         });
+      },
+    },
+    {
+      // On native (Capacitor) builds, fetch a JWT right after login and store it
+      // in the device Keychain/Keystore so the app stays authenticated even when
+      // the browser cookie store is cleared by the OS.
+      condition: import.meta.env.PROD && !isDemoMode(),
+      action: () => {
+        fetchData("/api/User/token", { method: "GET" })
+          .then(async (res) => {
+            const { token } = await res.json();
+            await storeJwt(token);
+          })
+          .catch(() => {
+            // Cookie auth is the primary mechanism; JWT is a persistence layer.
+            // Silently ignore if the server hasn't configured a JWT key yet.
+          });
       },
     },
   ];

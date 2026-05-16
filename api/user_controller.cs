@@ -23,8 +23,13 @@ using budgetbud.Models.Response;
 using budgetbud.Exceptions;
 using budgetbud.Models;
 using budgetbud.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace budgetbud.Controllers;
 
@@ -35,11 +40,13 @@ public class UserController : ControllerBase
 {
   private readonly UserDataService _userDataService;
   private readonly IIdentityService _identityService;
+  private readonly IConfiguration _configuration;
 
-  public UserController(UserDataService userDataService, IIdentityService identityService)
+  public UserController(UserDataService userDataService, IIdentityService identityService, IConfiguration configuration)
   {
     _userDataService = userDataService;
     _identityService = identityService;
+    _configuration = configuration;
   }
 
   [HttpGet("details")]
@@ -50,6 +57,36 @@ public class UserController : ControllerBase
         id: _identityService.GetUserIdentity()
     );
     return Ok(userDetails);
+  }
+
+  // Issues a JWT for the current authenticated session.
+  // Native (Capacitor) clients store this in the device Keychain/Keystore and
+  // attach it as a Bearer token on subsequent launches, surviving cookie eviction.
+  [HttpGet("token")]
+  [Authorize(AuthenticationSchemes =
+      Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)]
+  public IActionResult GetToken()
+  {
+      var jwtKey = _configuration.GetValue<string>("Auth:JwtKey");
+      if (string.IsNullOrEmpty(jwtKey))
+          return StatusCode(503, "JWT not configured");
+
+      var userId = _identityService.GetUserIdentity();
+      var expiryDays = _configuration.GetValue<int>("Auth:JwtExpiryDays", 30);
+
+      var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+      var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+      var claims = new[] { new Claim(ClaimTypes.NameIdentifier, userId) };
+
+      var token = new JwtSecurityToken(
+          issuer: "budgetbud",
+          audience: "budgetbud",
+          claims: claims,
+          expires: DateTime.UtcNow.AddDays(expiryDays),
+          signingCredentials: credentials
+      );
+
+      return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
   }
 
   [HttpPost("nickname")]

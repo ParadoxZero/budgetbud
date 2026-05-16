@@ -18,29 +18,29 @@
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
 
-import { clearJwt, getJwt } from "./auth_persistence_service";
+import { Capacitor } from "@capacitor/core";
+import { Preferences } from "@capacitor/preferences";
 
-export async function fetchData(
-  url: string,
-  options: RequestInit,
-): Promise<Response> {
-  const jwt = await getJwt();
-  if (jwt) {
-    // Attach JWT Bearer token for native platforms where cookie auth may not
-    // persist across sessions (e.g., cookie cleared by OS).
-    const headers = new Headers(options.headers as HeadersInit | undefined);
-    headers.set("Authorization", `Bearer ${jwt}`);
-    options = { ...options, headers };
-  }
+const JWT_KEY = "auth_jwt";
 
-  const response = await fetch(url, options);
-  if (response.status === 401) {
-    // JWT may have expired — clear it so next login stores a fresh one.
-    await clearJwt();
-    window.location.href = "/index.html";
+// On native (iOS/Android), Capacitor Preferences backs to the device
+// Keychain / Keystore — the JWT survives cookie eviction and app restarts.
+// On web, no storage is used because HttpOnly cookies handle auth.
+
+export async function storeJwt(token: string): Promise<void> {
+  if (Capacitor.isNativePlatform()) {
+    await Preferences.set({ key: JWT_KEY, value: token });
   }
-  if (!response.ok) {
-    throw new Error("API request failed");
+}
+
+export async function getJwt(): Promise<string | null> {
+  if (!Capacitor.isNativePlatform()) return null;
+  const { value } = await Preferences.get({ key: JWT_KEY });
+  return value;
+}
+
+export async function clearJwt(): Promise<void> {
+  if (Capacitor.isNativePlatform()) {
+    await Preferences.remove({ key: JWT_KEY });
   }
-  return response;
 }
