@@ -22,7 +22,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 
 import "./main.css";
-import { Button, Card, Col, ConfigProvider, Divider, Flex, Layout, Row, Space, Typography, Image } from "antd";
+import { Button, Card, Col, ConfigProvider, Divider, Flex, Layout, Row, Space, Spin, Typography, Image } from "antd";
 import {
   GithubOutlined,
   GoogleOutlined,
@@ -33,6 +33,7 @@ import {
 
 import { GetScreenSize, ScreenSize } from "./utils";
 import AppFooter from "./components/app_footer";
+import { IsAuthenticated } from "./services/ping_service";
 
 function SignInButtons({ compact = false }: { compact?: boolean }) {
   return (
@@ -57,6 +58,26 @@ function App() {
 
   const { Header, Content, Footer } = Layout;
   const [current, setCurrent] = React.useState(0);
+  const [checkingSession, setCheckingSession] = React.useState(true);
+
+  React.useEffect(() => {
+    IsAuthenticated().then((authenticated) => {
+      if (authenticated) {
+        window.location.href = "/app.html";
+      } else {
+        setCheckingSession(false);
+      }
+    });
+  }, []);
+
+  if (checkingSession) {
+    return (
+      <Flex align="center" justify="center" style={{ height: "100vh" }}>
+        <Spin size="large" />
+      </Flex>
+    );
+  }
+
   return (
     <Layout className="landing-root">
       {/* Ant Design Header */}
