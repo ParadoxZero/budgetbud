@@ -37,3 +37,12 @@ export async function GetAuthDetails(): Promise<Object> {
     return Promise.reject(error);
   }
 }
+
+export async function IsAuthenticated(): Promise<boolean> {
+  try {
+    const response = await fetch("/api/ping/user");
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
