@@ -73,6 +73,7 @@ import SingleCategory from "../components/single_category";
 import EditCategory, { EditCategoryState } from "../components/edit_category";
 import { ShareBudgetModal } from "../components/share_budget_modal";
 import { RolloverModal } from "../components/rollover_modal";
+import SingleCategoryCheckbox from "../components/single_category_checkbox";
 
 const { Text } = Typography;
 
@@ -305,6 +306,27 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
       .catch(() => this.setState({ add_expense_mode_context: null }));
   }
 
+  handle_single_category_check(category_id: number, category_name: string, allocation: number) {
+    const budget = this.props.budget_list[this.props.selected_budget_index!];
+    const expense = DataModelFactory.createExpense(0, category_id, allocation, category_name);
+    this._data_service
+      .updateExpense(budget.id, expense)
+      .then((data) => {
+        store.dispatch(budgetSlice.actions.updateCurrent(data));
+      })
+      .catch((e) => console.error("Failed to add single category expense", e));
+  }
+
+  handle_single_category_uncheck(category_id: number, expense_id: number) {
+    const budget = this.props.budget_list[this.props.selected_budget_index!];
+    this._data_service
+      .deleteExpense(budget.id, category_id, expense_id)
+      .then((data) => {
+        store.dispatch(budgetSlice.actions.updateCurrent(data));
+      })
+      .catch((e) => console.error("Failed to remove single category expense", e));
+  }
+
   render_add_single_category_expense() {
     const context = this.state.add_expense_mode_context;
     if (!context) return null;
@@ -394,19 +416,40 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
   }
 
   render_catogory_list_row(
-    id: number,
+    category_id: number,
     title: string,
     value: number,
     total: number,
+    isSingleType: boolean | undefined,
+    expenseId: number | undefined,
   ) {
+    if (isSingleType) {
+      const isChecked = expenseId !== undefined;
+      return (
+        <SingleCategoryCheckbox
+          title={title}
+          total={total}
+          isChecked={isChecked}
+          onCheck={() =>
+            this.handle_single_category_check(category_id, title, total)
+          }
+          onUncheck={() => {
+            if (expenseId !== undefined) {
+              this.handle_single_category_uncheck(category_id, expenseId);
+            }
+          }}
+        />
+      );
+    }
+
     const add_expense_mode_context = this.state.add_expense_mode_context;
     if (
       add_expense_mode_context &&
-      add_expense_mode_context.category_id === id
+      add_expense_mode_context.category_id === category_id
     ) {
       return this.render_add_single_category_expense();
     }
-    return this.render_view_single_category(id, title, value, total);
+    return this.render_view_single_category(category_id, title, value, total);
   }
 
   render_add_expense_modal() {
@@ -488,6 +531,8 @@ class OverviewPage extends React.Component<OverviewProps, IState> {
                 category.name,
                 this.state.filled_allocations[category.id],
                 category.allocation,
+                category.isSingleType,
+                category.expenseList[0]?.id,
               )}
               <Divider style={{ margin: 0, padding: 0 }} />
             </div>

@@ -116,6 +116,7 @@ public class UserDataService
           var existing_category = categoriesById[category.id.Value];
           existing_category.Allocation = category.amount;
           existing_category.Name = category.title;
+          existing_category.IsSingleType = category.isSingleType;
           updatedCategoryList.Add(existing_category);
         }
         else {
@@ -125,6 +126,7 @@ public class UserDataService
             Description = "",
             Allocation = category.amount,
             IsActive = true,
+            IsSingleType = category.isSingleType,
             Currency = "INR",
             LastUpdated = DateTime.UtcNow.Ticks,
             ExpenseList = new List<Expense>()

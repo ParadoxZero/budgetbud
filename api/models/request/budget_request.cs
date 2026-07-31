@@ -22,4 +22,4 @@ namespace budgetbud.Models.Request;
 
 public record CreateBudgetInput(string name);
 
-public record GroupCategoryEditRow(int? id, string title, int amount);
+public record GroupCategoryEditRow(int? id, string title, int amount, bool? isSingleType = null);

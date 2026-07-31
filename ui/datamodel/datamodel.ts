@@ -73,6 +73,7 @@ export interface Category {
   lastUpdated: number;
   currency: string;
   expenseList: Expense[];
+  isSingleType?: boolean;
 }
 
 export interface CategoryLog {
@@ -130,6 +131,7 @@ export interface GroupCategoryEditRow {
   id: number | null;
   title: string;
   amount: number;
+  isSingleType?: boolean;
 }
 
 export class DataModelFactory {

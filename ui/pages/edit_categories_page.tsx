@@ -26,6 +26,7 @@ import {
   Popconfirm,
   Button,
   Flex,
+  Switch,
   message,
 } from "antd";
 import {
@@ -109,6 +110,7 @@ const EditCategoriesPage: React.FC<EditCategoriesPageProps> = ({
         id: cat.id,
         title: cat.name,
         amount: cat.allocation,
+        isSingleType: cat.isSingleType,
       }),
     );
     setDataSource(initialData);
@@ -190,6 +192,21 @@ const EditCategoriesPage: React.FC<EditCategoriesPageProps> = ({
         <InputNumber
           value={record.amount}
           onChange={(value) => handleRowChange(record.row_key, "amount", value)}
+        />
+      ),
+    },
+    {
+      title: "Type",
+      dataIndex: "isSingleType",
+      width: "20%",
+      render: (_: any, record: GroupCategoryEditRow) => (
+        <Switch
+          checkedChildren="Single"
+          unCheckedChildren="List"
+          checked={record.isSingleType ?? false}
+          onChange={(checked) =>
+            handleRowChange(record.row_key, "isSingleType", checked)
+          }
         />
       ),
     },
