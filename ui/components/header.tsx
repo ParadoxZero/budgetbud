@@ -1,6 +1,6 @@
 /*
  * BudgetBud - Budgeting and Expense Tracker with WebUI and API server
- * Copyright (C) 2025  Sidhin S Thomas <sidhin.thomas@gmail.com>
+ * Copyright (C) 2026  Sidhin S Thomas <sidhin.thomas@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -17,6 +17,7 @@
  *
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
+
 
 import {
   FileOutlined,
@@ -45,6 +46,7 @@ import { getDataService } from "../services/data_service";
 import { NumberToMonth } from "../utils";
 import { LinkBudgetModal } from "./link_budget_modal";
 import { NicknameModal } from "./nickname_modal";
+import { SettingsModal } from "./settings_modal";
 
 export interface HeaderBudgetDetails {
   name: string;
@@ -65,7 +67,7 @@ export interface HeaderProps {
 
 interface HeaderState {
   is_budget_selector_visible: boolean;
-  open_model: 'share' | 'rollover' | 'link' | 'edit_nickname' | 'none';
+  open_model: 'share' | 'rollover' | 'link' | 'edit_nickname' | 'settings' | 'none';
 }
 
 class Header extends React.Component<HeaderProps, HeaderState> {
@@ -220,6 +222,13 @@ class Header extends React.Component<HeaderProps, HeaderState> {
    
     const items: MenuProps["items"] = [
       {
+        label: "Settings",
+        key: "2",
+        onClick: () => {
+          this.setState({ open_model: 'settings' });
+        },
+      },
+      {
         label: "Edit Nickname",
         key: "3",
         onClick: () => {
@@ -242,6 +251,12 @@ class Header extends React.Component<HeaderProps, HeaderState> {
         </Dropdown>
         <NicknameModal
           isOpen={this.state.open_model === 'edit_nickname'}
+          onDone={() => {
+            this.setState({ open_model: 'none' });
+          }}
+        />
+        <SettingsModal
+          isOpen={this.state.open_model === 'settings'}
           onDone={() => {
             this.setState({ open_model: 'none' });
           }}
