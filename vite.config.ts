@@ -28,6 +28,10 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
+      injectRegister: false,
+      strategies: "injectManifest",
+      srcDir: "ui",
+      filename: "sw.ts",
       manifest: {
         name: "BudgetBud - Track your budget seamlessly",
         short_name: "BudgetBud",
@@ -49,8 +53,8 @@ export default defineConfig({
           "with friends and family",
         categories: ["finance", "productivity"],
       },
-      workbox: {
-        globIgnores: ["*"],
+      injectManifest: {
+        globPatterns: ["**/*.{js,css,html,png,svg,ico}"],
       },
     }),
   ],

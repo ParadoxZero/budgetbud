@@ -23,8 +23,29 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import { Provider } from "react-redux";
 
-import { store } from "./store.ts";
+import { store, syncSlice } from "./store.ts";
 import "./main.css";
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(() => {
+      // Offline/unsupported first visit: app still works without precache/sync.
+    });
+  });
+  navigator.serviceWorker.addEventListener("message", (event) => {
+    const { syncId, status, error } = event.data ?? {};
+    if (!syncId) {
+      return;
+    }
+    if (status === "success") {
+      store.dispatch(syncSlice.actions.remove({ id: syncId }));
+    } else if (status === "failed") {
+      store.dispatch(
+        syncSlice.actions.markFailed({ id: syncId, error: error ?? "Sync failed" }),
+      );
+    }
+  });
+}
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
