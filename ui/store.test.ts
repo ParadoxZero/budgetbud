@@ -74,4 +74,15 @@ describe("syncSlice", () => {
     );
     expect(state.items).toEqual([makeItem({ id: "sync-2" })]);
   });
+
+  it("markSyncing flips a failed item back to syncing and clears the error", () => {
+    const initial = {
+      items: [makeItem({ status: "failed", error: "network error" })],
+    };
+    const state = syncSlice.reducer(
+      initial,
+      syncSlice.actions.markSyncing({ id: "sync-1" }),
+    );
+    expect(state.items[0]).toEqual(makeItem({ status: "syncing" }));
+  });
 });

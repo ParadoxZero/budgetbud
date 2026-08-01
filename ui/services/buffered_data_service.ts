@@ -32,7 +32,30 @@ import {
 import { DataService } from "./data_service";
 import { RemoteDataService } from "./remote_data_service";
 import { getCachedBudgetList, setCachedBudgetList } from "./indexeddb_cache";
-import { budgetSlice, store } from "../store";
+import { budgetSlice, store, syncSlice, SyncItem } from "../store";
+
+interface PendingSyncRequest {
+  url: string;
+  method: string;
+  body: string;
+}
+
+const pendingSyncRequests = new Map<string, PendingSyncRequest>();
+
+function fireSyncRequest(syncId: string, request: PendingSyncRequest): void {
+  fetch(request.url, {
+    method: request.method,
+    body: request.body,
+    headers: {
+      "Content-Type": "application/json",
+      "X-Sync-Id": syncId,
+    },
+  }).catch(() => {
+    // Intentionally swallowed: offline/failed sends are handled by the
+    // service worker's BackgroundSyncPlugin queue + postMessage outcome
+    // reporting (see ui/sw.ts), not by this promise.
+  });
+}
 
 export class BufferedDataService implements DataService {
   private remote = new RemoteDataService();
@@ -96,7 +119,51 @@ export class BufferedDataService implements DataService {
   }
 
   updateExpense(budget_id: string, expense: Expense): Promise<Budget> {
-    return this.remote.updateExpense(budget_id, expense);
+    const state = store.getState();
+    const index = state.budget.budget_list.findIndex(
+      (b: Budget) => b.id === budget_id,
+    );
+    if (index === -1) {
+      return this.remote.updateExpense(budget_id, expense);
+    }
+
+    const budget: Budget = structuredClone(state.budget.budget_list[index]);
+    const category = budget.categoryList.find(
+      (c) => c.id === expense.categoryId,
+    );
+    if (!category) {
+      return this.remote.updateExpense(budget_id, expense);
+    }
+
+    const optimisticExpense: Expense = { ...expense, id: -Date.now() };
+    category.expenseList.push(optimisticExpense);
+    category.lastUpdated = Date.now();
+    budget.last_updated = Date.now();
+
+    store.dispatch(budgetSlice.actions.updateCurrent(budget));
+    const updatedList = [...state.budget.budget_list];
+    updatedList[index] = budget;
+    void setCachedBudgetList(updatedList);
+
+    const syncId = crypto.randomUUID();
+    const syncItem: SyncItem = {
+      id: syncId,
+      type: "add",
+      description: `${optimisticExpense.title || "Expense"} - $${optimisticExpense.amount.toFixed(2)}`,
+      budgetId: budget_id,
+      status: "syncing",
+    };
+    store.dispatch(syncSlice.actions.enqueue(syncItem));
+
+    const request: PendingSyncRequest = {
+      url: `/api/Budget/${budget_id}/expense`,
+      method: "POST",
+      body: JSON.stringify(expense),
+    };
+    pendingSyncRequests.set(syncId, request);
+    fireSyncRequest(syncId, request);
+
+    return Promise.resolve(budget);
   }
 
   editExpense(budget_id: string, expense: Expense): Promise<Budget> {
@@ -108,7 +175,65 @@ export class BufferedDataService implements DataService {
     category_id: number,
     expenseId: number,
   ): Promise<Budget> {
-    return this.remote.deleteExpense(budget_id, category_id, expenseId);
+    const state = store.getState();
+    const index = state.budget.budget_list.findIndex(
+      (b: Budget) => b.id === budget_id,
+    );
+    if (index === -1) {
+      return this.remote.deleteExpense(budget_id, category_id, expenseId);
+    }
+
+    const budget: Budget = structuredClone(state.budget.budget_list[index]);
+    const category = budget.categoryList.find((c) => c.id === category_id);
+    if (!category) {
+      return this.remote.deleteExpense(budget_id, category_id, expenseId);
+    }
+
+    const removedExpense = category.expenseList.find(
+      (e) => e.id === expenseId,
+    );
+    category.expenseList = category.expenseList.filter(
+      (e) => e.id !== expenseId,
+    );
+    category.lastUpdated = Date.now();
+    budget.last_updated = Date.now();
+
+    store.dispatch(budgetSlice.actions.updateCurrent(budget));
+    const updatedList = [...state.budget.budget_list];
+    updatedList[index] = budget;
+    void setCachedBudgetList(updatedList);
+
+    const syncId = crypto.randomUUID();
+    const description = removedExpense
+      ? `Delete: ${removedExpense.title || "Expense"} - $${removedExpense.amount.toFixed(2)}`
+      : "Delete expense";
+    const syncItem: SyncItem = {
+      id: syncId,
+      type: "delete",
+      description,
+      budgetId: budget_id,
+      status: "syncing",
+    };
+    store.dispatch(syncSlice.actions.enqueue(syncItem));
+
+    const request: PendingSyncRequest = {
+      url: `/api/Budget/${budget_id}/category/${category_id}/expense/${expenseId}`,
+      method: "DELETE",
+      body: "",
+    };
+    pendingSyncRequests.set(syncId, request);
+    fireSyncRequest(syncId, request);
+
+    return Promise.resolve(budget);
+  }
+
+  retry(syncId: string): void {
+    const request = pendingSyncRequests.get(syncId);
+    if (!request) {
+      return;
+    }
+    store.dispatch(syncSlice.actions.markSyncing({ id: syncId }));
+    fireSyncRequest(syncId, request);
   }
 
   updateRecurring(budget_id: string, recurring: Recurring): Promise<Budget> {

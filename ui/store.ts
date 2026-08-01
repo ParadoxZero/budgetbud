@@ -132,6 +132,13 @@ export const syncSlice = createSlice({
     remove: (state, action: { payload: { id: string } }) => {
       state.items = state.items.filter((i) => i.id !== action.payload.id);
     },
+    markSyncing: (state, action: { payload: { id: string } }) => {
+      const item = state.items.find((i) => i.id === action.payload.id);
+      if (item) {
+        item.status = "syncing";
+        item.error = undefined;
+      }
+    },
   },
 });
 
