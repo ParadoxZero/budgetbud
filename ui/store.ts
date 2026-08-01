@@ -1,6 +1,6 @@
 /*
  * BudgetBud - Budgeting and Expense Tracker with WebUI and API server
- * Copyright (C) 2024  Sidhin S Thomas <sidhin.thomas@gmail.com>
+ * Copyright (C) 2026  Sidhin S Thomas <sidhin.thomas@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -17,6 +17,7 @@
  *
  * The source is available at: https://github.com/ParadoxZero/budgetbud
  */
+
 
 import { configureStore } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
@@ -102,6 +103,38 @@ export const budgetSlice = createSlice({
   },
 });
 
+export interface SyncItem {
+  id: string;
+  type: "add" | "delete";
+  description: string;
+  budgetId: string;
+  status: "syncing" | "failed";
+  error?: string;
+}
+
+export const syncSlice = createSlice({
+  name: "sync",
+  initialState: { items: [] as SyncItem[] },
+  reducers: {
+    enqueue: (state, action: { payload: SyncItem }) => {
+      state.items.push(action.payload);
+    },
+    markFailed: (
+      state,
+      action: { payload: { id: string; error: string } },
+    ) => {
+      const item = state.items.find((i) => i.id === action.payload.id);
+      if (item) {
+        item.status = "failed";
+        item.error = action.payload.error;
+      }
+    },
+    remove: (state, action: { payload: { id: string } }) => {
+      state.items = state.items.filter((i) => i.id !== action.payload.id);
+    },
+  },
+});
+
 // Action creators are generated for each case reducer function
 export const { navigation: navigate, to_category_view } =
   navigationSlice.actions;
@@ -112,5 +145,6 @@ export var store = configureStore({
     navigation: navigation_reducer,
     header: headerSlice.reducer,
     budget: budgetSlice.reducer,
+    sync: syncSlice.reducer,
   },
 });
