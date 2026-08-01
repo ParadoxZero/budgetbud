@@ -25,28 +25,36 @@ import {
   LogoutOutlined,
   PlusOutlined,
   SmileOutlined,
+  SyncOutlined,
   UserOutlined,
+  WarningOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
+  Badge,
   Button,
   Divider,
+  Drawer,
   Dropdown,
   Flex,
   Input,
+  List,
   MenuProps,
+  Popconfirm,
   Select,
   Space,
+  Tooltip,
   Typography,
 } from "antd";
 import React from "react";
 import { connect } from "react-redux";
-import { budgetSlice, headerSlice, navigate, store, View } from "../store";
+import { budgetSlice, headerSlice, navigate, store, syncSlice, SyncItem, View } from "../store";
 import { getDataService } from "../services/data_service";
 import { NumberToMonth } from "../utils";
 import { LinkBudgetModal } from "./link_budget_modal";
 import { NicknameModal } from "./nickname_modal";
 import { SettingsModal } from "./settings_modal";
+import { BufferedDataService } from "../services/buffered_data_service";
 
 export interface HeaderBudgetDetails {
   name: string;
@@ -63,11 +71,13 @@ export interface HeaderProps {
   budget_list: HeaderBudgetDetails[];
   selected_budget_index: number | null;
   show_title: boolean;
+  sync_items: SyncItem[];
 }
 
 interface HeaderState {
   is_budget_selector_visible: boolean;
   open_model: 'share' | 'rollover' | 'link' | 'edit_nickname' | 'settings' | 'none';
+  is_sync_drawer_open: boolean;
 }
 
 class Header extends React.Component<HeaderProps, HeaderState> {
@@ -91,6 +101,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
         gap="small"
       >
         {this.render_budget_selector()}
+        {this.render_sync_status()}
         {this.render_more_menu()}
       </Flex>
     );
@@ -101,6 +112,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
     this.state = {
       is_budget_selector_visible: false,
       open_model: 'none',
+      is_sync_drawer_open: false,
     };
   }
 
@@ -218,8 +230,82 @@ class Header extends React.Component<HeaderProps, HeaderState> {
     );
   }
 
+  render_sync_status() {
+    const items = this.props.sync_items;
+    if (items.length === 0) {
+      return null;
+    }
+    const hasFailed = items.some((i) => i.status === "failed");
+    const icon = hasFailed ? <WarningOutlined /> : <SyncOutlined spin />;
+    const tooltip = hasFailed
+      ? `${items.filter((i) => i.status === "failed").length} change(s) failed to sync`
+      : `Syncing ${items.length} change(s)`;
+
+    return (
+      <>
+        <Tooltip title={tooltip}>
+          <Badge dot={hasFailed} color={hasFailed ? "red" : "orange"}>
+            <Button
+              type="default"
+              shape="circle"
+              size="large"
+              icon={icon}
+              onClick={() => this.setState({ is_sync_drawer_open: true })}
+            />
+          </Badge>
+        </Tooltip>
+        <Drawer
+          title="Sync status"
+          open={this.state.is_sync_drawer_open}
+          onClose={() => this.setState({ is_sync_drawer_open: false })}
+        >
+          <List
+            dataSource={items}
+            renderItem={(item) => (
+              <List.Item
+                actions={
+                  item.status === "failed"
+                    ? [
+                        <a
+                          key="retry"
+                          onClick={() => {
+                            new BufferedDataService().retry(item.id);
+                          }}
+                        >
+                          Retry
+                        </a>,
+                        <Popconfirm
+                          key="discard"
+                          title="Discard this change?"
+                          description="This change will not be saved to the server."
+                          onConfirm={() =>
+                            store.dispatch(syncSlice.actions.remove({ id: item.id }))
+                          }
+                        >
+                          <a>Discard</a>
+                        </Popconfirm>,
+                      ]
+                    : []
+                }
+              >
+                <List.Item.Meta
+                  title={item.description}
+                  description={
+                    item.status === "failed"
+                      ? item.error ?? "Failed to sync"
+                      : "Syncing…"
+                  }
+                />
+              </List.Item>
+            )}
+          />
+        </Drawer>
+      </>
+    );
+  }
+
   render_more_menu() {
-   
+
     const items: MenuProps["items"] = [
       {
         label: "Settings",
@@ -273,6 +359,7 @@ function mapStateToProps(state: any): HeaderProps {
     title: state.header.title,
     isVisible: state.header.is_visible,
     show_title: state.header.show_title,
+    sync_items: state.sync.items,
   };
 }
 
