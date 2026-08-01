@@ -32,6 +32,8 @@ import { fetchData } from "./network_service";
 import { isDemoMode } from "../utils";
 import { LocalDataService } from "./local_data_service";
 import { RemoteDataService } from "./remote_data_service";
+import { BufferedDataService } from "./buffered_data_service";
+import { isBackgroundSyncEnabled } from "./settings_service";
 
 export interface DataService {
   getBudget(): Promise<Budget[]>;
@@ -63,9 +65,11 @@ export interface DataService {
 export function getDataService(): DataService {
   if (isDemoMode()) {
     return new LocalDataService();
-  } else {
-    return new RemoteDataService();
   }
+  if (isBackgroundSyncEnabled()) {
+    return new BufferedDataService();
+  }
+  return new RemoteDataService();
 }
 
 export async function RolloverBudget(budget_id: string): Promise<Budget> {
